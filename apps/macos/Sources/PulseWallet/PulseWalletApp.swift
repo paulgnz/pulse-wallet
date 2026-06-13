@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 @main
 struct PulseWalletApp: App {
@@ -6,12 +7,17 @@ struct PulseWalletApp: App {
     @State private var keyStore = KeyStore()
 
     var body: some Scene {
-        WindowGroup {
+        // Single window (not WindowGroup) — external pulsevm:// events reuse the
+        // existing window instead of spawning a new one on each Connect.
+        Window("PulseVM", id: "main") {
             RootView()
                 .environment(model)
                 .environment(keyStore)
                 .frame(minWidth: 880, minHeight: 560)
-                .onOpenURL { model.handleURL($0) }
+                .onOpenURL { url in
+                    NSApp.activate(ignoringOtherApps: true)   // bring wallet to front
+                    model.handleURL(url)
+                }
                 .sheet(item: Binding(get: { model.pendingRequest },
                                      set: { model.pendingRequest = $0 })) { request in
                     DappRequestSheet(request: request)
