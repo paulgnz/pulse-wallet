@@ -1,95 +1,95 @@
-2026-06-13 22:39:23 +0000 [MT] Initial pipeline context: <IDEDistributionProcessingPipelineContext: 0xb2c17d200; archive(resolved)="<IDEArchive: 0xb2c0a35d0>", distributionTask(resolved)="2", distributionDestination(resolved)="1", distributionMethod(resolved)="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team(resolved)="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
+2026-06-13 22:43:15 +0000 [MT] Initial pipeline context: <IDEDistributionProcessingPipelineContext: 0x91e909200; archive(resolved)="<IDEArchive: 0x91e0db8e0>", distributionTask(resolved)="2", distributionDestination(resolved)="1", distributionMethod(resolved)="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team(resolved)="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
 	Chain (12, self inclusive):
-	<IDEDistributionProcessingPipelineContext: 0xb2c17d200; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionProcessingPipelineContext: 0xb2c17cf00; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59e300; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59de00; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59db80; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59d900; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59ca00; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59c780; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59c500; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="<IDEProvisioningBasicTeam: 0xb2e5a8760; teamID='UKU2H2D5Z7', teamName='(null)'>">
-	<IDEDistributionContext: 0xb2e59c280; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="(null)">
-	<IDEDistributionContext: 0xb2e59c000; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0xb2c877d00>", team="(null)">
-	<IDEDistributionContext: 0x100de7420; archive = "<IDEArchive: 0xb2c0a35d0>", distributionMethod="(null)", team="(null)">
-</IDEDistributionProcessingPipelineContext: 0xb2c17d200>
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionCreateDestRootStep
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionCopyItemStep
-2026-06-13 22:39:23 +0000 [MT] Running /usr/bin/ditto '-V' '/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app' '/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app'
-2026-06-13 22:39:23 +0000  >>> Copying /Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app 
-2026-06-13 22:39:23 +0000  copying file ./Contents/_CodeSignature/CodeResources ... 
-2026-06-13 22:39:23 +0000  2672 bytes for ./Contents/_CodeSignature/CodeResources
-2026-06-13 22:39:23 +0000  copying file ./Contents/MacOS/PulseVM ... 
-2026-06-13 22:39:23 +0000  4343952 bytes for ./Contents/MacOS/PulseVM
-2026-06-13 22:39:23 +0000  copying file ./Contents/Resources/AppIcon.icns ... 
-2026-06-13 22:39:23 +0000  64274 bytes for ./Contents/Resources/AppIcon.icns
-2026-06-13 22:39:23 +0000  copying file ./Contents/Resources/Assets.car ... 
-2026-06-13 22:39:23 +0000  445000 bytes for ./Contents/Resources/Assets.car
-2026-06-13 22:39:23 +0000  copying file ./Contents/Info.plist ... 
-2026-06-13 22:39:23 +0000  1932 bytes for ./Contents/Info.plist
-2026-06-13 22:39:23 +0000  copying file ./Contents/PkgInfo ... 
-2026-06-13 22:39:23 +0000  8 bytes for ./Contents/PkgInfo
-2026-06-13 22:39:23 +0000 [MT] /usr/bin/ditto exited with 0
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionEmbedProfileStep
-2026-06-13 22:39:23 +0000 [MT] Skipping profile for item: <IDEDistributionItem: 0xb2c1151a0; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0xb2c0f33c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0xb2c115140; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0xb2c047d80; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
+	<IDEDistributionProcessingPipelineContext: 0x91e909200; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionProcessingPipelineContext: 0x91e908f00; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e6580; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e6080; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e5e00; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e5b80; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e4c80; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e4a00; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e4780; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="<IDEProvisioningBasicTeam: 0x91f4ec360; teamID='UKU2H2D5Z7', teamName='(null)'>">
+	<IDEDistributionContext: 0x91f4e4500; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="(null)">
+	<IDEDistributionContext: 0x91f4e4280; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x91e5bfc60>", team="(null)">
+	<IDEDistributionContext: 0x102c2cc10; archive = "<IDEArchive: 0x91e0db8e0>", distributionMethod="(null)", team="(null)">
+</IDEDistributionProcessingPipelineContext: 0x91e909200>
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionCreateDestRootStep
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionCopyItemStep
+2026-06-13 22:43:15 +0000 [MT] Running /usr/bin/ditto '-V' '/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app' '/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app'
+2026-06-13 22:43:15 +0000  >>> Copying /Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app 
+2026-06-13 22:43:15 +0000  copying file ./Contents/_CodeSignature/CodeResources ... 
+2026-06-13 22:43:15 +0000  2672 bytes for ./Contents/_CodeSignature/CodeResources
+2026-06-13 22:43:15 +0000  copying file ./Contents/MacOS/PulseVM ... 
+2026-06-13 22:43:15 +0000  4344240 bytes for ./Contents/MacOS/PulseVM
+2026-06-13 22:43:15 +0000  copying file ./Contents/Resources/AppIcon.icns ... 
+2026-06-13 22:43:15 +0000  64274 bytes for ./Contents/Resources/AppIcon.icns
+2026-06-13 22:43:15 +0000  copying file ./Contents/Resources/Assets.car ... 
+2026-06-13 22:43:15 +0000  445000 bytes for ./Contents/Resources/Assets.car
+2026-06-13 22:43:15 +0000  copying file ./Contents/Info.plist ... 
+2026-06-13 22:43:15 +0000  1932 bytes for ./Contents/Info.plist
+2026-06-13 22:43:15 +0000  copying file ./Contents/PkgInfo ... 
+2026-06-13 22:43:15 +0000  8 bytes for ./Contents/PkgInfo
+2026-06-13 22:43:15 +0000 [MT] /usr/bin/ditto exited with 0
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionEmbedProfileStep
+2026-06-13 22:43:15 +0000 [MT] Skipping profile for item: <IDEDistributionItem: 0x91e168d20; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0x91e13f000:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x91e168cc0; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x91e1a8000; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
     "1.2.840.113635.100.6.1.12",
     "1.2.840.113635.100.6.1.2"
 ), issueDate='2025-12-12 07:31:02 +0000''>', entitlements='{
-}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0xb2c114a20:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'>
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionInfoPlistStep
-2026-06-13 22:39:23 +0000 [MT] Skipping step: IDEDistributionInfoPlistStep because it said so
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionAppThinningPlistStep
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionSymbolsStep
-2026-06-13 22:39:23 +0000 [MT] Skipping step: IDEDistributionSymbolsStep because it said so
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionAppThinningStep
-2026-06-13 22:39:23 +0000 [MT] Skipping step: IDEDistributionAppThinningStep because it said so
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionArchThinningStep
-2026-06-13 22:39:23 +0000 [MT] Archs to thin for item /Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app are []
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionODRStep
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionStripXattrsStep
-2026-06-13 22:39:23 +0000 [MT] Skipping stripping extended attributes because the codesign step will strip them.
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionCodesignStep
-2026-06-13 22:39:23 +0000 [MT] Entitlements for <IDEDistributionItem: 0xb2c1151a0; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0xb2c0f33c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0xb2c115140; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0xb2c047d80; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
+}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0x91e1686c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'>
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionInfoPlistStep
+2026-06-13 22:43:15 +0000 [MT] Skipping step: IDEDistributionInfoPlistStep because it said so
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionAppThinningPlistStep
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionSymbolsStep
+2026-06-13 22:43:15 +0000 [MT] Skipping step: IDEDistributionSymbolsStep because it said so
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionAppThinningStep
+2026-06-13 22:43:15 +0000 [MT] Skipping step: IDEDistributionAppThinningStep because it said so
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionArchThinningStep
+2026-06-13 22:43:15 +0000 [MT] Archs to thin for item /Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app are []
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionODRStep
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionStripXattrsStep
+2026-06-13 22:43:15 +0000 [MT] Skipping stripping extended attributes because the codesign step will strip them.
+2026-06-13 22:43:15 +0000 [MT] Processing step: IDEDistributionCodesignStep
+2026-06-13 22:43:15 +0000 [MT] Entitlements for <IDEDistributionItem: 0x91e168d20; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0x91e13f000:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x91e168cc0; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x91e1a8000; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
     "1.2.840.113635.100.6.1.12",
     "1.2.840.113635.100.6.1.2"
 ), issueDate='2025-12-12 07:31:02 +0000''>', entitlements='{
-}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0xb2c114a20:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'>: {
+}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0x91e1686c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'>: {
 }
-2026-06-13 22:39:23 +0000 [MT] Associated App Clip Identifiers Filter: Skipping because "com.apple.developer.associated-appclip-app-identifiers" is not present
-2026-06-13 22:39:23 +0000 [MT] Entitlements for <IDEDistributionItem: 0xb2c1151a0; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0xb2c0f33c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0xb2c115140; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0xb2c046dc0; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
+2026-06-13 22:43:15 +0000 [MT] Associated App Clip Identifiers Filter: Skipping because "com.apple.developer.associated-appclip-app-identifiers" is not present
+2026-06-13 22:43:15 +0000 [MT] Entitlements for <IDEDistributionItem: 0x91e168d20; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0x91e13f000:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x91e168cc0; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x91e1aa280; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
     "1.2.840.113635.100.6.1.12",
     "1.2.840.113635.100.6.1.2"
 ), issueDate='2025-12-12 07:31:02 +0000''>', entitlements='{
-}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0xb2c114a20:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'> are: {
+}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0x91e1686c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'> are: {
 }
-2026-06-13 22:39:23 +0000 [MT] Writing entitlements for <IDEDistributionItem: 0xb2c1151a0; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0xb2c0f33c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0xb2c115140; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0xb2c046dc0; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
+2026-06-13 22:43:15 +0000 [MT] Writing entitlements for <IDEDistributionItem: 0x91e168d20; bundleID='dev.pulsevm.wallet', path='<DVTFilePath:0x91e13f000:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x91e168cc0; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x91e1aa280; name='Apple Development: Paul Grey (DBEZN7JVFW)', hash='766B7624B38371A66F4BBF979F6C1DE15A09A38F', serialNumber='189EC5CD75D81FB7193BB5BBD7399BD3', certificateKinds='(
     "1.2.840.113635.100.6.1.12",
     "1.2.840.113635.100.6.1.2"
 ), issueDate='2025-12-12 07:31:02 +0000''>', entitlements='{
-}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0xb2c114a20:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'> to: /var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/entitlements~~~cbiqy6
-2026-06-13 22:39:23 +0000 [MT] invoking codesign: <NSConcreteTask: 0xb2c3cec60; launchPath='/usr/bin/codesign', arguments='(
+}', teamID='UKU2H2D5Z7', identifier='dev.pulsevm.wallet', executablePath='<DVTFilePath:0x91e1686c0:'/Users/paulgrey/dev/pulse-wallet/apps/macos/build/release/PulseVM.xcarchive/Products/Applications/PulseVM.app/Contents/MacOS/PulseVM'>', hardenedRuntime='1'>'> to: /var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/entitlements~~~f7E0Gf
+2026-06-13 22:43:15 +0000 [MT] invoking codesign: <NSConcreteTask: 0x91e3f94a0; launchPath='/usr/bin/codesign', arguments='(
     "-f",
     "-s",
     E6C895EE38D21EE5BFB361CAE9CE523FD084D7E4,
     "--entitlements",
-    "/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/entitlements~~~cbiqy6",
+    "/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/entitlements~~~f7E0Gf",
     "--requirements",
     "=designated => anchor apple generic  and identifier \"$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"UKU2H2D5Z7\" ))",
     "--preserve-metadata=identifier,flags,runtime,launch-constraints,library-constraints",
     "--generate-entitlement-der",
     "--strip-disallowed-xattrs",
     "-vvv",
-    "/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app"
+    "/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app"
 )'>
-2026-06-13 22:39:23 +0000 [MT] codesign output: /var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app: replacing existing signature
-/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app: signed app bundle with Mach-O universal (x86_64 arm64) [dev.pulsevm.wallet]
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionZipODRItemStep
-2026-06-13 22:39:23 +0000 [MT] Skipping step: IDEDistributionZipODRItemStep because it said so
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionSkipPackagingStep
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionAppStoreInformationStep
-2026-06-13 22:39:23 +0000 [MT] Skipping step: IDEDistributionAppStoreInformationStep because it said so
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionGenerateProcessedDistributionItems
-2026-06-13 22:39:23 +0000 [MT] IDEDistributionItem init <DVTFilePath:0xb2c2b4d80:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app'>
-2026-06-13 22:39:23 +0000 [MT] [OPTIONAL] Didn't find embedded provisioning profile for <DVTFilePath:0xb2c2b4d80:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app'>: Error Domain=NSCocoaErrorDomain Code=4 "No file at <DVTFilePath:0xb2bc328b0:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app/Contents/embedded.provisionprofile'>" UserInfo={NSLocalizedDescription=No file at <DVTFilePath:0xb2bc328b0:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~4fhVyf/Root/Applications/PulseVM.app/Contents/embedded.provisionprofile'>}
-2026-06-13 22:39:23 +0000 [MT] Processing step: IDEDistributionCreateManifestStep
-2026-06-13 22:39:23 +0000 [MT] Skipping step: IDEDistributionCreateManifestStep because it said so
+2026-06-13 22:43:16 +0000 [MT] codesign output: /var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app: replacing existing signature
+/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app: signed app bundle with Mach-O universal (x86_64 arm64) [dev.pulsevm.wallet]
+2026-06-13 22:43:16 +0000 [MT] Processing step: IDEDistributionZipODRItemStep
+2026-06-13 22:43:16 +0000 [MT] Skipping step: IDEDistributionZipODRItemStep because it said so
+2026-06-13 22:43:16 +0000 [MT] Processing step: IDEDistributionSkipPackagingStep
+2026-06-13 22:43:16 +0000 [MT] Processing step: IDEDistributionAppStoreInformationStep
+2026-06-13 22:43:16 +0000 [MT] Skipping step: IDEDistributionAppStoreInformationStep because it said so
+2026-06-13 22:43:16 +0000 [MT] Processing step: IDEDistributionGenerateProcessedDistributionItems
+2026-06-13 22:43:16 +0000 [MT] IDEDistributionItem init <DVTFilePath:0x91e2e8840:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app'>
+2026-06-13 22:43:16 +0000 [MT] [OPTIONAL] Didn't find embedded provisioning profile for <DVTFilePath:0x91e2e8840:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app'>: Error Domain=NSCocoaErrorDomain Code=4 "No file at <DVTFilePath:0x91dc72370:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app/Contents/embedded.provisionprofile'>" UserInfo={NSLocalizedDescription=No file at <DVTFilePath:0x91dc72370:'/var/folders/rk/m8v3c07j7hv6znyby9w2by080000gn/T/XcodeDistPipeline.~~~NNKsEb/Root/Applications/PulseVM.app/Contents/embedded.provisionprofile'>}
+2026-06-13 22:43:16 +0000 [MT] Processing step: IDEDistributionCreateManifestStep
+2026-06-13 22:43:16 +0000 [MT] Skipping step: IDEDistributionCreateManifestStep because it said so

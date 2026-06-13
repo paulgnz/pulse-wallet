@@ -37,11 +37,15 @@ echo "▶︎ Building the Rust core (universal)…"
 if [ -x ../../scripts/build-core-macos.sh ]; then (cd ../.. && scripts/build-core-macos.sh)
 else echo "  (skipping; using existing Vendor/libpulse_wallet_core.a)"; fi
 
-echo "▶︎ Archiving Release…"
+# Monotonically increasing build number (git commit count) so every DMG is
+# recognized as newer than the last — clean updates for recipients.
+BUILD_NO=$(git rev-list --count HEAD 2>/dev/null || echo 1)
+echo "▶︎ Archiving Release (build $BUILD_NO)…"
 rm -rf "$ARCHIVE" "$EXPORT_DIR"
 xcodebuild -project PulseWallet.xcodeproj -scheme "$SCHEME" -configuration Release \
     -archivePath "$ARCHIVE" archive \
     DEVELOPMENT_TEAM=UKU2H2D5Z7 \
+    CURRENT_PROJECT_VERSION="$BUILD_NO" \
     -quiet
 
 echo "▶︎ Exporting with Developer ID…"
