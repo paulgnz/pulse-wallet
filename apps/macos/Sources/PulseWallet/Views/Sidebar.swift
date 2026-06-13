@@ -43,7 +43,11 @@ private struct BrandHeader: View {
 /// create an account.
 private struct AccountSwitcher: View {
     @Environment(AppModel.self) private var model
+    @Environment(KeyStore.self) private var keyStore
     @State private var showAddAccount = false
+
+    /// Permissions the active key can sign for on the current account.
+    private var authorizedPermissions: [String] { model.permissions(forKey: keyStore.activeKey?.pubKey) }
 
     var body: some View {
         Menu {
@@ -51,6 +55,15 @@ private struct AccountSwitcher: View {
                 ForEach(model.accountNames, id: \.self) { name in
                     Button { model.switchAccount(name) } label: {
                         Label(name, systemImage: name == model.accountName ? "checkmark" : "person.crop.circle")
+                    }
+                }
+            }
+            if !authorizedPermissions.isEmpty {
+                Section("Sign with permission") {
+                    ForEach(authorizedPermissions, id: \.self) { perm in
+                        Button { model.permissionName = perm } label: {
+                            Label("@\(perm)", systemImage: perm == model.permissionName ? "checkmark" : "key")
+                        }
                     }
                 }
             }
@@ -88,6 +101,9 @@ private struct AccountSwitcher: View {
         .buttonStyle(.plain)
         .padding(12)
         .sheet(isPresented: $showAddAccount) { AddAccountSheet() }
+        .task(id: "\(model.accountName)\(model.account?.accountName ?? "")\(keyStore.activeKeyID ?? "")") {
+            model.selectBestPermission(forKey: keyStore.activeKey?.pubKey)
+        }
     }
 }
 

@@ -119,6 +119,20 @@ final class AppModel {
 
     var coreSymbol: String? { account?.coreSymbol }
 
+    /// Permissions on the loaded account that `pub` is a key of (e.g. ["owner","active"]).
+    func permissions(forKey pub: String?) -> [String] {
+        guard let pub, !pub.isEmpty, let perms = account?.permissions else { return [] }
+        return perms.filter { p in p.requiredAuth.keys.contains { $0.key == pub } }.map(\.permName)
+    }
+
+    /// Default `permissionName` to a permission the active key actually controls.
+    func selectBestPermission(forKey pub: String?) {
+        let authorized = permissions(forKey: pub)
+        if !authorized.contains(permissionName) {
+            permissionName = authorized.first ?? "active"
+        }
+    }
+
     func explorerAccountURL(_ name: String) -> URL? { networks.active.accountURL(name) }
     func explorerTxURL(_ txid: String) -> URL? { networks.active.txURL(txid) }
 

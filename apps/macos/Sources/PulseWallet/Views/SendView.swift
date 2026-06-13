@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SendView: View {
     @Environment(AppModel.self) private var model
+    @Environment(KeyStore.self) private var keyStore
 
     @State private var recipient = ""
     @State private var amount = ""
@@ -9,8 +10,30 @@ struct SendView: View {
     @State private var memo = ""
     @State private var showingConfirm = false
 
+    /// A held key whose pubkey is in the account's active permission.
+    private var canSign: Bool {
+        guard let perms = model.account?.permissions else { return false }
+        let active = Set(perms.first { $0.permName == model.permissionName }?
+            .requiredAuth.keys.map(\.key) ?? [])
+        return keyStore.keys.contains { active.contains($0.pubKey) }
+    }
+    /// Antelope account name: 1–12 chars of [.a-z1-5].
+    private var recipientValid: Bool {
+        let r = recipient.trimmingCharacters(in: .whitespaces)
+        return !r.isEmpty && r.count <= 12 && r.allSatisfy { "abcdefghijklmnopqrstuvwxyz12345.".contains($0) }
+    }
+    private var amountValue: Decimal { Decimal(string: amount.trimmingCharacters(in: .whitespaces)) ?? 0 }
+    private var balance: Decimal { model.assets.first { $0.symbol == symbol }?.amount ?? 0 }
+    private var overBalance: Bool { amountValue > balance }
+
+    private var validationError: String? {
+        if !canSign { return "Watch-only account — add a key that controls \(model.accountName) to send." }
+        if !recipient.isEmpty && !recipientValid { return "Invalid account name (use a–z, 1–5, '.', ≤12 chars)." }
+        if amountValue > 0 && overBalance { return "Amount exceeds your \(symbol) balance (\(balance))." }
+        return nil
+    }
     private var canSend: Bool {
-        !recipient.isEmpty && (Double(amount) ?? 0) > 0
+        canSign && recipientValid && amountValue > 0 && !overBalance && !symbol.isEmpty
     }
 
     var body: some View {
@@ -31,6 +54,8 @@ struct SendView: View {
                                 TextField("0.0000", text: $amount)
                                     .textFieldStyle(.plain)
                                     .font(.title3.monospacedDigit())
+                                Button("Max") { amount = "\(NSDecimalNumber(decimal: balance))" }
+                                    .buttonStyle(.link).font(.caption)
                                 Picker("", selection: $symbol) {
                                     if symbol.isEmpty || !model.assets.contains(where: { $0.symbol == symbol }) {
                                         Text("—").tag("")
@@ -42,6 +67,8 @@ struct SendView: View {
                                 .fixedSize()
                             }
                         }
+                        Text("Available: \(NSDecimalNumber(decimal: balance)) \(symbol)")
+                            .font(.caption2).foregroundStyle(.secondary)
 
                         field("Memo (optional)") {
                             TextField("reference", text: $memo)
@@ -50,6 +77,11 @@ struct SendView: View {
                     }
                 }
 
+                if let err = validationError {
+                    Label(err, systemImage: "exclamationmark.triangle")
+                        .font(.caption).foregroundStyle(Brand.warn)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 PrimaryButton(title: "Review & Sign", systemImage: "signature") {
                     showingConfirm = true
                 }

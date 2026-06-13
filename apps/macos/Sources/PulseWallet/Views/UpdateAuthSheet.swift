@@ -78,7 +78,7 @@ struct UpdateAuthSheet: View {
             do {
                 let tx = try model.core.buildUpdateAuth(
                     systemContract: "pulse", account: me, permission: permission, parent: parent,
-                    threshold: th, keys: keyStr, authActor: me, authPerm: "owner",
+                    threshold: th, keys: keyStr, authActor: me, authPerm: model.permissionName,
                     chainId: ctx.chainId, refBlockNum: ctx.refBlockNum,
                     refBlockPrefix: ctx.refBlockPrefix, expiration: ctx.expiration)
                 guard let preImage = Data(hexString: tx.preimage) else { status = "bad preimage"; working = false; return }

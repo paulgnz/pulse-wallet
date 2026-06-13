@@ -91,8 +91,9 @@ struct DappRequestSheet: View {
             do {
                 switch request {
                 case .login(let cb):
-                    // Login returns the account (and active pubkey if one is held).
+                    // Login returns the account, the permission the key controls, and its pubkey.
                     callback(cb, items: ["account": model.accountName,
+                                         "permission": model.permissionName,
                                          "key": keyStore.activeKey?.pubKey ?? ""])
                 case .sign(let chainId, let packed, _, let cb):
                     let material = try model.core.signingMaterial(packedTrx: packed, chainId: chainId)

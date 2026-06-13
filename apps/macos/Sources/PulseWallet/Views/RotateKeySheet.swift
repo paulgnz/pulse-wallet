@@ -238,7 +238,7 @@ struct RotateKeySheet: View {
             do {
                 let tx = try model.core.buildUpdateAuth(
                     systemContract: "pulse", account: me, permission: perm, parent: par,
-                    threshold: 1, keys: "\(nk.pubKey)@1", authActor: me, authPerm: "owner",
+                    threshold: 1, keys: "\(nk.pubKey)@1", authActor: me, authPerm: model.permissionName,
                     chainId: ctx.chainId, refBlockNum: ctx.refBlockNum,
                     refBlockPrefix: ctx.refBlockPrefix, expiration: ctx.expiration)
                 guard let preImage = Data(hexString: tx.preimage) else { status = "bad preimage"; working = false; return }
