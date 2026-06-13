@@ -39,7 +39,7 @@ struct WelcomeSheet: View {
             }
         }
         .padding(28).frame(width: 460, height: 560)
-        .background(Brand.navy.gradient.opacity(0.6))
+        .background(BrandBackground())
     }
 
     private func bullet(_ icon: String, _ title: String, _ body: String) -> some View {

@@ -44,7 +44,7 @@ struct UpdateAuthSheet: View {
             }
         }
         .padding(24).frame(width: 480, height: 520)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
         .onAppear { if !loaded { prefillFromChain(); loaded = true } }
     }
 

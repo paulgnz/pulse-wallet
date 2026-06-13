@@ -164,6 +164,9 @@ private struct ProposeSheet: View {
                 group("Amount") { TextField("0.0000", text: $amount) }
                 group("Token") {
                     Picker("", selection: $symbol) {
+                        if symbol.isEmpty || !model.assets.contains(where: { $0.symbol == symbol }) {
+                            Text("—").tag("")
+                        }
                         ForEach(model.assets) { Text($0.symbol).tag($0.symbol) }
                     }.labelsHidden()
                 }.fixedSize()
@@ -180,7 +183,7 @@ private struct ProposeSheet: View {
             }
         }
         .padding(24).frame(width: 460, height: 540)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
         .onAppear { if symbol.isEmpty { symbol = model.primaryAsset?.symbol ?? "" } }
     }
 

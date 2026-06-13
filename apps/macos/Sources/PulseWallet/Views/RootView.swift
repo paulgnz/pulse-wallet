@@ -33,7 +33,7 @@ struct RootView: View {
                     }
                 }
         }
-        .background(Brand.navy.gradient.opacity(0.35))
+        .background(BrandBackground())
         .overlay { if model.isLocked { LockScreen() } }
         .animation(.smooth, value: model.isLocked)
         .task { await model.refresh() }

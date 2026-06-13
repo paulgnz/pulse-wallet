@@ -27,6 +27,23 @@ extension Color {
     }
 }
 
+/// Adaptive app background — navy in dark, soft blue-white in light.
+struct BrandBackground: View {
+    @Environment(\.colorScheme) private var scheme
+    var body: some View {
+        Group {
+            if scheme == .dark {
+                LinearGradient(colors: [Brand.navy, Color(hex: 0x131D3F)],
+                               startPoint: .top, endPoint: .bottom)
+            } else {
+                LinearGradient(colors: [Color(hex: 0xF4F6FE), Color(hex: 0xE7ECFC)],
+                               startPoint: .top, endPoint: .bottom)
+            }
+        }
+        .ignoresSafeArea()
+    }
+}
+
 /// Layout constants — generous spacing per macOS Tahoe guidance.
 enum Metric {
     static let corner: CGFloat = 16

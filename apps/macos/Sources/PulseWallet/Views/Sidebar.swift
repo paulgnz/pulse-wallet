@@ -118,6 +118,6 @@ private struct AddAccountSheet: View {
             }
         }
         .padding(24).frame(width: 420, height: 300)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 }

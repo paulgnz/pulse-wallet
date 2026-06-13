@@ -62,7 +62,7 @@ struct ExportKeySheet: View {
             }
         }
         .padding(24).frame(width: 460, height: 400)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 
     private func reveal() {

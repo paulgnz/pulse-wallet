@@ -32,6 +32,9 @@ struct SendView: View {
                                     .textFieldStyle(.plain)
                                     .font(.title3.monospacedDigit())
                                 Picker("", selection: $symbol) {
+                                    if symbol.isEmpty || !model.assets.contains(where: { $0.symbol == symbol }) {
+                                        Text("—").tag("")
+                                    }
                                     ForEach(model.assets) { Text($0.symbol).tag($0.symbol) }
                                 }
                                 .labelsHidden()
@@ -114,7 +117,7 @@ struct SignSheet: View {
         }
         .padding(24)
         .frame(width: 420, height: 500)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 
     private var header: some View {

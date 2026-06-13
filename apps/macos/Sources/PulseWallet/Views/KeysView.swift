@@ -184,7 +184,7 @@ private struct NewEnclaveKeySheet: View {
             }
         }
         .padding(24).frame(width: 420, height: 320)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 }
 
@@ -226,7 +226,7 @@ private struct ImportKeySheet: View {
             }
         }
         .padding(24).frame(width: 460, height: 400)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 
     private func runImport() {
@@ -283,7 +283,7 @@ private struct DeleteKeySheet: View {
             }
         }
         .padding(24).frame(width: 460, height: 400)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 
     private func confirmDelete() {

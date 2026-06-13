@@ -11,7 +11,6 @@ struct PulseWalletApp: App {
                 .environment(model)
                 .environment(keyStore)
                 .frame(minWidth: 880, minHeight: 560)
-                .preferredColorScheme(.dark)   // deliberate navy/glass aesthetic
                 .onOpenURL { model.handleURL($0) }
                 .sheet(item: Binding(get: { model.pendingRequest },
                                      set: { model.pendingRequest = $0 })) { request in

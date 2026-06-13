@@ -53,7 +53,7 @@ struct DappRequestSheet: View {
             actions
         }
         .padding(24).frame(width: 420, height: 380)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
     }
 
     private var title: String {

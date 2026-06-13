@@ -150,7 +150,7 @@ private struct NetworkEditSheet: View {
             }
         }
         .padding(24).frame(width: 480, height: 440)
-        .background(Brand.navy.gradient.opacity(0.5))
+        .background(BrandBackground())
         .onAppear {
             if let n = network {
                 label = n.label; rpc = n.rpc; hyperion = n.hyperion
