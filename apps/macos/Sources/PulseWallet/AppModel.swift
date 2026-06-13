@@ -197,15 +197,20 @@ final class AppModel {
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
         func q(_ name: String) -> String? { items.first { $0.name == name }?.value }
         let callback = q("callback").flatMap(URL.init(string:))
+        // Relay return target (seamless, no browser tab) when the dapp supplies one.
+        let relay: RelayTarget? = {
+            guard let base = q("relay"), let rid = q("rid"), !base.isEmpty, !rid.isEmpty else { return nil }
+            return RelayTarget(base: base, rid: rid)
+        }()
         switch url.host {
         case "login":
-            pendingRequest = PendingRequest(request: .login(callback: callback))
+            pendingRequest = PendingRequest(request: .login(callback: callback), relay: relay)
         case "sign":
             guard let packed = q("packed_trx") else { return }
             let cid = q("chain_id") ?? networks.active.chainId ?? chainInfo?.chainId ?? ""
             // Query values use form-encoding where '+' means space.
             let summary = (q("summary") ?? "External transaction").replacingOccurrences(of: "+", with: " ")
-            pendingRequest = PendingRequest(request: .sign(chainId: cid, packedTrx: packed, summary: summary, callback: callback))
+            pendingRequest = PendingRequest(request: .sign(chainId: cid, packedTrx: packed, summary: summary, callback: callback), relay: relay)
         default:
             break
         }

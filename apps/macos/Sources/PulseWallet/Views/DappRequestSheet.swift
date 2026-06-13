@@ -20,6 +20,13 @@ enum DappRequest: Identifiable, Sendable {
     }
 }
 
+/// A relay return target — when present, the wallet POSTs the result to
+/// `<base>/result/<rid>` instead of opening a browser callback tab (seamless).
+struct RelayTarget: Sendable {
+    let base: String
+    let rid: String
+}
+
 /// Wraps a request with a unique id so each `.sheet(item:)` presentation is a
 /// fresh view. Without this, two logins share the same DappRequest.id, and
 /// SwiftUI reuses the previous sheet's @State — showing a stale "Approved"
@@ -27,6 +34,7 @@ enum DappRequest: Identifiable, Sendable {
 struct PendingRequest: Identifiable, Sendable {
     let id = UUID()
     let request: DappRequest
+    var relay: RelayTarget? = nil
 }
 
 /// Approval UI for a dapp login/sign request — the desktop end of the SDK.
@@ -36,6 +44,7 @@ struct DappRequestSheet: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     let request: DappRequest
+    var relay: RelayTarget? = nil
 
     @State private var working = false
     @State private var error: String?
@@ -195,11 +204,28 @@ struct DappRequestSheet: View {
     }
 
     private func callback(_ url: URL?, items: [String: String]) {
+        // Seamless path: POST the result to the relay (no browser tab). The dapp
+        // polls the relay for it. Falls back to a browser callback if no relay.
+        if let relay {
+            postToRelay(relay, items: items)
+            return
+        }
         guard let url, var comps = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
         var q = comps.queryItems ?? []
         q.append(contentsOf: items.map { URLQueryItem(name: $0.key, value: $0.value) })
         comps.queryItems = q
         if let final = comps.url { NSWorkspace.shared.open(final) }
+    }
+
+    private func postToRelay(_ relay: RelayTarget, items: [String: String]) {
+        let base = relay.base.hasSuffix("/") ? String(relay.base.dropLast()) : relay.base
+        guard let url = URL(string: "\(base)/result/\(relay.rid)"),
+              let body = try? JSONSerialization.data(withJSONObject: items) else { return }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "content-type")
+        req.httpBody = body
+        URLSession.shared.dataTask(with: req).resume()
     }
 
     private func row(_ k: String, _ v: String) -> some View {
