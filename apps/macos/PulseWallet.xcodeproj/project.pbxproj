@@ -66,7 +66,7 @@
 		7F4AC6D391E73F3C113B9068 /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
 		988744519E80C7631A1550B1 /* KeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysView.swift; sourceTree = "<group>"; };
 		9BABA36B61663BE346CB123A /* KeyToolkit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyToolkit.swift; sourceTree = "<group>"; };
-		B031CB39F049EBE1AE8FB4F9 /* PulseVM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseVM.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1981660F714156CB20D4B81 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		BCE2872F95290C0C2024BCB1 /* Biometrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometrics.swift; sourceTree = "<group>"; };
 		CFE7891077FC4FDC8B7002AE /* Hyperion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hyperion.swift; sourceTree = "<group>"; };
@@ -77,14 +77,14 @@
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_249A9940-7107-40D0-A4AC-CC2407F07C81" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		15B50EBACB7F935BCC464F48 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B031CB39F049EBE1AE8FB4F9 /* PulseVM.app */,
+				B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,7 +95,6 @@
 				38573CD364D78478731A93FC /* Resources */,
 				D5B7171F1B2011B539E0D41B /* Sources */,
 				15B50EBACB7F935BCC464F48 /* Products */,
-				59AAD2822FDD6471003826BD /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -153,14 +152,6 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		59AAD2822FDD6471003826BD /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				"TEMP_249A9940-7107-40D0-A4AC-CC2407F07C81" /* Signing.xcconfig */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		A681EFCEBC3738C1E176A3BA /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,6 +193,14 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
+		"TEMP_E64A9D37-919B-4B6E-BD72-257179B4E926" /* macos */ = {
+			isa = PBXGroup;
+			children = (
+				"TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */,
+			);
+			path = macos;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -220,7 +219,7 @@
 			packageProductDependencies = (
 			);
 			productName = PulseWallet;
-			productReference = B031CB39F049EBE1AE8FB4F9 /* PulseVM.app */;
+			productReference = B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -383,12 +382,11 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_249A9940-7107-40D0-A4AC-CC2407F07C81" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Resources/PulseWallet.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_PREVIEWS = YES;
 				HEADER_SEARCH_PATHS = (
@@ -480,12 +478,11 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_249A9940-7107-40D0-A4AC-CC2407F07C81" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Resources/PulseWallet.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_PREVIEWS = YES;
 				HEADER_SEARCH_PATHS = (

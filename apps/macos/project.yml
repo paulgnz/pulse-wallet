@@ -23,6 +23,18 @@ settings:
     DEAD_CODE_STRIPPING: true
     ENABLE_USER_SCRIPT_SANDBOXING: true
 
+# Explicit shared scheme so `xcodegen generate` always produces one (otherwise
+# Xcode won't let you build until you create a scheme manually).
+schemes:
+  PulseWallet:
+    build:
+      targets:
+        PulseWallet: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
 targets:
   PulseWallet:
     type: application
