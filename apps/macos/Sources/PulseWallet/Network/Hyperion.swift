@@ -60,6 +60,24 @@ struct Hyperion: Sendable {
         return try decoder.decode(ActionsResponse.self, from: data).actions
     }
 
+    private struct KeyAccountsResponse: Decodable, Sendable { let accountNames: [String] }
+
+    /// Accounts whose permissions include `publicKey`.
+    func getKeyAccounts(_ publicKey: String) async throws -> [String] {
+        var comps = URLComponents(url: endpoint.appendingPathComponent("v2/state/get_key_accounts"),
+                                  resolvingAgainstBaseURL: false)!
+        comps.queryItems = [URLQueryItem(name: "public_key", value: publicKey)]
+        var req = URLRequest(url: comps.url!, timeoutInterval: 15)
+        req.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: req)
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            throw PulseRPC.Failure(message: "Hyperion HTTP \(http.statusCode)")
+        }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try decoder.decode(KeyAccountsResponse.self, from: data).accountNames
+    }
+
     /// All token balances held by `account`, across every contract.
     func getTokens(_ account: String) async throws -> [TokenBalance] {
         var comps = URLComponents(url: endpoint.appendingPathComponent("v2/state/get_tokens"),

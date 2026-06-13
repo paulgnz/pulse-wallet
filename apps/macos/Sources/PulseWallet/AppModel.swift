@@ -148,6 +148,11 @@ final class AppModel {
         Task { await refresh() }
     }
 
+    /// Accounts a public key can sign for (reverse lookup via Hyperion).
+    func keyAccounts(_ publicKey: String) async -> [String] {
+        (try? await hyperion?.getKeyAccounts(publicKey)) ?? []
+    }
+
     /// Broadcast a signed transaction; returns the tx id.
     func broadcast(signatures: [String], packedTrx: String) async throws -> String {
         guard let rpc else { throw PulseRPC.Failure(message: "Invalid endpoint") }

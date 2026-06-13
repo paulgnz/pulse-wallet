@@ -75,11 +75,13 @@ struct KeysView: View {
 }
 
 private struct KeyRow: View {
+    @Environment(AppModel.self) private var model
     let key: WalletKey
     let isActive: Bool
     var onUse: () -> Void
     var onDelete: () -> Void
     @State private var copied = false
+    @State private var accounts: [String] = []
 
     var body: some View {
         GlassCard(padding: 16) {
@@ -101,11 +103,24 @@ private struct KeyRow: View {
                     Text(key.pubKey)
                         .font(.caption.monospaced()).foregroundStyle(.secondary)
                         .textSelection(.enabled).lineLimit(1).truncationMode(.middle)
+                    if !accounts.isEmpty {
+                        Text("Signs for \(accounts.count): \(accounts.prefix(4).joined(separator: ", "))\(accounts.count > 4 ? "…" : "")")
+                            .font(.caption2).foregroundStyle(Brand.accent)
+                            .lineLimit(1).truncationMode(.tail)
+                    }
                 }
                 Spacer()
                 Menu {
                     Button("Copy public key") { copyPub() }
                     if !isActive { Button("Set as active") { onUse() } }
+                    if !accounts.isEmpty {
+                        Divider()
+                        Menu("Watch account") {
+                            ForEach(accounts.prefix(20), id: \.self) { name in
+                                Button(name) { model.addAccount(name) }
+                            }
+                        }
+                    }
                     Divider()
                     Button("Delete…", role: .destructive) { onDelete() }
                 } label: {
@@ -115,6 +130,7 @@ private struct KeyRow: View {
                 .fixedSize()
             }
         }
+        .task(id: key.pubKey) { accounts = await model.keyAccounts(key.pubKey) }
     }
 
     private func badge(_ text: String, tint: Color) -> some View {
