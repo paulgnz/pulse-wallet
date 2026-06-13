@@ -11,6 +11,9 @@ struct MultisigView: View {
     @State private var showPropose = false
     @State private var approveProposer = ""
     @State private var approveName = ""
+    @State private var reviewing: ReviewTarget?
+
+    struct ReviewTarget: Identifiable { let proposer: String; let name: String; var id: String { proposer + "/" + name } }
 
     var body: some View {
         ScrollView {
@@ -30,6 +33,11 @@ struct MultisigView: View {
         .scrollContentBackground(.hidden)
         .task(id: model.accountName) { await load() }
         .sheet(isPresented: $showPropose) { ProposeSheet(onDone: { Task { await load() } }) }
+        .sheet(item: $reviewing) { t in
+            ProposalReviewSheet(proposer: t.proposer, name: t.name,
+                                onApprove: { approve(proposer: t.proposer, name: t.name) },
+                                onExecute: { exec(proposer: t.proposer, name: t.name) })
+        }
     }
 
     private var header: some View {
@@ -62,8 +70,10 @@ struct MultisigView: View {
                                 Image(systemName: "doc.badge.gearshape").foregroundStyle(Brand.accent)
                                 Text(name).font(.body.monospaced().weight(.medium))
                                 Spacer()
-                                Button("Approve") { approve(proposer: model.accountName, name: name) }
-                                    .buttonStyle(.glass)
+                                Button("Review") {
+                                    reviewing = ReviewTarget(proposer: model.accountName, name: name)
+                                }
+                                .buttonStyle(.glass)
                                 Button("Execute") { exec(proposer: model.accountName, name: name) }
                                     .buttonStyle(.glassProminent).tint(Brand.primary)
                             }
@@ -105,8 +115,8 @@ struct MultisigView: View {
                         .pulseField(mono: true)
                     TextField("Proposal name", text: $approveName)
                         .pulseField(mono: true)
-                    Button("Approve as \(model.accountName)") {
-                        approve(proposer: approveProposer, name: approveName)
+                    Button("Review & approve") {
+                        reviewing = ReviewTarget(proposer: approveProposer, name: approveName)
                     }
                     .buttonStyle(.glass)
                     .disabled(approveProposer.isEmpty || approveName.isEmpty)
@@ -256,5 +266,71 @@ private struct ProposeSheet: View {
                 working = false
             }
         }
+    }
+}
+
+/// Decode a proposal's transaction and show its real actions before the user
+/// approves — the msig equivalent of decode-before-sign. Don't approve blind.
+private struct ProposalReviewSheet: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    let proposer: String
+    let name: String
+    var onApprove: () -> Void
+    var onExecute: () -> Void
+
+    @State private var decoded: DecodedTx?
+    @State private var loading = true
+
+    var body: some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 6) {
+                Image(systemName: "checkmark.seal").font(.system(size: 36))
+                    .foregroundStyle(Brand.brandGradient)
+                Text("Review proposal").font(.title2.weight(.semibold))
+                Text("\(proposer) · \(name)").font(.caption.monospaced()).foregroundStyle(.secondary)
+            }
+
+            ScrollView {
+                VStack(spacing: 12) {
+                    if loading {
+                        ProgressView("Decoding proposal…").frame(maxWidth: .infinity).padding()
+                    } else if let decoded {
+                        ForEach(decoded.actions) { ActionCard(action: $0) }
+                        GlassCard(padding: 12) {
+                            HStack { Text("Expires").foregroundStyle(.secondary); Spacer()
+                                Text(expiry(decoded.expiration)).fontWeight(.medium) }
+                        }
+                    } else {
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Couldn't decode this proposal", systemImage: "exclamationmark.triangle")
+                                    .font(.callout.weight(.semibold)).foregroundStyle(Brand.warn)
+                                Text("The proposal wasn't found, or its transaction can't be decoded. Only approve if you trust the proposer.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxHeight: .infinity)
+
+            HStack {
+                Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
+                Button { onExecute(); dismiss() } label: {
+                    Label("Execute", systemImage: "play.fill").frame(maxWidth: .infinity).padding(.vertical, 4)
+                }
+                .buttonStyle(.glass).controlSize(.large)
+                PrimaryButton(title: "Approve", systemImage: "touchid") { onApprove(); dismiss() }
+            }
+        }
+        .padding(24).frame(width: 460, height: 560)
+        .background(BrandBackground())
+        .task { decoded = await model.decodedProposal(proposer: proposer, name: name); loading = false }
+    }
+
+    private func expiry(_ secs: UInt32) -> String {
+        let f = DateFormatter(); f.dateStyle = .short; f.timeStyle = .medium
+        return f.string(from: Date(timeIntervalSince1970: TimeInterval(secs)))
     }
 }

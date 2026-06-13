@@ -214,7 +214,7 @@ final class AppModel {
     /// The pulse.msig contract account on the active network.
     var msigContract: String { "pulse.msig" }
 
-    struct ProposalRow: Decodable, Sendable { let proposalName: String }
+    struct ProposalRow: Decodable, Sendable { let proposalName: String; let packedTransaction: String }
 
     /// Proposal names created by `proposer`.
     func proposals(by proposer: String) async -> [String] {
@@ -222,6 +222,16 @@ final class AppModel {
         let rows = (try? await rpc.getTableRows(
             code: msigContract, scope: proposer, table: "proposal", as: ProposalRow.self)) ?? []
         return rows.map(\.proposalName)
+    }
+
+    /// Decode the transaction a proposal would execute — so approvers can see
+    /// exactly what they're signing off on rather than approving blind.
+    func decodedProposal(proposer: String, name: String) async -> DecodedTx? {
+        guard let rpc else { return nil }
+        let rows = (try? await rpc.getTableRows(
+            code: msigContract, scope: proposer, table: "proposal", as: ProposalRow.self)) ?? []
+        guard let row = rows.first(where: { $0.proposalName == name }) else { return nil }
+        return core.decodeTransaction(packedTrx: row.packedTransaction)
     }
 
     // Approvals inbox — who has approved / is still requested on each proposal.

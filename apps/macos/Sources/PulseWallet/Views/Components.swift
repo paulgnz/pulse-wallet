@@ -75,6 +75,65 @@ extension View {
     func pulseField(mono: Bool = false) -> some View { modifier(PulseFieldChrome(mono: mono)) }
 }
 
+/// Renders one decoded action — transfers get a friendly summary; everything
+/// else shows account·name + the raw data so nothing is hidden. Shared by
+/// decode-before-sign (dapp) and decode-before-approve (multisig).
+struct ActionCard: View {
+    let action: DecodedTx.Action
+
+    var body: some View {
+        GlassCard(padding: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: icon).foregroundStyle(Brand.accent)
+                    Text("\(action.account) · \(action.name)")
+                        .font(.callout.weight(.semibold).monospaced())
+                    Spacer()
+                }
+                if let t = action.transfer {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(t.quantity).font(.title3.weight(.bold))
+                            Spacer()
+                        }
+                        Text("\(t.from)  →  \(t.to)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                        if !t.memo.isEmpty {
+                            Text("memo: \(t.memo)").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                } else {
+                    Text("data: \(dataPreview)").font(.caption2.monospaced())
+                        .foregroundStyle(.secondary).lineLimit(2).truncationMode(.middle)
+                }
+                if !action.authorization.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(action.authorization.indices, id: \.self) { i in
+                            let a = action.authorization[i]
+                            Text("\(a.actor)@\(a.permission)")
+                                .font(.caption2.monospaced())
+                                .padding(.horizontal, 7).padding(.vertical, 2)
+                                .background(.secondary.opacity(0.15), in: .capsule)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var icon: String {
+        if action.transfer != nil { return "arrow.left.arrow.right" }
+        switch action.name {
+        case "updateauth", "deleteauth", "linkauth", "unlinkauth": return "key.fill"
+        case "delegatebw", "undelegatebw", "refund": return "bolt.fill"
+        case "buyram", "buyrambytes", "sellram": return "memorychip"
+        default: return "doc.text"
+        }
+    }
+    private var dataPreview: String {
+        action.dataHex.isEmpty ? "(none)" : "0x" + action.dataHex
+    }
+}
+
 /// Primary action — uses the macOS Tahoe prominent glass button style.
 struct PrimaryButton: View {
     let title: String
