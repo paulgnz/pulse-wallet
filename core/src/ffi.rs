@@ -5,7 +5,10 @@
 //! error (null pointer, buffer too small, or invalid input). PUB_R1 is ~57
 //! chars and SIG_R1 ~101 chars, so a 256-byte buffer is always sufficient.
 
-use crate::{assemble_sig_r1, decode_pvt_r1, encode_pub_r1};
+use crate::{
+    assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, pub_k1_from_priv,
+    sign_k1,
+};
 use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
 use std::slice;
@@ -94,6 +97,94 @@ pub unsafe extern "C" fn pwc_decode_pvt_r1(s: *const c_char, out32: *mut u8) -> 
             slice::from_raw_parts_mut(out32, 32).copy_from_slice(&key);
             0
         }
+        Err(_) => -1,
+    }
+}
+
+// --- K1 (secp256k1) ---------------------------------------------------------
+
+/// Decode a K1 private key ("PVT_K1_…" or legacy WIF) → 32 raw bytes.
+/// Returns 0 on success, -1 on error.
+///
+/// # Safety
+/// `s` is a NUL-terminated C string; `out32` points to 32 writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_decode_pvt_k1(s: *const c_char, out32: *mut u8) -> c_int {
+    if s.is_null() || out32.is_null() {
+        return -1;
+    }
+    let text = match CStr::from_ptr(s).to_str() {
+        Ok(t) => t,
+        Err(_) => return -1,
+    };
+    match decode_pvt_k1(text) {
+        Ok(key) => {
+            slice::from_raw_parts_mut(out32, 32).copy_from_slice(&key);
+            0
+        }
+        Err(_) => -1,
+    }
+}
+
+/// Derive the 33-byte compressed K1 public key from a raw private key.
+///
+/// # Safety
+/// `priv32` points to 32 readable bytes; `out33` to 33 writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_pub_k1(priv32: *const u8, out33: *mut u8) -> c_int {
+    if priv32.is_null() || out33.is_null() {
+        return -1;
+    }
+    let mut p = [0u8; 32];
+    p.copy_from_slice(slice::from_raw_parts(priv32, 32));
+    match pub_k1_from_priv(&p) {
+        Ok(pub_c) => {
+            slice::from_raw_parts_mut(out33, 33).copy_from_slice(&pub_c);
+            0
+        }
+        Err(_) => -1,
+    }
+}
+
+/// Encode a 33-byte compressed K1 public key as "PUB_K1_…".
+///
+/// # Safety
+/// `pub33` points to 33 readable bytes; `out` to `out_len` writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_encode_pub_k1(
+    pub33: *const u8,
+    out: *mut c_char,
+    out_len: usize,
+) -> c_int {
+    if pub33.is_null() {
+        return -1;
+    }
+    let mut arr = [0u8; 33];
+    arr.copy_from_slice(slice::from_raw_parts(pub33, 33));
+    write_str(out, out_len, &encode_pub_k1(&arr))
+}
+
+/// Sign a 32-byte digest with a K1 private key → "SIG_K1_…".
+///
+/// # Safety
+/// `priv32`/`digest32` point to 32 readable bytes each; `out` to `out_len`
+/// writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_sign_k1(
+    priv32: *const u8,
+    digest32: *const u8,
+    out: *mut c_char,
+    out_len: usize,
+) -> c_int {
+    if priv32.is_null() || digest32.is_null() {
+        return -1;
+    }
+    let mut p = [0u8; 32];
+    p.copy_from_slice(slice::from_raw_parts(priv32, 32));
+    let mut d = [0u8; 32];
+    d.copy_from_slice(slice::from_raw_parts(digest32, 32));
+    match sign_k1(&p, &d) {
+        Ok(sig) => write_str(out, out_len, &sig),
         Err(_) => -1,
     }
 }

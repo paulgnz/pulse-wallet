@@ -95,9 +95,10 @@ private struct KeyRow: View {
                         Text(key.label).font(.body.weight(.semibold))
                         badge(key.isHardwareBacked ? "Secure Enclave" : "Imported",
                               tint: key.isHardwareBacked ? Brand.accent : Brand.glow)
+                        badge(key.curve.rawValue.uppercased(), tint: .gray)
                         if isActive { badge("Active", tint: Brand.success) }
                     }
-                    Text(key.pubR1)
+                    Text(key.pubKey)
                         .font(.caption.monospaced()).foregroundStyle(.secondary)
                         .textSelection(.enabled).lineLimit(1).truncationMode(.middle)
                 }
@@ -126,7 +127,7 @@ private struct KeyRow: View {
 
     private func copyPub() {
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(key.pubR1, forType: .string)
+        NSPasteboard.general.setString(key.pubKey, forType: .string)
         copied = true
     }
 }
@@ -167,15 +168,22 @@ private struct ImportKeySheet: View {
     @Binding var error: String?
     @State private var label = ""
     @State private var secret = ""
+    @State private var curve: WalletKey.Curve = .r1
     @State private var localError: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             sheetHeader("Import Key", systemImage: "square.and.arrow.down",
-                        subtitle: "Paste a PVT_R1_… private key (or 64-char hex). It is stored in the Keychain behind Touch ID and never displayed again.")
+                        subtitle: "Paste a PVT_R1_…/PVT_K1_… key (or WIF / 64-char hex). It is stored in the Keychain behind Touch ID and never displayed again.")
             TextField("Label", text: $label).textFieldStyle(.roundedBorder)
-            SecureField("PVT_R1_… or hex private key", text: $secret)
+            SecureField("PVT_R1_… / PVT_K1_… / WIF / hex", text: $secret)
                 .textFieldStyle(.roundedBorder).font(.callout.monospaced())
+                .onChange(of: secret) { _, new in curve = KeyStore.detectCurve(new) }
+            Picker("Curve", selection: $curve) {
+                Text("R1 (secp256r1)").tag(WalletKey.Curve.r1)
+                Text("K1 (secp256k1)").tag(WalletKey.Curve.k1)
+            }
+            .pickerStyle(.segmented)
             if let e = localError {
                 Label(e, systemImage: "exclamationmark.triangle")
                     .font(.caption).foregroundStyle(Brand.danger)
@@ -184,18 +192,18 @@ private struct ImportKeySheet: View {
             HStack {
                 Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
                 Spacer()
-                PrimaryButton(title: "Import", systemImage: "checkmark") { importKey() }
+                PrimaryButton(title: "Import", systemImage: "checkmark") { runImport() }
                     .frame(width: 160)
                     .disabled(secret.isEmpty)
             }
         }
-        .padding(24).frame(width: 460, height: 360)
+        .padding(24).frame(width: 460, height: 400)
         .background(Brand.navy.gradient.opacity(0.5))
     }
 
-    private func importKey() {
+    private func runImport() {
         do {
-            try store.importR1(secret: secret, label: label)
+            try store.importKey(secret: secret, label: label, curve: curve)
             secret = ""
             dismiss()
         } catch {
@@ -221,7 +229,7 @@ private struct DeleteKeySheet: View {
             sheetHeader("Delete key", systemImage: "trash",
                         subtitle: "This permanently removes “\(key.label)”. \(key.isHardwareBacked ? "The Secure Enclave key will be destroyed and cannot be recovered." : "The imported key will be erased from the Keychain.") Make sure you have a backup if this key controls funds.")
             GlassCard(padding: 14) {
-                Text(key.pubR1).font(.caption.monospaced())
+                Text(key.pubKey).font(.caption.monospaced())
                     .foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
             }
             VStack(alignment: .leading, spacing: 6) {

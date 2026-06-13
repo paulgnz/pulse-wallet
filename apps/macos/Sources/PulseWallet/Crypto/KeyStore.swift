@@ -6,11 +6,13 @@ import Observation
 /// only this metadata is persisted in defaults.
 struct WalletKey: Identifiable, Codable, Hashable {
     enum Kind: String, Codable { case enclave, imported }
+    enum Curve: String, Codable { case r1, k1 }
     let id: String                 // UUID, also the Keychain account name
     var label: String
     let kind: Kind
-    let pubCompressedHex: String   // 33-byte compressed P-256 key, hex
-    var pubR1: String              // PUB_R1_…
+    var curve: Curve = .r1
+    let pubCompressedHex: String   // 33-byte compressed key, hex
+    var pubKey: String             // PUB_R1_… or PUB_K1_…
     let createdAt: Date
 
     var isHardwareBacked: Bool { kind == .enclave }
@@ -53,29 +55,41 @@ final class KeyStore {
         let id = UUID().uuidString
         try Keychain.save(account: id, data: handle.key.dataRepresentation, biometric: false)
         let key = WalletKey(id: id, label: label.isEmpty ? "Enclave key" : label,
-                            kind: .enclave, pubCompressedHex: pub.hexString,
-                            pubR1: core.encodePubR1(compressedPublicKey: pub), createdAt: Date())
+                            kind: .enclave, curve: .r1, pubCompressedHex: pub.hexString,
+                            pubKey: core.encodePubR1(compressedPublicKey: pub), createdAt: Date())
         keys.append(key)
         persist()
         if activeKeyID == nil { activeKeyID = id }
         return key
     }
 
-    /// Import an R1 private key ("PVT_R1_…" or 64-char hex). Stored biometric-gated.
+    /// Import a private key. R1 ("PVT_R1_…"/hex) or K1 ("PVT_K1_…"/WIF).
+    /// Stored in the Keychain behind Touch ID.
     @discardableResult
-    func importR1(secret: String, label: String) throws -> WalletKey {
-        let raw = try rawSecret(from: secret)
-        let priv = try P256.Signing.PrivateKey(rawRepresentation: raw)
-        let pub = priv.publicKey.compressedRepresentation
+    func importKey(secret: String, label: String, curve: WalletKey.Curve) throws -> WalletKey {
+        let raw = try rawSecret(from: secret, curve: curve)
+        let pub: Data
+        switch curve {
+        case .r1:
+            pub = try P256.Signing.PrivateKey(rawRepresentation: raw).publicKey.compressedRepresentation
+        case .k1:
+            guard let p = core.pubK1(privateKey: raw) else {
+                throw PulseCoreError.badInput("invalid K1 private key")
+            }
+            pub = p
+        }
         let hex = pub.hexString
         if let existing = keys.first(where: { $0.pubCompressedHex == hex }) {
             throw PulseCoreError.badInput("key already imported (\(existing.label))")
         }
+        let pubStr = curve == .r1
+            ? core.encodePubR1(compressedPublicKey: pub)
+            : core.encodePubK1(compressedPublicKey: pub)
         let id = UUID().uuidString
         try Keychain.save(account: id, data: raw, biometric: true)
         let key = WalletKey(id: id, label: label.isEmpty ? "Imported key" : label,
-                            kind: .imported, pubCompressedHex: hex,
-                            pubR1: core.encodePubR1(compressedPublicKey: pub), createdAt: Date())
+                            kind: .imported, curve: curve, pubCompressedHex: hex,
+                            pubKey: pubStr, createdAt: Date())
         keys.append(key)
         persist()
         if activeKeyID == nil { activeKeyID = id }
@@ -97,7 +111,7 @@ final class KeyStore {
         persist()
     }
 
-    private func rawSecret(from secret: String) throws -> Data {
+    private func rawSecret(from secret: String, curve: WalletKey.Curve) throws -> Data {
         let t = secret.trimmingCharacters(in: .whitespacesAndNewlines)
         if t.hasPrefix("PVT_R1_") {
             guard let raw = core.decodePvtR1(t) else {
@@ -105,10 +119,23 @@ final class KeyStore {
             }
             return raw
         }
+        if t.hasPrefix("PVT_K1_") || t.first == "5" {  // PVT_K1 or legacy WIF
+            guard let raw = core.decodePvtK1(t) else {
+                throw PulseCoreError.badInput("invalid K1 key (bad checksum?)")
+            }
+            return raw
+        }
         let hex = t.hasPrefix("0x") ? String(t.dropFirst(2)) : t
         guard hex.count == 64, let raw = Data(hexString: hex) else {
-            throw PulseCoreError.badInput("expected a PVT_R1_… key or 64-char hex")
+            throw PulseCoreError.badInput("expected a PVT_R1_…/PVT_K1_…/WIF key or 64-char hex")
         }
         return raw
+    }
+
+    /// Detect the likely curve from a pasted secret's prefix.
+    static func detectCurve(_ secret: String) -> WalletKey.Curve {
+        let t = secret.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.hasPrefix("PVT_K1_") || t.first == "5" { return .k1 }
+        return .r1
     }
 }

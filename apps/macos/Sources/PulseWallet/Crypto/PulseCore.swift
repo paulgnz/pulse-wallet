@@ -22,6 +22,12 @@ protocol PulseCore {
     /// Decode a "PVT_R1_…" private key to its raw 32 bytes (nil if invalid).
     func decodePvtR1(_ wif: String) -> Data?
 
+    // K1 (secp256k1) — for existing Antelope accounts.
+    func decodePvtK1(_ wif: String) -> Data?        // "PVT_K1_…" or legacy WIF
+    func pubK1(privateKey: Data) -> Data?           // raw32 -> 33B compressed
+    func encodePubK1(compressedPublicKey: Data) -> String
+    func signK1(privateKey: Data, digest: Data) throws -> String
+
     /// Build the signing digest for a transfer action (chain-id bound).
     func transferDigest(from: String, to: String, quantity: String,
                         memo: String, chainID: String) throws -> (preImage: Data, digest: Data)
@@ -51,6 +57,12 @@ struct PulseCoreStub: PulseCore {
         throw PulseCoreError.notImplemented("assembleSigR1 — wire pulse-wallet-core via uniffi")
     }
     func decodePvtR1(_ wif: String) -> Data? { nil }
+    func decodePvtK1(_ wif: String) -> Data? { nil }
+    func pubK1(privateKey: Data) -> Data? { nil }
+    func encodePubK1(compressedPublicKey: Data) -> String { "" }
+    func signK1(privateKey: Data, digest: Data) throws -> String {
+        throw PulseCoreError.notImplemented("signK1")
+    }
 
     func transferDigest(from: String, to: String, quantity: String,
                         memo: String, chainID: String) throws -> (preImage: Data, digest: Data) {
