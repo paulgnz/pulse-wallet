@@ -189,7 +189,7 @@ struct SignSheet: View {
                     }
                 }
                 HStack {
-                    Button("Close") { dismiss() }.buttonStyle(.glass)
+                    Button("Close") { dismiss() }.buttonStyle(.glass).controlSize(.large)
                     // If we already have a signature, retry just the broadcast (no re-sign).
                     if sigR1 != nil {
                         PrimaryButton(title: "Retry broadcast", systemImage: "arrow.clockwise") { broadcast() }

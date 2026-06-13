@@ -84,10 +84,19 @@ struct DappRequestSheet: View {
         .padding(24).frame(width: 460, height: isSign ? 560 : 360)
         .background(BrandBackground())
         .task {
-            if case .sign(_, let packed, _, _) = request {
-                if let d = model.core.decodeTransaction(packedTrx: packed) { decoded = d }
-                else { decodeFailed = true }
+            guard case .sign(_, let packed, _, _) = request else { return }
+            // Decode off the main actor, racing a timeout so a malformed packed
+            // trx can never hang the sheet on "Decoding…" — it falls back to the
+            // "couldn't decode" notice instead. (Fresh PulseCoreFFI inside the
+            // detached task, like KeyStore.performSign, avoids a non-Sendable capture.)
+            let result: DecodedTx? = await withTaskGroup(of: DecodedTx?.self) { group in
+                group.addTask { await Task.detached { PulseCoreFFI().decodeTransaction(packedTrx: packed) }.value }
+                group.addTask { try? await Task.sleep(nanoseconds: 3_000_000_000); return nil }
+                let first = await group.next() ?? nil
+                group.cancelAll()
+                return first
             }
+            if let result { decoded = result } else { decodeFailed = true }
         }
     }
 
