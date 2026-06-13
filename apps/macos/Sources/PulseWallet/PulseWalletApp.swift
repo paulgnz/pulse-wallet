@@ -14,6 +14,7 @@ struct PulseWalletApp: App {
                 .environment(model)
                 .environment(keyStore)
                 .frame(minWidth: 880, minHeight: 560)
+                .preferredColorScheme(model.appearanceScheme)
                 .onOpenURL { url in
                     NSApp.activate(ignoringOtherApps: true)   // bring wallet to front
                     model.handleURL(url)

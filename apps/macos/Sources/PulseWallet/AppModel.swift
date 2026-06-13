@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftUI
 
 enum WalletSection: String, CaseIterable, Identifiable {
     case wallet, send, receive, activity, multisig, keys, tools, settings
@@ -72,6 +73,7 @@ final class AppModel {
             accountName = accountNames[0]
         }
         autoLock = UserDefaults.standard.object(forKey: "wallet.autoLock") as? Bool ?? true
+        appearance = UserDefaults.standard.string(forKey: "wallet.appearance") ?? "system"
     }
 
     private func persistAccounts() {
@@ -90,6 +92,12 @@ final class AppModel {
 
     var isLocked = false
     var autoLock = true { didSet { UserDefaults.standard.set(autoLock, forKey: "wallet.autoLock") } }
+
+    /// "system" | "light" | "dark"
+    var appearance = "system" { didSet { UserDefaults.standard.set(appearance, forKey: "wallet.appearance") } }
+    var appearanceScheme: ColorScheme? {
+        switch appearance { case "light": return .light; case "dark": return .dark; default: return nil }
+    }
 
     private var rpc: PulseRPC? { PulseRPC(endpoint) }
     private var hyperion: Hyperion? { Hyperion(hyperionEndpoint) }

@@ -79,6 +79,16 @@ struct SettingsView: View {
                 Toggle("Lock wallet when inactive", isOn: $model.autoLock)
                 Divider()
                 HStack {
+                    Label("Appearance", systemImage: "circle.lefthalf.filled")
+                    Spacer()
+                    Picker("", selection: $model.appearance) {
+                        Text("System").tag("system")
+                        Text("Light").tag("light")
+                        Text("Dark").tag("dark")
+                    }.labelsHidden().pickerStyle(.segmented).fixedSize()
+                }
+                Divider()
+                HStack {
                     Label("Signing key", systemImage: "touchid")
                     Spacer()
                     Text(model.selectedAccount?.isHardwareBacked == true
