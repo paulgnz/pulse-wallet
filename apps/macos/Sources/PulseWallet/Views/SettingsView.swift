@@ -243,26 +243,33 @@ private struct NetworkEditSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             Text(network == nil ? "Add Network" : "Edit Network")
                 .font(.title2.weight(.semibold))
-            field("Label", "A-Chain Testnet", $label)
-            field("RPC endpoint", "https://rpc.…", $rpc, mono: true)
-            field("Hyperion endpoint (optional)", "https://hyperion.…", $hyperion, mono: true)
-            field("Explorer base (optional)", "https://explorer.…", $explorer, mono: true)
-            field("Headline token", "XPR", $primarySymbol)
 
-            HStack {
-                Button {
-                    Task { await test() }
-                } label: {
-                    Label(testing ? "Testing…" : "Test connection", systemImage: "antenna.radiowaves.left.and.right")
+            // Scroll the fields so the sheet never clips its title/content.
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    field("Label", "A-Chain Testnet", $label)
+                    field("RPC endpoint", "https://rpc.…", $rpc, mono: true)
+                    field("Hyperion endpoint (optional)", "https://hyperion.…", $hyperion, mono: true)
+                    field("Explorer base (optional)", "https://explorer.…", $explorer, mono: true)
+                    field("Headline token", "XPR", $primarySymbol)
+
+                    HStack {
+                        Button {
+                            Task { await test() }
+                        } label: {
+                            Label(testing ? "Testing…" : "Test connection", systemImage: "antenna.radiowaves.left.and.right")
+                        }
+                        .buttonStyle(.glass).controlSize(.large).disabled(rpc.isEmpty || testing)
+                        if let r = testResult {
+                            Text(r).font(.caption).foregroundStyle(chainId != nil ? Brand.success : Brand.danger)
+                                .lineLimit(2)
+                        }
+                    }
                 }
-                .buttonStyle(.glass).disabled(rpc.isEmpty || testing)
-                if let r = testResult {
-                    Text(r).font(.caption).foregroundStyle(chainId != nil ? Brand.success : Brand.danger)
-                        .lineLimit(2)
-                }
+                .padding(.bottom, 4)
             }
+            .scrollContentBackground(.hidden)
 
-            Spacer()
             HStack {
                 Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
                 Spacer()
@@ -271,7 +278,7 @@ private struct NetworkEditSheet: View {
                     .disabled(label.isEmpty || rpc.isEmpty)
             }
         }
-        .padding(24).frame(width: 480, height: 440)
+        .padding(24).frame(width: 480, height: 540)
         .background(BrandBackground())
         .onAppear {
             if let n = network {
