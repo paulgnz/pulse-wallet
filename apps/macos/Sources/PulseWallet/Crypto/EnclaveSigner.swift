@@ -45,6 +45,19 @@ enum EnclaveSigner {
         return KeyHandle(key: key)
     }
 
+    /// Persisted, per-account Enclave key. The `dataRepresentation` is an
+    /// encrypted blob that only this Secure Enclave can use, so it is safe to
+    /// store in UserDefaults; the private key never leaves the chip.
+    static func handle(forAccount account: String) throws -> KeyHandle {
+        let defaultsKey = "enclaveKey.\(account)"
+        if let data = UserDefaults.standard.data(forKey: defaultsKey) {
+            return try load(from: data)
+        }
+        let handle = try createKey()
+        UserDefaults.standard.set(handle.key.dataRepresentation, forKey: defaultsKey)
+        return handle
+    }
+
     /// Sign the transaction PRE-IMAGE and return raw r‖s (64 bytes).
     ///
     /// IMPORTANT: CryptoKit's `signature(for:)` hashes the input with SHA-256
@@ -59,5 +72,15 @@ enum EnclaveSigner {
         ctx.localizedReason = reason
         let signature = try handle.key.signature(for: preImage)
         return signature.rawRepresentation   // 64 bytes: r(32) ‖ s(32)
+    }
+
+    /// Convenience: load/create the account's key and sign, off the main actor.
+    /// Returns raw r‖s. The (non-Sendable) Enclave key never crosses an actor
+    /// boundary — only the resulting `Data` does.
+    static func sign(account: String, preImage: Data, reason: String) async throws -> Data {
+        try await Task.detached(priority: .userInitiated) {
+            let handle = try handle(forAccount: account)
+            return try signPreImage(preImage, with: handle, reason: reason)
+        }.value
     }
 }

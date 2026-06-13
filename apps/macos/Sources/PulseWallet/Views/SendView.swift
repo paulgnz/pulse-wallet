@@ -5,7 +5,7 @@ struct SendView: View {
 
     @State private var recipient = ""
     @State private var amount = ""
-    @State private var symbol = "SYS"
+    @State private var symbol = "XPR"
     @State private var memo = ""
     @State private var showingConfirm = false
 
@@ -82,6 +82,7 @@ struct SignSheet: View {
     let memo: String
 
     @State private var state: SignState = .review
+    @State private var rawSignature: Data?
     enum SignState { case review, signing, broadcast, done, failed(String) }
 
     var body: some View {
@@ -97,11 +98,12 @@ struct SignSheet: View {
                     if !memo.isEmpty { Divider(); row("Memo", memo) }
                 }
             }
+            if let sig = rawSignature { signatureCard(sig) }
             Spacer()
             actions
         }
         .padding(24)
-        .frame(width: 420, height: 440)
+        .frame(width: 420, height: 500)
         .background(Brand.navy.gradient.opacity(0.5))
     }
 
@@ -136,9 +138,37 @@ struct SignSheet: View {
     }
 
     private func sign() {
-        // Wires to EnclaveSigner -> pulse-wallet-core (assemble_sig_r1) -> RPC push.
-        // Flow scaffolded; live broadcast lands with the uniffi binding.
         state = .signing
+        let account = model.selectedAccount?.name ?? "default"
+        let summary = "\(account)->\(recipient):\(amount) \(symbol):\(memo)"
+        let reason = "Sign transfer of \(amount) \(symbol) to \(recipient)"
+        Task {
+            do {
+                // Until pulse-wallet-core is linked we sign a transfer summary to
+                // exercise the Secure Enclave end-to-end (real Touch ID → r‖s).
+                // The real flow signs the canonical tx digest, then the Rust core
+                // derives the recovery id and assembles SIG_R1 for broadcast.
+                rawSignature = try await EnclaveSigner.sign(
+                    account: account, preImage: Data(summary.utf8), reason: reason)
+                state = .done
+            } catch {
+                state = .failed(error.localizedDescription)
+            }
+        }
+    }
+
+    private func signatureCard(_ sig: Data) -> some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 6) {
+                Label("Secure Enclave signature · r‖s", systemImage: "checkmark.seal.fill")
+                    .font(.subheadline.weight(.medium)).foregroundStyle(Brand.success)
+                Text(sig.map { String(format: "%02x", $0) }.joined())
+                    .font(.caption2.monospaced()).foregroundStyle(.secondary)
+                    .textSelection(.enabled).lineLimit(4)
+                Text("SIG_R1 assembly + broadcast come with the Rust-core link.")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
     }
 
     private var isWorking: Bool {
@@ -166,7 +196,7 @@ struct SignSheet: View {
         case .review:    return "Confirm transfer"
         case .signing:   return "Authenticate"
         case .broadcast: return "Broadcasting…"
-        case .done:      return "Sent"
+        case .done:      return "Signed"
         case .failed:    return "Failed"
         }
     }

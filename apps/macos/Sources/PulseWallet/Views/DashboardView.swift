@@ -3,7 +3,10 @@ import SwiftUI
 struct DashboardView: View {
     @Environment(AppModel.self) private var model
 
-    private var primary: Asset? { model.assets.first }
+    // Headline balance is the value token (XPR); SYS is a staked resource.
+    private var primary: Asset? {
+        model.assets.first { $0.role == .value } ?? model.assets.first
+    }
 
     var body: some View {
         ScrollView {
@@ -71,7 +74,16 @@ struct DashboardView: View {
                                 .font(.headline).foregroundStyle(Brand.accent)
                         }
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(asset.symbol).font(.body.weight(.semibold))
+                            HStack(spacing: 6) {
+                                Text(asset.symbol).font(.body.weight(.semibold))
+                                if asset.role == .resource {
+                                    Text("RESOURCE")
+                                        .font(.caption2.weight(.semibold))
+                                        .padding(.horizontal, 5).padding(.vertical, 1)
+                                        .background(Brand.glow.opacity(0.18), in: .capsule)
+                                        .foregroundStyle(Brand.glow)
+                                }
+                            }
                             Text(asset.contract).font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()

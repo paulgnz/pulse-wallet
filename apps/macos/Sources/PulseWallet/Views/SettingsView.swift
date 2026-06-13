@@ -37,7 +37,7 @@ struct SettingsView: View {
                 GlassCard {
                     VStack(alignment: .leading, spacing: 8) {
                         SectionHeader(title: "About", systemImage: "info.circle")
-                        Text("Pulse Wallet — a native macOS wallet for PulseVM.")
+                        Text("PulseVM — the native macOS wallet for PulseVM.")
                             .font(.callout)
                         Text("Keys are generated and held in the Secure Enclave; signatures are produced on-device with Touch ID and never leave the chip.")
                             .font(.caption).foregroundStyle(.secondary)

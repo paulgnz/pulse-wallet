@@ -30,8 +30,8 @@ private struct BrandHeader: View {
                     .foregroundStyle(.white)
             }
             VStack(alignment: .leading, spacing: 0) {
-                Text("Pulse").font(.headline)
-                Text("Wallet").font(.headline).foregroundStyle(.secondary)
+                Text("PulseVM").font(.headline)
+                Text("Wallet").font(.subheadline).foregroundStyle(.secondary)
             }
             Spacer()
         }

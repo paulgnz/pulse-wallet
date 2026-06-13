@@ -9,13 +9,17 @@ struct PulseAccount: Identifiable, Hashable {
     var isHardwareBacked: Bool       // Secure Enclave key?
 }
 
+/// Whether a token is the spendable value token or a staked system resource.
+enum AssetRole { case value, resource }
+
 /// A token balance held by an account.
 struct Asset: Identifiable, Hashable {
     var id: String { symbol }
-    let symbol: String               // "SYS", "XPR"
+    let symbol: String               // "XPR" (value), "SYS" (resource)
     let amount: Decimal
     let precision: Int
-    let contract: String             // "pulse.token"
+    let contract: String             // "eosio.token", "pulse.token"
+    var role: AssetRole = .value
 
     var formatted: String {
         let f = NSDecimalNumber(decimal: amount)
