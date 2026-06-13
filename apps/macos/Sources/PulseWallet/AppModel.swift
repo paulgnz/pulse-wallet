@@ -31,7 +31,11 @@ final class AppModel {
 
     /// Network this wallet is pointed at (A-Chain testnet by default).
     var endpoint = "https://rpc.a-chain-testnet.protonnz.com"
+    var hyperionEndpoint = "https://hyperion.a-chain-testnet.protonnz.com"
     var chainName = "A-Chain Testnet"
+
+    /// The token shown as the headline balance (value token; SYS is resource).
+    var primarySymbol = "XPR"
 
     /// Chain logic backed by the Rust core (validated vs pulsevm-js).
     let core: PulseCore = PulseCoreFFI()
@@ -51,6 +55,7 @@ final class AppModel {
     var isLocked = false
 
     private var rpc: PulseRPC? { PulseRPC(endpoint) }
+    private var hyperion: Hyperion? { Hyperion(hyperionEndpoint) }
 
     // MARK: Derived view state
 
@@ -68,6 +73,13 @@ final class AppModel {
     var accounts: [PulseAccount] { selectedAccount.map { [$0] } ?? [] }
 
     var coreSymbol: String? { account?.coreSymbol }
+
+    /// Headline asset: the primary value token if held, else first value, else first.
+    var primaryAsset: Asset? {
+        assets.first { $0.symbol == primarySymbol }
+            ?? assets.first { $0.role == .value }
+            ?? assets.first
+    }
 
     /// The network is paused if the head block hasn't advanced recently.
     var networkPaused: Bool {
@@ -96,23 +108,39 @@ final class AppModel {
             let (i, a) = try await (info, acct)
             chainInfo = i
             account = a
-            assets = Self.assets(from: a)
+
+            // Prefer Hyperion for full multi-token discovery; fall back to the
+            // system core balance if the indexer is unavailable.
+            if let tokens = try? await hyperion?.getTokens(accountName), !tokens.isEmpty {
+                assets = sorted(tokens.map(Asset.init(token:)))
+            } else {
+                assets = sorted(Self.coreAssets(from: a))
+            }
         } catch {
             loadError = error.localizedDescription
         }
         isLoading = false
     }
 
-    private static func assets(from account: AccountInfo) -> [Asset] {
-        var out: [Asset] = []
-        // The core liquid (spendable) token — SYS on A-Chain, XPR on mainnet.
-        if let bal = account.coreLiquidBalance,
-           let asset = Asset(balanceString: bal,
-                             contract: account.coreSymbol == "SYS" ? "pulse.token" : "eosio.token",
-                             role: .value) {
-            out.append(asset)
+    /// Value tokens first (primary token leading), resource tokens last.
+    private func sorted(_ assets: [Asset]) -> [Asset] {
+        let primary = primarySymbol
+        func rank(_ a: Asset) -> Int {
+            if a.symbol == primary { return 0 }
+            return a.role == .value ? 1 : 2
         }
-        return out
+        return assets.sorted { lhs, rhs in
+            let (l, r) = (rank(lhs), rank(rhs))
+            return l != r ? l < r : lhs.symbol < rhs.symbol
+        }
+    }
+
+    private static func coreAssets(from account: AccountInfo) -> [Asset] {
+        guard let bal = account.coreLiquidBalance,
+              let asset = Asset(balanceString: bal, contract: "pulse.token",
+                                role: account.coreSymbol == "SYS" ? .resource : .value)
+        else { return [] }
+        return [asset]
     }
 
     /// Parse chain timestamps like "2026-06-11T22:18:20.000" (UTC, no zone).

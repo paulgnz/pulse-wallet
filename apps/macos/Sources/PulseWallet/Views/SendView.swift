@@ -5,7 +5,7 @@ struct SendView: View {
 
     @State private var recipient = ""
     @State private var amount = ""
-    @State private var symbol = "XPR"
+    @State private var symbol = ""
     @State private var memo = ""
     @State private var showingConfirm = false
 
@@ -56,6 +56,9 @@ struct SendView: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
+        .onAppear {
+            if symbol.isEmpty { symbol = model.primaryAsset?.symbol ?? "" }
+        }
         .sheet(isPresented: $showingConfirm) {
             SignSheet(recipient: recipient, amount: amount, symbol: symbol, memo: memo)
         }

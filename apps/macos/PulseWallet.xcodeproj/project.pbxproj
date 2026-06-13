@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE7891077FC4FDC8B7002AE /* Hyperion.swift */; };
 		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
 		227763B316A637302CE0C75F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13029EAE706A34911065861E /* Models.swift */; };
 		2D80351ED5E347B638B5DEB7 /* PulseRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A106B02E0B4966774E12E5 /* PulseRPC.swift */; };
@@ -44,6 +45,7 @@
 		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1981660F714156CB20D4B81 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		CFE7891077FC4FDC8B7002AE /* Hyperion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hyperion.swift; sourceTree = "<group>"; };
 		D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreen.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 		B03162D6E425EC07E89D2978 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				CFE7891077FC4FDC8B7002AE /* Hyperion.swift */,
 				37A106B02E0B4966774E12E5 /* PulseRPC.swift */,
 			);
 			path = Network;
@@ -223,6 +226,7 @@
 				C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */,
 				9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */,
 				3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */,
+				08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */,
 				B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */,
 				227763B316A637302CE0C75F /* Models.swift in Sources */,
 				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,

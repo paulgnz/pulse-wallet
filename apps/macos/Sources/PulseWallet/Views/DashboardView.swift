@@ -50,8 +50,7 @@ struct DashboardView: View {
     }
 
     private var heroBalance: String {
-        if let a = model.assets.first { return a.formatted }
-        if let s = model.coreSymbol { return "0.0000 \(s)" }
+        if let a = model.primaryAsset { return a.formatted }
         return model.isLoading ? "…" : "—"
     }
 
