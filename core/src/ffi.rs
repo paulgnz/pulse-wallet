@@ -11,8 +11,8 @@ use crate::tx::{
     parse_perm_levels, signing_material_hex, PermLevel, TransferParams,
 };
 use crate::{
-    assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, pub_k1_from_priv,
-    sign_k1,
+    assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, encode_pvt_k1,
+    encode_pvt_r1, pub_k1_from_priv, sign_k1,
 };
 use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
@@ -112,6 +112,30 @@ pub unsafe extern "C" fn pwc_decode_pvt_r1(s: *const c_char, out32: *mut u8) -> 
         }
         Err(_) => -1,
     }
+}
+
+/// Encode a raw 32-byte private key as "PVT_R1_…" (for backup/export).
+/// # Safety: `priv32` points to 32 bytes; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_encode_pvt_r1(priv32: *const u8, out: *mut c_char, out_len: usize) -> c_int {
+    if priv32.is_null() {
+        return -1;
+    }
+    let mut p = [0u8; 32];
+    p.copy_from_slice(slice::from_raw_parts(priv32, 32));
+    write_str(out, out_len, &encode_pvt_r1(&p))
+}
+
+/// Encode a raw 32-byte private key as "PVT_K1_…" (for backup/export).
+/// # Safety: see above.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_encode_pvt_k1(priv32: *const u8, out: *mut c_char, out_len: usize) -> c_int {
+    if priv32.is_null() {
+        return -1;
+    }
+    let mut p = [0u8; 32];
+    p.copy_from_slice(slice::from_raw_parts(priv32, 32));
+    write_str(out, out_len, &encode_pvt_k1(&p))
 }
 
 // --- K1 (secp256k1) ---------------------------------------------------------

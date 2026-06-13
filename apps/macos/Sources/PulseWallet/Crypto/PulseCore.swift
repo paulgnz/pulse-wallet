@@ -22,8 +22,11 @@ protocol PulseCore {
     /// Decode a "PVT_R1_…" private key to its raw 32 bytes (nil if invalid).
     func decodePvtR1(_ wif: String) -> Data?
 
+    func encodePvtR1(_ raw: Data) -> String         // raw32 -> "PVT_R1_…"
+
     // K1 (secp256k1) — for existing Antelope accounts.
     func decodePvtK1(_ wif: String) -> Data?        // "PVT_K1_…" or legacy WIF
+    func encodePvtK1(_ raw: Data) -> String         // raw32 -> "PVT_K1_…"
     func pubK1(privateKey: Data) -> Data?           // raw32 -> 33B compressed
     func encodePubK1(compressedPublicKey: Data) -> String
     func signK1(privateKey: Data, digest: Data) throws -> String
@@ -90,7 +93,9 @@ struct PulseCoreStub: PulseCore {
         throw PulseCoreError.notImplemented("assembleSigR1 — wire pulse-wallet-core via uniffi")
     }
     func decodePvtR1(_ wif: String) -> Data? { nil }
+    func encodePvtR1(_ raw: Data) -> String { "" }
     func decodePvtK1(_ wif: String) -> Data? { nil }
+    func encodePvtK1(_ raw: Data) -> String { "" }
     func pubK1(privateKey: Data) -> Data? { nil }
     func encodePubK1(compressedPublicKey: Data) -> String { "" }
     func signK1(privateKey: Data, digest: Data) throws -> String {

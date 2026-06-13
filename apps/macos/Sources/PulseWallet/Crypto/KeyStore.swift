@@ -105,6 +105,16 @@ final class KeyStore {
         persist()
     }
 
+    /// Export an imported key's private key (PVT_…) for backup. Prompts Touch ID
+    /// via the Keychain. Enclave keys are non-exportable by design.
+    func exportSecret(_ key: WalletKey, reason: String) throws -> String {
+        guard key.kind == .imported else {
+            throw PulseCoreError.badInput("Secure Enclave keys cannot be exported — back up via a recovery key or multisig.")
+        }
+        let raw = try Keychain.load(account: key.id, reason: reason)
+        return key.curve == .r1 ? core.encodePvtR1(raw) : core.encodePvtK1(raw)
+    }
+
     func rename(_ key: WalletKey, to label: String) {
         guard let idx = keys.firstIndex(of: key) else { return }
         keys[idx].label = label

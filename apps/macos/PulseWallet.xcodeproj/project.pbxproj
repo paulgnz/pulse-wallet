@@ -36,6 +36,7 @@
 		BEC49AA9E87AF795843DA76A /* MultisigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0963F1C4442FCBABC7261C01 /* MultisigView.swift */; };
 		C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132057A53EF31C9B091E1859 /* Keychain.swift */; };
 		C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B1EEFEB2E72680C6C808D3 /* Components.swift */; };
+		EB049CD866A5520D483A4CCC /* ExportKeySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		37A106B02E0B4966774E12E5 /* PulseRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseRPC.swift; sourceTree = "<group>"; };
+		49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeySheet.swift; sourceTree = "<group>"; };
 		50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCoreFFI.swift; sourceTree = "<group>"; };
 		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		57F9C43E9860AAD1D468DC9C /* PulseCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCore.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				F4B1EEFEB2E72680C6C808D3 /* Components.swift */,
 				5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */,
 				0698D056BD05A32CE1905F8C /* DashboardView.swift */,
+				49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */,
 				988744519E80C7631A1550B1 /* KeysView.swift */,
 				D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */,
 				0963F1C4442FCBABC7261C01 /* MultisigView.swift */,
@@ -259,6 +262,7 @@
 				9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */,
 				5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */,
 				3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */,
+				EB049CD866A5520D483A4CCC /* ExportKeySheet.swift in Sources */,
 				08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */,
 				09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */,
 				C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */,

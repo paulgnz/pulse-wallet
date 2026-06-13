@@ -21,6 +21,10 @@ int pwc_assemble_sig_r1(const uint8_t *rs64, const uint8_t *digest32,
 // "PVT_R1_…" -> 32 raw private-key bytes into out32. Returns 0 ok, -1 on error.
 int pwc_decode_pvt_r1(const char *s, uint8_t *out32);
 
+// Encode a raw 32-byte private key for backup/export.
+int pwc_encode_pvt_r1(const uint8_t *priv32, char *out, size_t out_len);
+int pwc_encode_pvt_k1(const uint8_t *priv32, char *out, size_t out_len);
+
 // K1 (secp256k1) — for importing/controlling existing Antelope accounts.
 int pwc_decode_pvt_k1(const char *s, uint8_t *out32);          // PVT_K1_/WIF -> raw32
 int pwc_pub_k1(const uint8_t *priv32, uint8_t *out33);          // raw32 -> compressed pub

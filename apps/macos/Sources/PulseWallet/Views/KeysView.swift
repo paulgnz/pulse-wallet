@@ -89,6 +89,7 @@ private struct KeyRow: View {
     var onDelete: () -> Void
     @State private var copied = false
     @State private var accounts: [String] = []
+    @State private var showExport = false
 
     var body: some View {
         GlassCard(padding: 16) {
@@ -120,6 +121,9 @@ private struct KeyRow: View {
                 Menu {
                     Button("Copy public key") { copyPub() }
                     if !isActive { Button("Set as active") { onUse() } }
+                    if !key.isHardwareBacked {
+                        Button("Export private key…") { showExport = true }
+                    }
                     if !accounts.isEmpty {
                         Divider()
                         Menu("Watch account") {
@@ -138,6 +142,7 @@ private struct KeyRow: View {
             }
         }
         .task(id: key.pubKey) { accounts = await model.keyAccounts(key.pubKey) }
+        .sheet(isPresented: $showExport) { ExportKeySheet(key: key) }
     }
 
     private func badge(_ text: String, tint: Color) -> some View {

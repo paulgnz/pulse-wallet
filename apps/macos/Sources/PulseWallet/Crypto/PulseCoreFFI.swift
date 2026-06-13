@@ -44,10 +44,24 @@ struct PulseCoreFFI: PulseCore {
         return ok == 0 ? Data(out) : nil
     }
 
+    func encodePvtR1(_ raw: Data) -> String {
+        guard raw.count == 32 else { return "" }
+        var out = [CChar](repeating: 0, count: 128)
+        let n = raw.withUnsafeBytes { pwc_encode_pvt_r1($0.bindMemory(to: UInt8.self).baseAddress, &out, out.count) }
+        return n >= 0 ? String(cString: out) : ""
+    }
+
     func decodePvtK1(_ wif: String) -> Data? {
         var out = [UInt8](repeating: 0, count: 32)
         let ok = wif.withCString { pwc_decode_pvt_k1($0, &out) }
         return ok == 0 ? Data(out) : nil
+    }
+
+    func encodePvtK1(_ raw: Data) -> String {
+        guard raw.count == 32 else { return "" }
+        var out = [CChar](repeating: 0, count: 128)
+        let n = raw.withUnsafeBytes { pwc_encode_pvt_k1($0.bindMemory(to: UInt8.self).baseAddress, &out, out.count) }
+        return n >= 0 ? String(cString: out) : ""
     }
 
     func pubK1(privateKey: Data) -> Data? {
