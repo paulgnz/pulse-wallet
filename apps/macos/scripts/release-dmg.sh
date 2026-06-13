@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# Build a signed + notarized PulseVM.dmg that opens cleanly on ANY Mac.
+#
+# ONE-TIME SETUP (stores your notary credentials in the keychain):
+#   xcrun notarytool store-credentials "pulsevm-notary" \
+#       --apple-id "you@example.com" \
+#       --team-id  "UKU2H2D5Z7" \
+#       --password "abcd-efgh-ijkl-mnop"     # App-Specific Password from appleid.apple.com
+#
+# Then just run:  ./scripts/release-dmg.sh
+#
+set -euo pipefail
+
+cd "$(dirname "$0")/.."                              # apps/macos
+
+APP_NAME="PulseVM"
+SCHEME="PulseWallet"
+DEV_ID="Developer ID Application: Paul Grey (UKU2H2D5Z7)"
+NOTARY_PROFILE="pulsevm-notary"
+BUILD_DIR="build/release"
+ARCHIVE="$BUILD_DIR/$APP_NAME.xcarchive"
+EXPORT_DIR="$BUILD_DIR/export"
+DMG="$BUILD_DIR/$APP_NAME.dmg"
+STAGE="$BUILD_DIR/dmg-stage"
+
+echo "▶︎ Regenerating project…"
+xcodegen generate >/dev/null
+
+echo "▶︎ Building the Rust core (universal)…"
+if [ -x ../../scripts/build-core-macos.sh ]; then (cd ../.. && scripts/build-core-macos.sh)
+else echo "  (skipping; using existing Vendor/libpulse_wallet_core.a)"; fi
+
+echo "▶︎ Archiving Release…"
+rm -rf "$ARCHIVE" "$EXPORT_DIR"
+xcodebuild -project PulseWallet.xcodeproj -scheme "$SCHEME" -configuration Release \
+    -archivePath "$ARCHIVE" archive \
+    CODE_SIGN_STYLE=Manual \
+    CODE_SIGN_IDENTITY="$DEV_ID" \
+    DEVELOPMENT_TEAM=UKU2H2D5Z7 \
+    -quiet
+
+echo "▶︎ Exporting with Developer ID…"
+cat > "$BUILD_DIR/ExportOptions.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>method</key><string>developer-id</string>
+  <key>teamID</key><string>UKU2H2D5Z7</string>
+  <key>signingStyle</key><string>manual</string>
+</dict></plist>
+PLIST
+xcodebuild -exportArchive -archivePath "$ARCHIVE" \
+    -exportOptionsPlist "$BUILD_DIR/ExportOptions.plist" \
+    -exportPath "$EXPORT_DIR" -quiet
+
+APP="$EXPORT_DIR/$APP_NAME.app"
+echo "▶︎ Verifying signature…"
+codesign --verify --deep --strict --verbose=2 "$APP"
+
+echo "▶︎ Building DMG…"
+rm -rf "$STAGE" "$DMG"; mkdir -p "$STAGE"
+cp -R "$APP" "$STAGE/"
+ln -s /Applications "$STAGE/Applications"
+hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null
+
+echo "▶︎ Notarizing (this can take a few minutes)…"
+xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
+
+echo "▶︎ Stapling the ticket…"
+xcrun stapler staple "$DMG"
+xcrun stapler validate "$DMG"
+
+echo ""
+echo "✅ Done →  $(cd "$(dirname "$DMG")" && pwd)/$(basename "$DMG")"
+echo "   Send that file. Recipients double-click it, drag PulseVM → Applications, done."
