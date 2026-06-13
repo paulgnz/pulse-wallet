@@ -14,32 +14,36 @@ struct RootView: View {
             Sidebar()
                 .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 300)
         } detail: {
-            detail
-                .navigationTitle(model.section.title)
-                .toolbar {
-                    ToolbarItem(placement: .principal) { NetworkPill() }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button { Task { await model.refresh() } } label: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        .disabled(model.isLoading)
-                        .help("Refresh")
+            VStack(spacing: 0) {
+                // Banner sits below the floating toolbar (not across the title bar),
+                // so it never collides with the traffic lights / network pill.
+                if model.signingWithOwner { OwnerWarningBanner() }
+                detail
+            }
+            .navigationTitle(model.section.title)
+            .toolbar {
+                ToolbarItem(placement: .principal) { NetworkPill() }
+                ToolbarItem(placement: .primaryAction) {
+                    Button { Task { await model.refresh() } } label: {
+                        Image(systemName: "arrow.clockwise")
                     }
-                    if !keyStore.keys.isEmpty {
-                        ToolbarItem(placement: .primaryAction) {
-                            Button { model.lock() } label: { Image(systemName: "lock") }
-                                .help("Lock wallet")
-                        }
+                    .disabled(model.isLoading)
+                    .help("Refresh")
+                }
+                if !keyStore.keys.isEmpty {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button { model.lock() } label: { Image(systemName: "lock") }
+                            .help("Lock wallet")
                     }
                 }
+            }
         }
         .background(BrandBackground())
         .tint(Brand.accent)   // selection highlight + controls follow the theme, not system blue
-        .safeAreaInset(edge: .top) { if model.signingWithOwner { OwnerWarningBanner() } }
         .overlay {
-            // Red frame whenever signing is set to the high-privilege owner permission.
+            // Subtle red frame whenever signing is set to the high-privilege owner permission.
             if model.signingWithOwner {
-                RoundedRectangle(cornerRadius: 0).strokeBorder(Brand.danger, lineWidth: 3)
+                Rectangle().strokeBorder(Brand.danger.opacity(0.9), lineWidth: 2)
                     .ignoresSafeArea().allowsHitTesting(false)
             }
         }

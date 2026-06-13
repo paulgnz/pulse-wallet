@@ -10,6 +10,7 @@ struct ToolsView: View {
     @State private var inspectInput = ""
     @State private var inspectRows: [(String, String)] = []
     @State private var importStatus: String?
+    @State private var copiedBoth = false
 
     var body: some View {
         ScrollView {
@@ -35,7 +36,7 @@ struct ToolsView: View {
                     .pickerStyle(.segmented)
                     HStack {
                         PrimaryButton(title: "Generate", systemImage: "sparkles") {
-                            generated = KeyToolkit.generate(genCurve); importStatus = nil
+                            generated = KeyToolkit.generate(genCurve); importStatus = nil; copiedBoth = false
                         }
                         if generated != nil {
                             Button("Clear") { generated = nil }.buttonStyle(.glass)
@@ -49,6 +50,13 @@ struct ToolsView: View {
                         HStack {
                             Button("Import into wallet") { importGenerated(g) }
                                 .buttonStyle(.glassProminent).tint(Brand.primary)
+                            Button {
+                                copyBoth(g)
+                            } label: {
+                                Label(copiedBoth ? "Copied" : "Copy both",
+                                      systemImage: copiedBoth ? "checkmark" : "doc.on.doc")
+                            }
+                            .buttonStyle(.glass)
                             if let s = importStatus { Text(s).font(.caption).foregroundStyle(.secondary) }
                         }
                     }
@@ -67,7 +75,7 @@ struct ToolsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                     HStack {
                         TextField("key…", text: $inspectInput)
-                            .textFieldStyle(.roundedBorder).font(.caption.monospaced())
+                            .pulseField(mono: true)
                         Button("Inspect") { inspectRows = KeyToolkit.inspect(inspectInput) }
                             .buttonStyle(.glass)
                     }
@@ -94,6 +102,14 @@ struct ToolsView: View {
                 .lineLimit(2).truncationMode(.middle)
         }
         .padding(.vertical, 2)
+    }
+
+    /// Copy public + private together, clearly labeled, for backing up at once.
+    private func copyBoth(_ g: GeneratedKey) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString("PUBLIC: \(g.publicKey)\nPRIVATE: \(g.privateKey)", forType: .string)
+        copiedBoth = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { copiedBoth = false }
     }
 
     private func importGenerated(_ g: GeneratedKey) {
