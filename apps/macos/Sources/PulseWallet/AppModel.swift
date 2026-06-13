@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 enum WalletSection: String, CaseIterable, Identifiable {
-    case wallet, send, receive, activity, keys, settings
+    case wallet, send, receive, activity, multisig, keys, settings
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -10,6 +10,7 @@ enum WalletSection: String, CaseIterable, Identifiable {
         case .send:     return "Send"
         case .receive:  return "Receive"
         case .activity: return "Activity"
+        case .multisig: return "Multisig"
         case .keys:     return "Keys"
         case .settings: return "Settings"
         }
@@ -20,6 +21,7 @@ enum WalletSection: String, CaseIterable, Identifiable {
         case .send:     return "arrow.up.right.circle"
         case .receive:  return "arrow.down.left.circle"
         case .activity: return "clock.arrow.circlepath"
+        case .multisig: return "person.2.badge.key"
         case .keys:     return "key.horizontal"
         case .settings: return "gearshape"
         }
@@ -153,6 +155,28 @@ final class AppModel {
     /// Accounts a public key can sign for (reverse lookup via Hyperion).
     func keyAccounts(_ publicKey: String) async -> [String] {
         (try? await hyperion?.getKeyAccounts(publicKey)) ?? []
+    }
+
+    /// The pulse.msig contract account on the active network.
+    var msigContract: String { "pulse.msig" }
+
+    struct ProposalRow: Decodable, Sendable { let proposalName: String }
+
+    /// Proposal names created by `proposer`.
+    func proposals(by proposer: String) async -> [String] {
+        guard let rpc else { return [] }
+        let rows = (try? await rpc.getTableRows(
+            code: msigContract, scope: proposer, table: "proposal", as: ProposalRow.self)) ?? []
+        return rows.map(\.proposalName)
+    }
+
+    /// Build the TAPOS triple from current chain head (nil if not connected).
+    func taposContext() -> (chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32)? {
+        guard let info = chainInfo, let prefix = Self.refBlockPrefix(blockIdHex: info.headBlockId)
+        else { return nil }
+        let chainId = networks.active.chainId ?? info.chainId
+        return (chainId, UInt16(truncatingIfNeeded: info.headBlockNum), prefix,
+                UInt32(Date().timeIntervalSince1970) + 3600)  // proposals: longer expiry
     }
 
     /// Broadcast a signed transaction; returns the tx id.

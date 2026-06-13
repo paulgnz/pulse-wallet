@@ -5,7 +5,10 @@
 //! error (null pointer, buffer too small, or invalid input). PUB_R1 is ~57
 //! chars and SIG_R1 ~101 chars, so a 256-byte buffer is always sufficient.
 
-use crate::tx::{build_transfer_signing, TransferParams};
+use crate::tx::{
+    build_msig_propose_transfer_signing, build_msig_signing, build_transfer_signing,
+    msig_approve_data, msig_exec_data, parse_perm_levels, PermLevel, TransferParams,
+};
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, pub_k1_from_priv,
     sign_k1,
@@ -262,4 +265,88 @@ pub unsafe extern "C" fn pwc_build_transfer(
         }
         Err(_) => -1,
     }
+}
+
+fn emit_tx(result: Result<(Vec<u8>, Vec<u8>, Vec<u8>), String>, out: *mut c_char, out_len: usize) -> c_int {
+    match result {
+        Ok((packed, preimage, digest)) => unsafe {
+            let s = format!("{}\n{}\n{}", hex::encode(packed), hex::encode(preimage), hex::encode(digest));
+            write_str(out, out_len, &s)
+        },
+        Err(_) => -1,
+    }
+}
+
+// --- pulse.msig -------------------------------------------------------------
+
+/// propose a single transfer. `requested` is "actor@perm;actor2@perm2".
+/// # Safety: all string pointers are NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_msig_propose_transfer(
+    contract: *const c_char, proposer: *const c_char, proposal: *const c_char,
+    requested: *const c_char, from: *const c_char, to: *const c_char,
+    quantity: *const c_char, memo: *const c_char, token_contract: *const c_char,
+    inner_expiration: u32, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(contract), cstr(proposer), cstr(proposal), cstr(requested), cstr(from),
+             cstr(to), cstr(quantity), cstr(memo), cstr(token_contract), cstr(chain_id_hex));
+    let (contract, proposer, proposal, requested, from, to, quantity, memo, token, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(g), Some(h), Some(i), Some(j), Some(k)) =>
+            (a, b, c, d, e, g, h, i, j, k),
+        _ => return -1,
+    };
+    let inner = TransferParams {
+        from, to, quantity, memo, contract: token, actor: proposer, permission: "active",
+        ref_block_num, ref_block_prefix, expiration: inner_expiration,
+    };
+    let levels = parse_perm_levels(requested);
+    emit_tx(build_msig_propose_transfer_signing(
+        contract, proposer, proposal, &levels, &inner, cid, ref_block_num, ref_block_prefix, expiration),
+        out, out_len)
+}
+
+/// approve a proposal (signed by `auth`).
+/// # Safety: see above.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_msig_approve(
+    contract: *const c_char, proposer: *const c_char, proposal: *const c_char,
+    level_actor: *const c_char, level_perm: *const c_char,
+    auth_actor: *const c_char, auth_perm: *const c_char,
+    chain_id_hex: *const c_char, ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(contract), cstr(proposer), cstr(proposal), cstr(level_actor),
+             cstr(level_perm), cstr(auth_actor), cstr(auth_perm), cstr(chain_id_hex));
+    let (contract, proposer, proposal, la, lp, aa, ap, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(g), Some(h), Some(i)) =>
+            (a, b, c, d, e, g, h, i),
+        _ => return -1,
+    };
+    let data = msig_approve_data(proposer, proposal,
+        &PermLevel { actor: la.to_string(), permission: lp.to_string() });
+    emit_tx(build_msig_signing(contract, "approve", data,
+        PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// exec a proposal (signed by `executer@active`).
+/// # Safety: see above.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_msig_exec(
+    contract: *const c_char, proposer: *const c_char, proposal: *const c_char,
+    executer: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(contract), cstr(proposer), cstr(proposal), cstr(executer), cstr(chain_id_hex));
+    let (contract, proposer, proposal, executer, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e)) => (a, b, c, d, e),
+        _ => return -1,
+    };
+    let data = msig_exec_data(proposer, proposal, executer);
+    emit_tx(build_msig_signing(contract, "exec", data,
+        PermLevel { actor: executer.to_string(), permission: "active".to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
 }

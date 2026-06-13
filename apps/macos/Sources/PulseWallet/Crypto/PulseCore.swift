@@ -32,7 +32,28 @@ protocol PulseCore {
     func buildTransfer(from: String, to: String, quantity: String, memo: String,
                        contract: String, actor: String, permission: String,
                        chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
-                       expiration: UInt32) throws -> (packed: String, preimage: String, digest: String)
+                       expiration: UInt32) throws -> BuiltTx
+
+    // pulse.msig
+    func msigProposeTransfer(contract: String, proposer: String, proposal: String,
+                             requested: String, from: String, to: String, quantity: String,
+                             memo: String, tokenContract: String, innerExpiration: UInt32,
+                             chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                             expiration: UInt32) throws -> BuiltTx
+    func msigApprove(contract: String, proposer: String, proposal: String,
+                     levelActor: String, levelPerm: String, authActor: String, authPerm: String,
+                     chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                     expiration: UInt32) throws -> BuiltTx
+    func msigExec(contract: String, proposer: String, proposal: String, executer: String,
+                  chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                  expiration: UInt32) throws -> BuiltTx
+}
+
+/// Serialized transaction + its signing material (all hex).
+struct BuiltTx: Sendable {
+    let packed: String
+    let preimage: String
+    let digest: String
 }
 
 enum PulseCoreError: Error, LocalizedError {
@@ -68,7 +89,25 @@ struct PulseCoreStub: PulseCore {
     func buildTransfer(from: String, to: String, quantity: String, memo: String,
                        contract: String, actor: String, permission: String,
                        chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
-                       expiration: UInt32) throws -> (packed: String, preimage: String, digest: String) {
+                       expiration: UInt32) throws -> BuiltTx {
         throw PulseCoreError.notImplemented("buildTransfer")
+    }
+    func msigProposeTransfer(contract: String, proposer: String, proposal: String,
+                             requested: String, from: String, to: String, quantity: String,
+                             memo: String, tokenContract: String, innerExpiration: UInt32,
+                             chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                             expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("msigProposeTransfer")
+    }
+    func msigApprove(contract: String, proposer: String, proposal: String,
+                     levelActor: String, levelPerm: String, authActor: String, authPerm: String,
+                     chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                     expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("msigApprove")
+    }
+    func msigExec(contract: String, proposer: String, proposal: String, executer: String,
+                  chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                  expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("msigExec")
     }
 }

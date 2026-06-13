@@ -82,17 +82,52 @@ struct PulseCoreFFI: PulseCore {
         return String(cString: out)
     }
 
+    private func parse(_ out: [CChar], _ n: Int32, _ what: String) throws -> BuiltTx {
+        guard n >= 0 else { throw PulseCoreError.signing("\(what) failed (bad params?)") }
+        let parts = String(cString: out).split(separator: "\n", omittingEmptySubsequences: false)
+        guard parts.count == 3 else { throw PulseCoreError.signing("malformed tx output") }
+        return BuiltTx(packed: String(parts[0]), preimage: String(parts[1]), digest: String(parts[2]))
+    }
+
     func buildTransfer(from: String, to: String, quantity: String, memo: String,
                        contract: String, actor: String, permission: String,
                        chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
-                       expiration: UInt32) throws -> (packed: String, preimage: String, digest: String) {
+                       expiration: UInt32) throws -> BuiltTx {
         var out = [CChar](repeating: 0, count: 4096)
         let n = pwc_build_transfer(from, to, quantity, memo, contract, actor, permission,
-                                   chainId, refBlockNum, refBlockPrefix, expiration,
-                                   &out, out.count)
-        guard n >= 0 else { throw PulseCoreError.signing("buildTransfer failed (bad params?)") }
-        let parts = String(cString: out).split(separator: "\n", omittingEmptySubsequences: false)
-        guard parts.count == 3 else { throw PulseCoreError.signing("malformed tx output") }
-        return (String(parts[0]), String(parts[1]), String(parts[2]))
+                                   chainId, refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "buildTransfer")
+    }
+
+    func msigProposeTransfer(contract: String, proposer: String, proposal: String,
+                             requested: String, from: String, to: String, quantity: String,
+                             memo: String, tokenContract: String, innerExpiration: UInt32,
+                             chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                             expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_msig_propose_transfer(contract, proposer, proposal, requested, from, to,
+                                          quantity, memo, tokenContract, innerExpiration, chainId,
+                                          refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "msigProposeTransfer")
+    }
+
+    func msigApprove(contract: String, proposer: String, proposal: String,
+                     levelActor: String, levelPerm: String, authActor: String, authPerm: String,
+                     chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                     expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_msig_approve(contract, proposer, proposal, levelActor, levelPerm,
+                                 authActor, authPerm, chainId, refBlockNum, refBlockPrefix,
+                                 expiration, &out, out.count)
+        return try parse(out, n, "msigApprove")
+    }
+
+    func msigExec(contract: String, proposer: String, proposal: String, executer: String,
+                  chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                  expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_msig_exec(contract, proposer, proposal, executer, chainId,
+                              refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "msigExec")
     }
 }

@@ -125,6 +125,19 @@ struct PulseRPC: Sendable {
         enum CodingKeys: String, CodingKey { case transactionId, id }
     }
 
+    private struct Rows<T: Decodable>: Decodable { let rows: [T] }
+
+    /// Read a contract table. Includes the strict params PulseVM expects.
+    func getTableRows<T: Decodable>(code: String, scope: String, table: String,
+                                    limit: Int = 100, as type: T.Type) async throws -> [T] {
+        let r: Rows<T> = try await call("pulsevm.getTableRows", params: [
+            "json": true, "code": code, "scope": scope, "table": table, "limit": limit,
+            "key_type": "", "index_position": 1, "lower_bound": "", "upper_bound": "",
+            "reverse": false, "encode_type": "dec",
+        ], as: Rows<T>.self)
+        return r.rows
+    }
+
     /// Submit a signed transaction. Returns the transaction id.
     func issueTx(signatures: [String], packedTrx: String) async throws -> String {
         let result: TxResult = try await call("pulsevm.issueTx", params: [

@@ -127,23 +127,175 @@ pub fn serialize_transfer_tx(p: &TransferParams) -> Result<Vec<u8>, String> {
     Ok(t)
 }
 
+/// (preimage, digest) for a packed transaction under a given chain id.
+fn signing_material(packed: &[u8], chain_id_hex: &str) -> Result<(Vec<u8>, Vec<u8>), String> {
+    let chain_id = hex::decode(chain_id_hex).map_err(|e| e.to_string())?;
+    if chain_id.len() != 32 {
+        return Err("chain_id must be 32 bytes".into());
+    }
+    let cfd_hash = sha256(&[]); // empty context-free data
+    let mut preimage = Vec::with_capacity(32 + packed.len() + 32);
+    preimage.extend_from_slice(&chain_id);
+    preimage.extend_from_slice(packed);
+    preimage.extend_from_slice(&cfd_hash);
+    let digest = sha256(&preimage);
+    Ok((preimage, digest.to_vec()))
+}
+
 /// (packed_trx, preimage, digest) for signing a transfer.
 pub fn build_transfer_signing(
     p: &TransferParams,
     chain_id_hex: &str,
 ) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), String> {
-    let chain_id = hex::decode(chain_id_hex).map_err(|e| e.to_string())?;
-    if chain_id.len() != 32 {
-        return Err("chain_id must be 32 bytes".into());
-    }
     let packed = serialize_transfer_tx(p)?;
-    let cfd_hash = sha256(&[]); // empty context-free data
-    let mut preimage = Vec::with_capacity(32 + packed.len() + 32);
-    preimage.extend_from_slice(&chain_id);
-    preimage.extend_from_slice(&packed);
-    preimage.extend_from_slice(&cfd_hash);
-    let digest = sha256(&preimage);
-    Ok((packed, preimage, digest.to_vec()))
+    let (preimage, digest) = signing_material(&packed, chain_id_hex)?;
+    Ok((packed, preimage, digest))
+}
+
+// === Generic actions (for multisig and arbitrary transactions) =============
+
+fn write_name(n: &str, out: &mut Vec<u8>) {
+    out.extend_from_slice(&name_to_u64(n).to_le_bytes());
+}
+
+pub struct PermLevel {
+    pub actor: String,
+    pub permission: String,
+}
+
+fn write_perm_levels(levels: &[PermLevel], out: &mut Vec<u8>) {
+    write_varuint32(levels.len() as u32, out);
+    for l in levels {
+        write_name(&l.actor, out);
+        write_name(&l.permission, out);
+    }
+}
+
+pub struct Action {
+    pub account: String,
+    pub name: String,
+    pub auth: Vec<PermLevel>,
+    pub data: Vec<u8>,
+}
+
+fn write_action(a: &Action, out: &mut Vec<u8>) {
+    write_name(&a.account, out);
+    write_name(&a.name, out);
+    write_perm_levels(&a.auth, out);
+    write_varuint32(a.data.len() as u32, out);
+    out.extend_from_slice(&a.data);
+}
+
+/// Serialize a transaction from a generic action list.
+pub fn serialize_tx(actions: &[Action], ref_block_num: u16, ref_block_prefix: u32, expiration: u32) -> Vec<u8> {
+    let mut t = Vec::new();
+    t.extend_from_slice(&expiration.to_le_bytes());
+    t.extend_from_slice(&ref_block_num.to_le_bytes());
+    t.extend_from_slice(&ref_block_prefix.to_le_bytes());
+    write_varuint32(0, &mut t); // max_net_usage_words
+    t.push(0); // max_cpu_usage_ms
+    write_varuint32(0, &mut t); // delay_sec
+    write_varuint32(0, &mut t); // context_free_actions
+    write_varuint32(actions.len() as u32, &mut t);
+    for a in actions {
+        write_action(a, &mut t);
+    }
+    write_varuint32(0, &mut t); // transaction_extensions
+    t
+}
+
+// --- eosio.msig (pulse.msig) action data ------------------------------------
+
+/// propose(name proposer, name proposal_name, permission_level[] requested, transaction trx)
+pub fn msig_propose_data(proposer: &str, proposal: &str, requested: &[PermLevel], trx: &[u8]) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(proposer, &mut d);
+    write_name(proposal, &mut d);
+    write_perm_levels(requested, &mut d);
+    d.extend_from_slice(trx); // transaction serialized inline
+    d
+}
+
+/// approve(name proposer, name proposal_name, permission_level level)
+pub fn msig_approve_data(proposer: &str, proposal: &str, level: &PermLevel) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(proposer, &mut d);
+    write_name(proposal, &mut d);
+    write_name(&level.actor, &mut d);
+    write_name(&level.permission, &mut d);
+    d
+}
+
+/// exec(name proposer, name proposal_name, name executer)
+pub fn msig_exec_data(proposer: &str, proposal: &str, executer: &str) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(proposer, &mut d);
+    write_name(proposal, &mut d);
+    write_name(executer, &mut d);
+    d
+}
+
+/// Build + sign-material for a single pulse.msig action authorized by `auth`.
+pub fn build_msig_signing(
+    msig_contract: &str,
+    action_name: &str,
+    action_data: Vec<u8>,
+    auth: PermLevel,
+    chain_id_hex: &str,
+    ref_block_num: u16,
+    ref_block_prefix: u32,
+    expiration: u32,
+) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), String> {
+    let action = Action {
+        account: msig_contract.to_string(),
+        name: action_name.to_string(),
+        auth: vec![auth],
+        data: action_data,
+    };
+    let packed = serialize_tx(&[action], ref_block_num, ref_block_prefix, expiration);
+    let (preimage, digest) = signing_material(&packed, chain_id_hex)?;
+    Ok((packed, preimage, digest))
+}
+
+/// Build + sign-material to propose a single transfer via pulse.msig.
+#[allow(clippy::too_many_arguments)]
+pub fn build_msig_propose_transfer_signing(
+    msig_contract: &str,
+    proposer: &str,
+    proposal: &str,
+    requested: &[PermLevel],
+    inner: &TransferParams,
+    chain_id_hex: &str,
+    ref_block_num: u16,
+    ref_block_prefix: u32,
+    expiration: u32,
+) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), String> {
+    let inner_trx = serialize_transfer_tx(inner)?;
+    let data = msig_propose_data(proposer, proposal, requested, &inner_trx);
+    build_msig_signing(
+        msig_contract,
+        "propose",
+        data,
+        PermLevel { actor: proposer.to_string(), permission: "active".to_string() },
+        chain_id_hex,
+        ref_block_num,
+        ref_block_prefix,
+        expiration,
+    )
+}
+
+/// Parse "actor@perm;actor2@perm2" into permission levels (default perm "active").
+pub fn parse_perm_levels(s: &str) -> Vec<PermLevel> {
+    s.split(';')
+        .map(|p| p.trim())
+        .filter(|p| !p.is_empty())
+        .map(|p| {
+            let mut it = p.splitn(2, '@');
+            let actor = it.next().unwrap_or("").to_string();
+            let permission = it.next().unwrap_or("active").to_string();
+            PermLevel { actor, permission }
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -183,5 +335,38 @@ mod tx_tests {
         // deterministic
         let (_, _, digest2) = build_transfer_signing(&p, cid).unwrap();
         assert_eq!(digest, digest2);
+    }
+
+    #[test]
+    fn parse_perm_levels_works() {
+        let levels = parse_perm_levels("alice@active; bob; carol@owner");
+        assert_eq!(levels.len(), 3);
+        assert_eq!(levels[0].actor, "alice");
+        assert_eq!(levels[0].permission, "active");
+        assert_eq!(levels[1].permission, "active"); // defaulted
+        assert_eq!(levels[2].permission, "owner");
+    }
+
+    #[test]
+    fn msig_approve_data_layout() {
+        let level = PermLevel { actor: "alice".into(), permission: "active".into() };
+        let d = msig_approve_data("proposer", "prop1", &level);
+        // proposer(8) + proposal(8) + actor(8) + permission(8) = 32 bytes
+        assert_eq!(d.len(), 32);
+    }
+
+    #[test]
+    fn msig_propose_wraps_inner_trx() {
+        let inner = TransferParams {
+            from: "protonnz", to: "hello", quantity: "1.0000 XPR", memo: "",
+            contract: "pulse.token", actor: "protonnz", permission: "active",
+            ref_block_num: 1, ref_block_prefix: 2, expiration: 1_760_000_000,
+        };
+        let requested = vec![PermLevel { actor: "bob".into(), permission: "active".into() }];
+        let cid = "0d6f033e887fae475d641104b6e87762b6c869e87a101afeeb64d608ab376618";
+        let (packed, _, digest) = build_msig_propose_transfer_signing(
+            "pulse.msig", "protonnz", "prop1", &requested, &inner, cid, 1, 2, 1_760_000_000).unwrap();
+        assert!(!packed.is_empty());
+        assert_eq!(digest.len(), 32);
     }
 }

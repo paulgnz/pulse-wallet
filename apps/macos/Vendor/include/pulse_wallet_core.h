@@ -35,6 +35,23 @@ int pwc_build_transfer(const char *from, const char *to, const char *quantity,
                        uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
                        char *out, size_t out_len);
 
+// pulse.msig. Each writes "<packed>\n<preimage>\n<digest>" (hex). 4096-byte buffer.
+int pwc_msig_propose_transfer(const char *contract, const char *proposer, const char *proposal,
+                              const char *requested, const char *from, const char *to,
+                              const char *quantity, const char *memo, const char *token_contract,
+                              uint32_t inner_expiration, const char *chain_id_hex,
+                              uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                              char *out, size_t out_len);
+int pwc_msig_approve(const char *contract, const char *proposer, const char *proposal,
+                     const char *level_actor, const char *level_perm,
+                     const char *auth_actor, const char *auth_perm, const char *chain_id_hex,
+                     uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                     char *out, size_t out_len);
+int pwc_msig_exec(const char *contract, const char *proposer, const char *proposal,
+                  const char *executer, const char *chain_id_hex,
+                  uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                  char *out, size_t out_len);
+
 #ifdef __cplusplus
 }
 #endif

@@ -30,12 +30,14 @@
 		AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F9C43E9860AAD1D468DC9C /* PulseCore.swift */; };
 		B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */; };
 		B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */; };
+		BEC49AA9E87AF795843DA76A /* MultisigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0963F1C4442FCBABC7261C01 /* MultisigView.swift */; };
 		C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132057A53EF31C9B091E1859 /* Keychain.swift */; };
 		C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B1EEFEB2E72680C6C808D3 /* Components.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0698D056BD05A32CE1905F8C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		0963F1C4442FCBABC7261C01 /* MultisigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultisigView.swift; sourceTree = "<group>"; };
 		13029EAE706A34911065861E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		132057A53EF31C9B091E1859 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		28704358E20940217081D30E /* EnclaveSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnclaveSigner.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				0698D056BD05A32CE1905F8C /* DashboardView.swift */,
 				988744519E80C7631A1550B1 /* KeysView.swift */,
 				D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */,
+				0963F1C4442FCBABC7261C01 /* MultisigView.swift */,
 				58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */,
 				5683B2975215EE839C7D7028 /* RootView.swift */,
 				335FC2C0D8FA258ACAC588FE /* SendView.swift */,
@@ -252,6 +255,7 @@
 				9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */,
 				B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */,
 				227763B316A637302CE0C75F /* Models.swift in Sources */,
+				BEC49AA9E87AF795843DA76A /* MultisigView.swift in Sources */,
 				36598184A7A34289D9A76A03 /* NetworkStore.swift in Sources */,
 				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,
 				8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */,
