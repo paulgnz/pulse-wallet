@@ -80,6 +80,14 @@ if [ "$NOTARIZE" = "1" ]; then
     xcrun stapler validate "$DMG"
 fi
 
+# Clean up intermediate .app copies — otherwise the staged/exported/archived
+# PulseVM.app copies linger on disk and register themselves as competing
+# pulsevm:// handlers (LaunchServices may then launch the wrong build).
+echo "▶︎ Cleaning up build copies (keeping the .dmg)…"
+rm -rf "$STAGE" "$EXPORT_DIR" "$ARCHIVE"
+LSREG=/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
+[ -x "$LSREG" ] && "$LSREG" -kill -r -domain local -domain user >/dev/null 2>&1 || true
+
 echo ""
 echo "✅ Done →  $(cd "$(dirname "$DMG")" && pwd)/$(basename "$DMG")"
 if [ "$NOTARIZE" = "1" ]; then
