@@ -12,7 +12,7 @@ use crate::tx::{
 };
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, encode_pvt_k1,
-    encode_pvt_r1, pub_k1_from_priv, sign_k1,
+    encode_pvt_r1, generate_k1, pub_k1_from_priv, sign_k1,
 };
 use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
@@ -161,6 +161,18 @@ pub unsafe extern "C" fn pwc_decode_pvt_k1(s: *const c_char, out32: *mut u8) -> 
         }
         Err(_) => -1,
     }
+}
+
+/// Generate a fresh random K1 private key into `out32`. Returns 0.
+/// # Safety: `out32` points to 32 writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_generate_k1(out32: *mut u8) -> c_int {
+    if out32.is_null() {
+        return -1;
+    }
+    let key = generate_k1();
+    slice::from_raw_parts_mut(out32, 32).copy_from_slice(&key);
+    0
 }
 
 /// Derive the 33-byte compressed K1 public key from a raw private key.

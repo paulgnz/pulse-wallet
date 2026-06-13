@@ -55,6 +55,7 @@ struct RootView: View {
         case .activity: ActivityView()
         case .multisig: MultisigView()
         case .keys:     KeysView()
+        case .tools:    ToolsView()
         case .settings: SettingsView()
         }
     }

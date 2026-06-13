@@ -64,6 +64,11 @@ struct PulseCoreFFI: PulseCore {
         return n >= 0 ? String(cString: out) : ""
     }
 
+    func generateK1() -> Data {
+        var out = [UInt8](repeating: 0, count: 32)
+        return pwc_generate_k1(&out) == 0 ? Data(out) : Data()
+    }
+
     func pubK1(privateKey: Data) -> Data? {
         guard privateKey.count == 32 else { return nil }
         var out = [UInt8](repeating: 0, count: 33)

@@ -26,6 +26,7 @@ int pwc_encode_pvt_r1(const uint8_t *priv32, char *out, size_t out_len);
 int pwc_encode_pvt_k1(const uint8_t *priv32, char *out, size_t out_len);
 
 // K1 (secp256k1) — for importing/controlling existing Antelope accounts.
+int pwc_generate_k1(uint8_t *out32);                           // fresh random K1 private key
 int pwc_decode_pvt_k1(const char *s, uint8_t *out32);          // PVT_K1_/WIF -> raw32
 int pwc_pub_k1(const uint8_t *priv32, uint8_t *out33);          // raw32 -> compressed pub
 int pwc_encode_pub_k1(const uint8_t *pub33, char *out, size_t out_len); // -> "PUB_K1_…"

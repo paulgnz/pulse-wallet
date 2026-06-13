@@ -27,6 +27,7 @@ protocol PulseCore {
     // K1 (secp256k1) — for existing Antelope accounts.
     func decodePvtK1(_ wif: String) -> Data?        // "PVT_K1_…" or legacy WIF
     func encodePvtK1(_ raw: Data) -> String         // raw32 -> "PVT_K1_…"
+    func generateK1() -> Data                       // fresh random K1 private key (32B)
     func pubK1(privateKey: Data) -> Data?           // raw32 -> 33B compressed
     func encodePubK1(compressedPublicKey: Data) -> String
     func signK1(privateKey: Data, digest: Data) throws -> String
@@ -96,6 +97,7 @@ struct PulseCoreStub: PulseCore {
     func encodePvtR1(_ raw: Data) -> String { "" }
     func decodePvtK1(_ wif: String) -> Data? { nil }
     func encodePvtK1(_ raw: Data) -> String { "" }
+    func generateK1() -> Data { Data() }
     func pubK1(privateKey: Data) -> Data? { nil }
     func encodePubK1(compressedPublicKey: Data) -> String { "" }
     func signK1(privateKey: Data, digest: Data) throws -> String {

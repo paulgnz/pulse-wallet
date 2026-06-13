@@ -160,6 +160,15 @@ pub fn decode_pvt_k1(s: &str) -> Result<[u8; 32], String> {
     Ok(out)
 }
 
+/// Generate a fresh random K1 private key (32 bytes) using the OS RNG.
+pub fn generate_k1() -> [u8; 32] {
+    let sk = K1SigningKey::random(&mut k256::elliptic_curve::rand_core::OsRng);
+    let bytes = sk.to_bytes();
+    let mut out = [0u8; 32];
+    out.copy_from_slice(&bytes);
+    out
+}
+
 /// Compressed K1 public key (33 bytes) from a raw private key.
 pub fn pub_k1_from_priv(priv32: &[u8; 32]) -> Result<[u8; 33], String> {
     let sk = K1SigningKey::from_bytes(priv32.into()).map_err(|e| e.to_string())?;

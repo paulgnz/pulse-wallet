@@ -16,6 +16,7 @@
 		36598184A7A34289D9A76A03 /* NetworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58EA5335982886F7C739E10 /* NetworkStore.swift */; };
 		37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55D58BFECA263D8B812953C /* AppModel.swift */; };
 		3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28704358E20940217081D30E /* EnclaveSigner.swift */; };
+		3BF949C3631B422387162462 /* KeyToolkit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BABA36B61663BE346CB123A /* KeyToolkit.swift */; };
 		3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1981660F714156CB20D4B81 /* ActivityView.swift */; };
 		40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED00983BCEA7586B91D3F8A /* Sidebar.swift */; };
 		493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FC2C0D8FA258ACAC588FE /* SendView.swift */; };
@@ -25,6 +26,7 @@
 		5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA718630DE93EEEAE5AB4CDC /* DataHex.swift */; };
 		794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78440EE6283769BDF3E38093 /* PulseWalletApp.swift */; };
 		7DC8A70C3F20BC28F2AC8D2C /* DappRequestSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */; };
+		87D9A358DFD66E49795200DD /* ToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4AC6D391E73F3C113B9068 /* ToolsView.swift */; };
 		8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */; };
 		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
 		9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988744519E80C7631A1550B1 /* KeysView.swift */; };
@@ -59,7 +61,9 @@
 		7565A5201A525117526CF9E4 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		78440EE6283769BDF3E38093 /* PulseWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWalletApp.swift; sourceTree = "<group>"; };
 		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
+		7F4AC6D391E73F3C113B9068 /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
 		988744519E80C7631A1550B1 /* KeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysView.swift; sourceTree = "<group>"; };
+		9BABA36B61663BE346CB123A /* KeyToolkit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyToolkit.swift; sourceTree = "<group>"; };
 		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1981660F714156CB20D4B81 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		BCE2872F95290C0C2024BCB1 /* Biometrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometrics.swift; sourceTree = "<group>"; };
@@ -129,6 +133,7 @@
 				335FC2C0D8FA258ACAC588FE /* SendView.swift */,
 				358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */,
 				7ED00983BCEA7586B91D3F8A /* Sidebar.swift */,
+				7F4AC6D391E73F3C113B9068 /* ToolsView.swift */,
 				F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */,
 				EAE1D7B9716513661393FD3A /* WelcomeSheet.swift */,
 			);
@@ -151,6 +156,7 @@
 				28704358E20940217081D30E /* EnclaveSigner.swift */,
 				132057A53EF31C9B091E1859 /* Keychain.swift */,
 				320D8A92D151F0FF17E2DC83 /* KeyStore.swift */,
+				9BABA36B61663BE346CB123A /* KeyToolkit.swift */,
 				57F9C43E9860AAD1D468DC9C /* PulseCore.swift */,
 				50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */,
 			);
@@ -265,6 +271,7 @@
 				EB049CD866A5520D483A4CCC /* ExportKeySheet.swift in Sources */,
 				08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */,
 				09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */,
+				3BF949C3631B422387162462 /* KeyToolkit.swift in Sources */,
 				C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */,
 				9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */,
 				B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */,
@@ -281,6 +288,7 @@
 				A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */,
 				40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */,
 				2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */,
+				87D9A358DFD66E49795200DD /* ToolsView.swift in Sources */,
 				57E93E5155AC480F95D08259 /* UpdateAuthSheet.swift in Sources */,
 				B02FE8BFF708DAA3B089A101 /* WelcomeSheet.swift in Sources */,
 			);
