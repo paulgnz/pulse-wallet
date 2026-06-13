@@ -141,10 +141,31 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 SectionHeader(title: "About", systemImage: "info.circle")
                 Text("PulseVM — the native macOS wallet for PulseVM.").font(.callout)
+                HStack {
+                    Label("Version", systemImage: "number")
+                    Spacer()
+                    Text(SettingsView.versionString)
+                        .font(.callout.monospaced()).foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
                 Text("Keys are generated and held in the Secure Enclave; signatures are produced on-device with Touch ID and never leave the chip.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
+    }
+
+    /// Marketing version + build, with a Debug/Release tag — so it's obvious which
+    /// build is running (e.g. the Xcode debug build vs the installed release).
+    static var versionString: String {
+        let info = Bundle.main.infoDictionary
+        let v = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let b = info?["CFBundleVersion"] as? String ?? "?"
+        #if DEBUG
+        let cfg = " · Debug"
+        #else
+        let cfg = " · Release"
+        #endif
+        return "\(v) (\(b))\(cfg)"
     }
 }
 
