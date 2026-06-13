@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ReceiveView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openURL) private var openURL
     @State private var copied = false
 
     var body: some View {
@@ -32,6 +33,15 @@ struct ReceiveView: View {
                         }
                         .buttonStyle(.glass)
                         .controlSize(.large)
+
+                        if let url = model.explorerAccountURL(model.accountName) {
+                            Button { openURL(url) } label: {
+                                Label("View on explorer", systemImage: "arrow.up.right.square")
+                                    .frame(maxWidth: .infinity).padding(.vertical, 4)
+                            }
+                            .buttonStyle(.glass)
+                            .controlSize(.large)
+                        }
                     }
                 }
 

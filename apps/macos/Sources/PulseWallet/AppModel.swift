@@ -102,6 +102,9 @@ final class AppModel {
 
     var coreSymbol: String? { account?.coreSymbol }
 
+    func explorerAccountURL(_ name: String) -> URL? { networks.active.accountURL(name) }
+    func explorerTxURL(_ txid: String) -> URL? { networks.active.txURL(txid) }
+
     /// Headline asset: the primary value token if held, else first value, else first.
     var primaryAsset: Asset? {
         assets.first { $0.symbol == primarySymbol }
@@ -201,7 +204,7 @@ final class AppModel {
                 asset: (outgoing ? "-" : "+") + qty,
                 memo: d.memo ?? "",
                 time: time,
-                txid: String(action.trxId.prefix(8)))
+                txid: action.trxId)
         }
         // Non-transfer action → generic contract row.
         return ActivityItem(

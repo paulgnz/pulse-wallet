@@ -111,6 +111,7 @@ private struct NetworkEditSheet: View {
     @State private var label = ""
     @State private var rpc = ""
     @State private var hyperion = ""
+    @State private var explorer = ""
     @State private var primarySymbol = "XPR"
     @State private var chainId: String?
     @State private var testResult: String?
@@ -123,6 +124,7 @@ private struct NetworkEditSheet: View {
             field("Label", "A-Chain Testnet", $label)
             field("RPC endpoint", "https://rpc.…", $rpc, mono: true)
             field("Hyperion endpoint (optional)", "https://hyperion.…", $hyperion, mono: true)
+            field("Explorer base (optional)", "https://explorer.…", $explorer, mono: true)
             field("Headline token", "XPR", $primarySymbol)
 
             HStack {
@@ -152,7 +154,7 @@ private struct NetworkEditSheet: View {
         .onAppear {
             if let n = network {
                 label = n.label; rpc = n.rpc; hyperion = n.hyperion
-                primarySymbol = n.primarySymbol; chainId = n.chainId
+                explorer = n.explorer; primarySymbol = n.primarySymbol; chainId = n.chainId
             }
         }
     }
@@ -184,6 +186,7 @@ private struct NetworkEditSheet: View {
             id: network?.id ?? UUID(),
             label: label, rpc: rpc,
             hyperion: hyperion.isEmpty ? rpc : hyperion,
+            explorer: explorer,
             chainId: chainId ?? network?.chainId,
             primarySymbol: primarySymbol.isEmpty ? "XPR" : primarySymbol)
         if network == nil { model.networks.add(net) } else { model.networks.update(net) }

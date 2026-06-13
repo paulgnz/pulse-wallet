@@ -7,13 +7,21 @@ struct PulseNetwork: Identifiable, Codable, Hashable {
     var label: String
     var rpc: String
     var hyperion: String
+    var explorer: String
     var chainId: String?
     var primarySymbol: String
 
     init(id: UUID = UUID(), label: String, rpc: String, hyperion: String,
-         chainId: String? = nil, primarySymbol: String = "XPR") {
-        self.id = id; self.label = label; self.rpc = rpc
-        self.hyperion = hyperion; self.chainId = chainId; self.primarySymbol = primarySymbol
+         explorer: String = "", chainId: String? = nil, primarySymbol: String = "XPR") {
+        self.id = id; self.label = label; self.rpc = rpc; self.hyperion = hyperion
+        self.explorer = explorer; self.chainId = chainId; self.primarySymbol = primarySymbol
+    }
+
+    func accountURL(_ name: String) -> URL? {
+        explorer.isEmpty ? nil : URL(string: "\(explorer)/account/\(name)")
+    }
+    func txURL(_ txid: String) -> URL? {
+        explorer.isEmpty ? nil : URL(string: "\(explorer)/transaction/\(txid)")
     }
 }
 
@@ -50,6 +58,7 @@ final class NetworkStore {
             label: "A-Chain Testnet",
             rpc: "https://rpc.a-chain-testnet.protonnz.com",
             hyperion: "https://hyperion.a-chain-testnet.protonnz.com",
+            explorer: "https://a-chain-testnet.metalblockchain.org",
             chainId: "0d6f033e887fae475d641104b6e87762b6c869e87a101afeeb64d608ab376618",
             primarySymbol: "XPR")]
     }

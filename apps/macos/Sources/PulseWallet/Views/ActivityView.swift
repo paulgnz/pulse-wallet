@@ -17,7 +17,11 @@ struct ActivityView: View {
 }
 
 struct ActivityRow: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.openURL) private var openURL
     let item: ActivityItem
+
+    private var explorerURL: URL? { model.explorerTxURL(item.txid) }
 
     var body: some View {
         GlassCard(padding: 14) {
@@ -30,7 +34,7 @@ struct ActivityRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.kind.rawValue.capitalized + " · " + item.counterparty)
                         .font(.body.weight(.medium))
-                    Text(item.memo.isEmpty ? item.txid : item.memo)
+                    Text(item.memo.isEmpty ? String(item.txid.prefix(12)) + "…" : item.memo)
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -39,8 +43,15 @@ struct ActivityRow: View {
                     Text(item.time, style: .relative)
                         .font(.caption2).foregroundStyle(.secondary)
                 }
+                if explorerURL != nil {
+                    Image(systemName: "arrow.up.right.square")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture { if let u = explorerURL { openURL(u) } }
+        .help(explorerURL != nil ? "View transaction in explorer" : "")
     }
 
     private var tint: Color {
