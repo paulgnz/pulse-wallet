@@ -7,3 +7,6 @@ node_modules/
 
 # Vendored Rust static lib (build with scripts/build-core-macos.sh)
 apps/macos/Vendor/*.a
+
+# Local signing (keep Team stable, not committed)
+apps/macos/Signing.xcconfig

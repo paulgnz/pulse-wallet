@@ -1,0 +1,8 @@
+// Copy this to Signing.xcconfig (gitignored) and set your Apple Development Team ID.
+// Find it: Xcode ▸ Settings ▸ Accounts, or `security find-identity -v -p codesigning`
+// (the 10-char ID in parentheses, e.g. "Apple Development: You (ABCDE12345)").
+//
+// A STABLE team is what keeps your Secure Enclave / imported keys readable across
+// rebuilds — Keychain items are bound to the signing identity.
+DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_STYLE = Automatic
