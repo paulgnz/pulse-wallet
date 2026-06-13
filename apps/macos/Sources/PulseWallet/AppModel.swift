@@ -24,14 +24,10 @@ enum WalletSection: String, CaseIterable, Identifiable {
     }
 }
 
+@MainActor
 @Observable
 final class AppModel {
     var section: WalletSection = .wallet
-    var accounts: [PulseAccount] = []
-    var selectedAccount: PulseAccount?
-    var assets: [Asset] = []
-    var activity: [ActivityItem] = []
-    var isLocked = false
 
     /// Network this wallet is pointed at (A-Chain testnet by default).
     var endpoint = "https://rpc.a-chain-testnet.protonnz.com"
@@ -40,44 +36,91 @@ final class AppModel {
     /// Chain logic backed by the Rust core (validated vs pulsevm-js).
     let core: PulseCore = PulseCoreFFI()
 
-    init() { loadSampleState() }
+    /// Watch account until onboarding (#6) provides a real owned account.
+    var accountName = "protonnz"
+    var permissionName = "active"
+
+    // Live state, fetched from RPC.
+    private(set) var chainInfo: ChainInfo?
+    private(set) var account: AccountInfo?
+    private(set) var assets: [Asset] = []
+    private(set) var activity: [ActivityItem] = []
+    private(set) var isLoading = false
+    private(set) var loadError: String?
+
+    var isLocked = false
+
+    private var rpc: PulseRPC? { PulseRPC(endpoint) }
+
+    // MARK: Derived view state
+
+    /// A `PulseAccount` synthesized from live chain data (keeps views simple).
+    var selectedAccount: PulseAccount? {
+        let activeKey = account?.permissions
+            .first { $0.permName == permissionName }?
+            .requiredAuth.keys.first?.key
+        return PulseAccount(
+            name: account?.accountName ?? accountName,
+            permission: permissionName,
+            pubKey: activeKey ?? "",
+            isHardwareBacked: activeKey?.hasPrefix("PUB_R1_") ?? false)
+    }
+    var accounts: [PulseAccount] { selectedAccount.map { [$0] } ?? [] }
+
+    var coreSymbol: String? { account?.coreSymbol }
+
+    /// The network is paused if the head block hasn't advanced recently.
+    var networkPaused: Bool {
+        guard let t = chainInfo?.headBlockTime, let d = Self.parseChainTime(t) else { return false }
+        return Date().timeIntervalSince(d) > 120
+    }
+
+    // MARK: Actions
 
     func lock() { isLocked = true }
     func unlock() { isLocked = false }
 
     func select(_ account: PulseAccount) {
-        selectedAccount = account
-        // In the real app: refresh balances + activity from RPC/Hyperion.
+        accountName = account.name
+        Task { await refresh() }
     }
 
-    /// Placeholder state so the UI is reviewable before RPC wiring lands.
-    /// Replaced by live `PulseClient` calls (see Crypto/PulseCore.swift).
-    private func loadSampleState() {
-        let acct = PulseAccount(
-            name: "protonnz",
-            permission: "active",
-            pubKey: "PUB_R1_562tX4UqQqJqfL3PnKFNYycVMQ1WghKDLzbx9XePwE1zSJj8Zo",
-            isHardwareBacked: true)
-        accounts = [
-            acct,
-            PulseAccount(name: "treasury.nz", permission: "active",
-                         pubKey: "PUB_R1_7x…ops", isHardwareBacked: false)
-        ]
-        selectedAccount = acct
-        // XPR is the value/transfer token (headline balance); SYS is the system
-        // resource token staked for CPU / NET / RAM.
-        assets = [
-            Asset(symbol: "XPR", amount: 50_000,     precision: 4, contract: "eosio.token", role: .value),
-            Asset(symbol: "SYS", amount: 1_284.5012, precision: 4, contract: "pulse.token", role: .resource)
-        ]
-        let now = Date(timeIntervalSince1970: 1_760_000_000)
-        activity = [
-            ActivityItem(kind: .received, counterparty: "metallicus", asset: "+250.0000 XPR",
-                         memo: "grant", time: now, txid: "a1b2c3"),
-            ActivityItem(kind: .sent, counterparty: "treasury.nz", asset: "-12.5000 XPR",
-                         memo: "ops", time: now.addingTimeInterval(-3600), txid: "d4e5f6"),
-            ActivityItem(kind: .staked, counterparty: "pulse.system", asset: "100.0000 SYS",
-                         memo: "CPU/NET", time: now.addingTimeInterval(-86400), txid: "070809")
-        ]
+    /// Pull chain info + the watched account's real balances/resources.
+    func refresh() async {
+        guard let rpc else { loadError = "Invalid endpoint"; return }
+        isLoading = true
+        loadError = nil
+        do {
+            async let info = rpc.getInfo()
+            async let acct = rpc.getAccount(accountName)
+            let (i, a) = try await (info, acct)
+            chainInfo = i
+            account = a
+            assets = Self.assets(from: a)
+        } catch {
+            loadError = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    private static func assets(from account: AccountInfo) -> [Asset] {
+        var out: [Asset] = []
+        // The core liquid (spendable) token — SYS on A-Chain, XPR on mainnet.
+        if let bal = account.coreLiquidBalance,
+           let asset = Asset(balanceString: bal,
+                             contract: account.coreSymbol == "SYS" ? "pulse.token" : "eosio.token",
+                             role: .value) {
+            out.append(asset)
+        }
+        return out
+    }
+
+    /// Parse chain timestamps like "2026-06-11T22:18:20.000" (UTC, no zone).
+    static func parseChainTime(_ s: String) -> Date? {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: "UTC")
+        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        return f.date(from: s)
     }
 }

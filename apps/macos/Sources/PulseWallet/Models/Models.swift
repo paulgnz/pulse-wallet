@@ -27,6 +27,18 @@ struct Asset: Identifiable, Hashable {
     }
 }
 
+extension Asset {
+    /// Parse an Antelope balance like "1000.0000 SYS". (In an extension so the
+    /// memberwise initializer is preserved.)
+    init?(balanceString: String, contract: String, role: AssetRole = .value) {
+        let parts = balanceString.split(separator: " ")
+        guard parts.count == 2, let amount = Decimal(string: String(parts[0])) else { return nil }
+        let precision = String(parts[0]).split(separator: ".").last.map(\.count) ?? 0
+        self.init(symbol: String(parts[1]), amount: amount, precision: precision,
+                  contract: contract, role: role)
+    }
+}
+
 enum ActivityKind: String {
     case sent, received, staked, contract
     var symbol: String {

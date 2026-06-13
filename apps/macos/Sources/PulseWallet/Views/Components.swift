@@ -26,6 +26,26 @@ struct SectionHeader: View {
     }
 }
 
+/// A labelled resource meter (CPU / NET / RAM).
+struct ResourceBar: View {
+    let label: String
+    let fraction: Double
+    var tint: Color = Brand.accent
+    var detail: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(label).font(.caption.weight(.semibold))
+                Spacer()
+                Text(detail ?? "\(Int((fraction * 100).rounded()))%")
+                    .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+            }
+            ProgressView(value: fraction).tint(tint)
+        }
+    }
+}
+
 /// Primary action — uses the macOS Tahoe prominent glass button style.
 struct PrimaryButton: View {
     let title: String

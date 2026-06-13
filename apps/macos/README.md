@@ -7,10 +7,16 @@ Glass) components: `NavigationSplitView`, `glassEffect`, `GlassEffectContainer`,
 ## Open it
 
 ```sh
+./scripts/build-core-macos.sh   # builds + vendors libpulse_wallet_core.a (run from repo root)
 cd apps/macos
-xcodegen generate          # regenerates PulseWallet.xcodeproj from project.yml
+xcodegen generate               # regenerates PulseWallet.xcodeproj from project.yml
 open PulseWallet.xcodeproj
 ```
+
+The app links the Rust core (`pulse-wallet-core`) as a vendored universal static
+lib via a C ABI (`Vendor/`). The `.a` is git-ignored, so run
+`scripts/build-core-macos.sh` once (and after any change to `core/`) before
+building in Xcode.
 
 `project.yml` is the source of truth — the `.xcodeproj` is generated, so commit
 the spec and regenerate rather than hand-editing the project. Requires

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
 		227763B316A637302CE0C75F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13029EAE706A34911065861E /* Models.swift */; };
+		2D80351ED5E347B638B5DEB7 /* PulseRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A106B02E0B4966774E12E5 /* PulseRPC.swift */; };
 		2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7565A5201A525117526CF9E4 /* Theme.swift */; };
 		37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55D58BFECA263D8B812953C /* AppModel.swift */; };
 		3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28704358E20940217081D30E /* EnclaveSigner.swift */; };
@@ -33,6 +34,7 @@
 		335FC2C0D8FA258ACAC588FE /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		37A106B02E0B4966774E12E5 /* PulseRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseRPC.swift; sourceTree = "<group>"; };
 		50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCoreFFI.swift; sourceTree = "<group>"; };
 		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		57F9C43E9860AAD1D468DC9C /* PulseCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCore.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				A681EFCEBC3738C1E176A3BA /* Crypto */,
 				DCF1FE27AD6AA4AC0E24C886 /* Design */,
 				4013BC0C099F9A70F860B656 /* Models */,
+				B03162D6E425EC07E89D2978 /* Network */,
 				3C40CA16AB27649DE789ACC1 /* Views */,
 				F55D58BFECA263D8B812953C /* AppModel.swift */,
 				78440EE6283769BDF3E38093 /* PulseWalletApp.swift */,
@@ -118,6 +121,14 @@
 				50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */,
 			);
 			path = Crypto;
+			sourceTree = "<group>";
+		};
+		B03162D6E425EC07E89D2978 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				37A106B02E0B4966774E12E5 /* PulseRPC.swift */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 		D5B7171F1B2011B539E0D41B /* Sources */ = {
@@ -216,6 +227,7 @@
 				227763B316A637302CE0C75F /* Models.swift in Sources */,
 				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,
 				8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */,
+				2D80351ED5E347B638B5DEB7 /* PulseRPC.swift in Sources */,
 				794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */,
 				B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */,
 				59747BF54046AFE46FF1C001 /* RootView.swift in Sources */,
