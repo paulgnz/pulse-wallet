@@ -74,13 +74,26 @@ enum EnclaveSigner {
         return signature.rawRepresentation   // 64 bytes: r(32) ‖ s(32)
     }
 
+    /// Everything the Rust core needs to assemble a SIG_R1: the raw r‖s, the
+    /// 32-byte digest that was actually signed, and the signer's compressed key.
+    struct Signed: Sendable {
+        let rs: Data                  // 64 bytes: r(32) ‖ s(32)
+        let digest: Data              // 32 bytes: sha256(preImage) — what CryptoKit signed
+        let publicKeyCompressed: Data // 33 bytes
+    }
+
     /// Convenience: load/create the account's key and sign, off the main actor.
-    /// Returns raw r‖s. The (non-Sendable) Enclave key never crosses an actor
-    /// boundary — only the resulting `Data` does.
-    static func sign(account: String, preImage: Data, reason: String) async throws -> Data {
+    /// The (non-Sendable) Enclave key never crosses an actor boundary — only the
+    /// resulting `Signed` (all `Data`) does.
+    ///
+    /// CryptoKit signs `SHA256(preImage)`, so the digest we return — and that the
+    /// core derives the recovery id against — is exactly that SHA-256.
+    static func sign(account: String, preImage: Data, reason: String) async throws -> Signed {
         try await Task.detached(priority: .userInitiated) {
             let handle = try handle(forAccount: account)
-            return try signPreImage(preImage, with: handle, reason: reason)
+            let rs = try signPreImage(preImage, with: handle, reason: reason)
+            let digest = Data(SHA256.hash(data: preImage))
+            return Signed(rs: rs, digest: digest, publicKeyCompressed: handle.compressedPublicKey)
         }.value
     }
 }

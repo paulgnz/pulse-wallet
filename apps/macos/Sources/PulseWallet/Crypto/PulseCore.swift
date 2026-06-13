@@ -24,7 +24,19 @@ protocol PulseCore {
                         memo: String, chainID: String) throws -> (preImage: Data, digest: Data)
 }
 
-enum PulseCoreError: Error { case notImplemented(String) }
+enum PulseCoreError: Error, LocalizedError {
+    case notImplemented(String)
+    case signing(String)
+    case badInput(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .notImplemented(let m): return "Not implemented: \(m)"
+        case .signing(let m):        return "Signing failed: \(m)"
+        case .badInput(let m):       return "Invalid input: \(m)"
+        }
+    }
+}
 
 /// Stand-in until the uniffi binding ships. Returns clearly-fake values so the
 /// UI is exercisable without claiming to be real.

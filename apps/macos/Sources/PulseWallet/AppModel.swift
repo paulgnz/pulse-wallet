@@ -37,6 +37,9 @@ final class AppModel {
     var endpoint = "https://rpc.a-chain-testnet.protonnz.com"
     var chainName = "A-Chain Testnet"
 
+    /// Chain logic backed by the Rust core (validated vs pulsevm-js).
+    let core: PulseCore = PulseCoreFFI()
+
     init() { loadSampleState() }
 
     func lock() { isLocked = true }

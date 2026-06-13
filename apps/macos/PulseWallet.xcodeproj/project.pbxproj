@@ -17,6 +17,7 @@
 		493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FC2C0D8FA258ACAC588FE /* SendView.swift */; };
 		59747BF54046AFE46FF1C001 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5683B2975215EE839C7D7028 /* RootView.swift */; };
 		794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78440EE6283769BDF3E38093 /* PulseWalletApp.swift */; };
+		8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */; };
 		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
 		A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */; };
 		AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F9C43E9860AAD1D468DC9C /* PulseCore.swift */; };
@@ -32,6 +33,7 @@
 		335FC2C0D8FA258ACAC588FE /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCoreFFI.swift; sourceTree = "<group>"; };
 		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		57F9C43E9860AAD1D468DC9C /* PulseCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCore.swift; sourceTree = "<group>"; };
 		58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 			children = (
 				28704358E20940217081D30E /* EnclaveSigner.swift */,
 				57F9C43E9860AAD1D468DC9C /* PulseCore.swift */,
+				50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */,
 			);
 			path = Crypto;
 			sourceTree = "<group>";
@@ -212,6 +215,7 @@
 				B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */,
 				227763B316A637302CE0C75F /* Models.swift in Sources */,
 				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,
+				8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */,
 				794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */,
 				B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */,
 				59747BF54046AFE46FF1C001 /* RootView.swift in Sources */,
@@ -304,14 +308,27 @@
 				CODE_SIGN_ENTITLEMENTS = Resources/PulseWallet.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_PREVIEWS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/include",
+				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lpulse_wallet_core",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = dev.pulsevm.wallet;
 				PRODUCT_NAME = PulseVM;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Vendor/PulseWallet-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -387,14 +404,27 @@
 				CODE_SIGN_ENTITLEMENTS = Resources/PulseWallet.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_PREVIEWS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/include",
+				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lpulse_wallet_core",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = dev.pulsevm.wallet;
 				PRODUCT_NAME = PulseVM;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Vendor/PulseWallet-Bridging-Header.h";
 			};
 			name = Release;
 		};

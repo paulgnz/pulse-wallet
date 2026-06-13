@@ -43,9 +43,17 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         ENABLE_PREVIEWS: true
         COMBINE_HIDPI_IMAGES: true
+        # Link the vendored Rust core (build with scripts/build-core-macos.sh).
+        SWIFT_OBJC_BRIDGING_HEADER: Vendor/PulseWallet-Bridging-Header.h
+        HEADER_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(SRCROOT)/Vendor/include"
+        LIBRARY_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(SRCROOT)/Vendor"
+        OTHER_LDFLAGS:
+          - "$(inherited)"
+          - "-lpulse_wallet_core"
         LD_RUNPATH_SEARCH_PATHS:
           - "$(inherited)"
           - "@executable_path/../Frameworks"
-    # When the Rust core's uniffi binding is ready, add it here:
-    #   dependencies:
-    #     - framework: ../../core/target/.../PulseWalletCoreFFI.xcframework

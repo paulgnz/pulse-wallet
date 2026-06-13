@@ -4,3 +4,6 @@ target/
 node_modules/
 *.xcodeproj/xcuserdata/
 .swiftpm/
+
+# Vendored Rust static lib (build with scripts/build-core-macos.sh)
+apps/macos/Vendor/*.a
