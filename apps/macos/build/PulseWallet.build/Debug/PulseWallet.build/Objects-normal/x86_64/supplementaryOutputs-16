@@ -1,0 +1,23 @@
+{
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Design/Theme.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Theme.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Theme.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Theme.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Theme.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Theme.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/Sidebar.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Sidebar.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Sidebar.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Sidebar.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Sidebar.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Sidebar.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/ToolsView.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ToolsView.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ToolsView.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ToolsView.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ToolsView.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ToolsView.swiftdeps"
+  }
+}

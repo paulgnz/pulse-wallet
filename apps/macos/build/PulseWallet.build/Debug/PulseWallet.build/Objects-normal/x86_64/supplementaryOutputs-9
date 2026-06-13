@@ -1,0 +1,23 @@
+{
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Crypto/Keychain.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Keychain.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Keychain.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Keychain.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Keychain.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Keychain.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/KeysView.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeysView.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeysView.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeysView.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeysView.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeysView.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/LockScreen.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/LockScreen.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/LockScreen.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/LockScreen.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/LockScreen.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/LockScreen.swiftdeps"
+  }
+}

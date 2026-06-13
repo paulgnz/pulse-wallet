@@ -225,7 +225,7 @@ struct RotateKeySheet: View {
     private func backupOld() {
         guard let active = store.activeKey else { return }
         Task {
-            do { oldBackup = try store.exportSecret(active, reason: "Back up current key before rotation") }
+            do { oldBackup = try await store.exportSecret(active, reason: "Back up current key before rotation") }
             catch { status = error.localizedDescription }
         }
     }

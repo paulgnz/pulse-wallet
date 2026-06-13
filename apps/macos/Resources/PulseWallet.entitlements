@@ -3,13 +3,11 @@
 <plist version="1.0">
 <dict>
     <!--
-      Required for Touch ID / biometric Keychain items (data-protection keychain).
-      $(AppIdentifierPrefix) resolves from DEVELOPMENT_TEAM (locked in Signing.xcconfig),
-      so the group is stable across rebuilds and keys persist.
+      Intentionally empty. Keys live in the standard (file) login keychain, bound
+      to the app's code signature — so no keychain-access-groups / provisioning
+      profile is needed (Mac apps signed "None Required" don't have one). Touch ID
+      is enforced in-app via LAContext; Secure Enclave keys are hardware-protected.
+      A stable signing Team (Signing.xcconfig) keeps items readable across builds.
     -->
-    <key>keychain-access-groups</key>
-    <array>
-        <string>$(AppIdentifierPrefix)dev.pulsevm.wallet</string>
-    </array>
 </dict>
 </plist>

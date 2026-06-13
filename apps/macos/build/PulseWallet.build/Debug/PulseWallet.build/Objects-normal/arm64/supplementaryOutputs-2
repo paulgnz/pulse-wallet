@@ -1,0 +1,23 @@
+{
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/Components.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/Components.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/Components.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/Components.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/Components.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/Components.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/DappRequestSheet.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DappRequestSheet.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DappRequestSheet.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DappRequestSheet.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DappRequestSheet.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DappRequestSheet.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/DashboardView.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DashboardView.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DashboardView.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DashboardView.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DashboardView.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/arm64/DashboardView.swiftdeps"
+  }
+}

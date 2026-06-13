@@ -1,0 +1,30 @@
+{
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Crypto/KeyStore.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyStore.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyStore.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyStore.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyStore.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyStore.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Crypto/KeyToolkit.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyToolkit.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyToolkit.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyToolkit.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyToolkit.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/KeyToolkit.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Network/Hyperion.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Hyperion.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Hyperion.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Hyperion.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Hyperion.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/Hyperion.swiftdeps"
+  },
+  "/Users/paulgrey/dev/pulse-wallet/apps/macos/Sources/PulseWallet/Views/ExportKeySheet.swift" : {
+    "const-values" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ExportKeySheet.swiftconstvalues",
+    "dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ExportKeySheet.d",
+    "diagnostics" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ExportKeySheet.dia",
+    "object" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ExportKeySheet.o",
+    "swift-dependencies" : "/Users/paulgrey/dev/pulse-wallet/apps/macos/build/PulseWallet.build/Debug/PulseWallet.build/Objects-normal/x86_64/ExportKeySheet.swiftdeps"
+  }
+}

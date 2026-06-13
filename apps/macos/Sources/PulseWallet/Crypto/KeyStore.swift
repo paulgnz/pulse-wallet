@@ -62,7 +62,7 @@ final class KeyStore {
         let handle = try EnclaveSigner.createKey()
         let pub = handle.compressedPublicKey
         let id = UUID().uuidString
-        try Keychain.save(account: id, data: handle.key.dataRepresentation, biometric: false)
+        try Keychain.save(account: id, data: handle.key.dataRepresentation)
         let key = WalletKey(id: id, label: label.isEmpty ? "Enclave key" : label,
                             kind: .enclave, curve: .r1, pubCompressedHex: pub.hexString,
                             pubKey: core.encodePubR1(compressedPublicKey: pub), createdAt: Date())
@@ -100,7 +100,7 @@ final class KeyStore {
             ? core.encodePubR1(compressedPublicKey: pub)
             : core.encodePubK1(compressedPublicKey: pub)
         let id = UUID().uuidString
-        try Keychain.save(account: id, data: raw, biometric: true)
+        try Keychain.save(account: id, data: raw)
         let key = WalletKey(id: id, label: label.isEmpty ? "Imported key" : label,
                             kind: .imported, curve: curve, pubCompressedHex: hex,
                             pubKey: pubStr, createdAt: Date())
@@ -121,11 +121,14 @@ final class KeyStore {
 
     /// Export an imported key's private key (PVT_…) for backup. Prompts Touch ID
     /// via the Keychain. Enclave keys are non-exportable by design.
-    func exportSecret(_ key: WalletKey, reason: String) throws -> String {
+    func exportSecret(_ key: WalletKey, reason: String) async throws -> String {
         guard key.kind == .imported else {
             throw PulseCoreError.badInput("Secure Enclave keys cannot be exported — back up via a recovery key or multisig.")
         }
-        let raw = try Keychain.load(account: key.id, reason: reason)
+        guard await Biometrics.authenticate(reason: reason) else {
+            throw PulseCoreError.signing("Authentication failed or cancelled")
+        }
+        let raw = try Keychain.load(account: key.id)
         return key.curve == .r1 ? core.encodePvtR1(raw) : core.encodePvtK1(raw)
     }
 
@@ -144,6 +147,13 @@ final class KeyStore {
         guard let key = activeKey else {
             throw PulseCoreError.badInput("No active key. Create or import one in Keys.")
         }
+        // Enclave keys prompt Touch ID during signing (the key's own access control).
+        // Imported keys live in the plain Keychain, so we gate them with Touch ID here.
+        if key.kind == .imported {
+            guard await Biometrics.authenticate(reason: reason) else {
+                throw PulseCoreError.signing("Authentication failed or cancelled")
+            }
+        }
         return try await KeyStore.performSign(key: key, preImage: preImage, reason: reason)
     }
 
@@ -153,7 +163,7 @@ final class KeyStore {
             let digest = Data(SHA256.hash(data: preImage))
             switch (key.kind, key.curve) {
             case (.enclave, _):
-                let blob = try Keychain.load(account: key.id, reason: reason)
+                let blob = try Keychain.load(account: key.id)
                 let handle = try EnclaveSigner.load(from: blob)
                 let rs = try EnclaveSigner.signPreImage(preImage, with: handle, reason: reason)
                 guard let pub = Data(hexString: key.pubCompressedHex) else {
@@ -161,7 +171,7 @@ final class KeyStore {
                 }
                 return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
             case (.imported, .r1):
-                let raw = try Keychain.load(account: key.id, reason: reason)
+                let raw = try Keychain.load(account: key.id)
                 let priv = try P256.Signing.PrivateKey(rawRepresentation: raw)
                 let rs = try priv.signature(for: preImage).rawRepresentation
                 guard let pub = Data(hexString: key.pubCompressedHex) else {
@@ -169,7 +179,7 @@ final class KeyStore {
                 }
                 return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
             case (.imported, .k1):
-                let raw = try Keychain.load(account: key.id, reason: reason)
+                let raw = try Keychain.load(account: key.id)
                 return try core.signK1(privateKey: raw, digest: digest)
             }
         }.value

@@ -69,7 +69,7 @@ struct ExportKeySheet: View {
         working = true
         Task {
             do {
-                revealed = try store.exportSecret(key, reason: "Export “\(key.label)” private key")
+                revealed = try await store.exportSecret(key, reason: "Export “\(key.label)” private key")
             } catch {
                 failed = error.localizedDescription
             }

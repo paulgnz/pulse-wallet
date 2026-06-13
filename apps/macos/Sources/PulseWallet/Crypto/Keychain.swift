@@ -18,45 +18,34 @@ enum KeychainError: Error, LocalizedError {
     }
 }
 
-/// Thin Keychain wrapper for storing key material. Imported secrets are stored
-/// with a biometric (Touch ID) access-control gate; Secure Enclave key blobs are
-/// already chip-bound, so they don't need a separate biometric gate to read.
+/// Thin Keychain wrapper. Items are stored in the standard (file) login keychain
+/// — NOT the data-protection keychain — so no `keychain-access-groups` entitlement
+/// / provisioning profile is required (Mac apps often have none). Touch ID is
+/// enforced in our own code (see `Biometrics`) before reading a secret, so the
+/// UX is the same without the entitlement dependency. Access is bound to the
+/// app's code signature, so a stable signing Team keeps items readable across builds.
 enum Keychain {
     static let service = "dev.pulsevm.wallet.keys"
 
-    static func save(account: String, data: Data, biometric: Bool) throws {
+    static func save(account: String, data: Data) throws {
         delete(account: account) // overwrite semantics
-        var query: [String: Any] = [
+        let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
         ]
-        if biometric {
-            var err: Unmanaged<CFError>?
-            guard let access = SecAccessControlCreateWithFlags(
-                nil, kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                [.biometryCurrentSet], &err) else {
-                throw KeychainError.accessControl
-            }
-            query[kSecAttrAccessControl as String] = access
-        } else {
-            query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        }
         let status = SecItemAdd(query as CFDictionary, nil)
         guard status == errSecSuccess else { throw KeychainError.status(status) }
     }
 
-    /// Read an item; if it was stored biometric-gated this prompts Touch ID.
-    static func load(account: String, reason: String) throws -> Data {
-        let ctx = LAContext()
-        ctx.localizedReason = reason
+    static func load(account: String) throws -> Data {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
-            kSecUseAuthenticationContext as String: ctx,
         ]
         var out: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &out)
@@ -66,20 +55,15 @@ enum Keychain {
         return data
     }
 
-    /// Check an item exists WITHOUT prompting Touch ID (for health checks).
-    /// errSecInteractionNotAllowed means it's there but biometric-gated → present.
+    /// Check an item exists (no prompt; plain items don't require auth).
     static func exists(account: String) -> Bool {
-        let ctx = LAContext()
-        ctx.interactionNotAllowed = true   // never prompt during a health check
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnAttributes as String: true,
-            kSecUseAuthenticationContext as String: ctx,
         ]
-        let status = SecItemCopyMatching(query as CFDictionary, nil)
-        return status == errSecSuccess || status == errSecInteractionNotAllowed
+        return SecItemCopyMatching(query as CFDictionary, nil) == errSecSuccess
     }
 
     @discardableResult
