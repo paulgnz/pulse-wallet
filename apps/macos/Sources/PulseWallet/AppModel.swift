@@ -31,20 +31,46 @@ enum WalletSection: String, CaseIterable, Identifiable {
 final class AppModel {
     var section: WalletSection = .wallet
 
-    /// Network this wallet is pointed at (A-Chain testnet by default).
-    var endpoint = "https://rpc.a-chain-testnet.protonnz.com"
-    var hyperionEndpoint = "https://hyperion.a-chain-testnet.protonnz.com"
-    var chainName = "A-Chain Testnet"
+    /// Configured networks (managed in Settings). The active one drives endpoints.
+    let networks = NetworkStore()
 
+    var endpoint: String { networks.active.rpc }
+    var hyperionEndpoint: String { networks.active.hyperion }
+    var chainName: String { networks.active.label }
     /// The token shown as the headline balance (value token; SYS is resource).
-    var primarySymbol = "XPR"
+    var primarySymbol: String { networks.active.primarySymbol }
 
     /// Chain logic backed by the Rust core (validated vs pulsevm-js).
     let core: PulseCore = PulseCoreFFI()
 
-    /// Watch account until onboarding (#6) provides a real owned account.
-    var accountName = "protonnz"
+    /// Watched accounts (switchable). Real key-owned onboarding lands in #6.
+    var accountNames: [String] = ["protonnz"] { didSet { persistAccounts() } }
+    var accountName = "protonnz" {
+        didSet { UserDefaults.standard.set(accountName, forKey: "wallet.activeAccount") }
+    }
     var permissionName = "active"
+
+    /// Set by the account menu's "Import key…" to auto-open the import sheet.
+    var requestImportKey = false
+
+    init() {
+        if let data = UserDefaults.standard.data(forKey: "wallet.accounts.v1"),
+           let arr = try? JSONDecoder().decode([String].self, from: data), !arr.isEmpty {
+            accountNames = arr
+        }
+        if let a = UserDefaults.standard.string(forKey: "wallet.activeAccount"),
+           accountNames.contains(a) {
+            accountName = a
+        } else {
+            accountName = accountNames[0]
+        }
+    }
+
+    private func persistAccounts() {
+        if let data = try? JSONEncoder().encode(accountNames) {
+            UserDefaults.standard.set(data, forKey: "wallet.accounts.v1")
+        }
+    }
 
     // Live state, fetched from RPC.
     private(set) var chainInfo: ChainInfo?
@@ -96,6 +122,26 @@ final class AppModel {
 
     func select(_ account: PulseAccount) {
         accountName = account.name
+        Task { await refresh() }
+    }
+
+    func switchAccount(_ name: String) {
+        guard name != accountName else { return }
+        accountName = name
+        Task { await refresh() }
+    }
+
+    /// Add a watch account by name (lowercased). Refresh validates it exists.
+    func addAccount(_ name: String) {
+        let n = name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !n.isEmpty, !accountNames.contains(n) else { return }
+        accountNames.append(n)
+        accountName = n
+        Task { await refresh() }
+    }
+
+    func switchNetwork(_ network: PulseNetwork) {
+        networks.select(network)
         Task { await refresh() }
     }
 

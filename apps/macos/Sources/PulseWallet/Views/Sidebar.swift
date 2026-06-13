@@ -39,28 +39,42 @@ private struct BrandHeader: View {
     }
 }
 
-/// Bottom-pinned account chooser with a hardware-key badge.
+/// Bottom-pinned account chooser: switch accounts, import a key, or (soon)
+/// create an account.
 private struct AccountSwitcher: View {
     @Environment(AppModel.self) private var model
+    @State private var showAddAccount = false
 
     var body: some View {
         Menu {
-            ForEach(model.accounts) { acct in
-                Button {
-                    model.select(acct)
-                } label: {
-                    Label(acct.name, systemImage: acct.isHardwareBacked ? "touchid" : "key")
+            Section("Accounts") {
+                ForEach(model.accountNames, id: \.self) { name in
+                    Button { model.switchAccount(name) } label: {
+                        Label(name, systemImage: name == model.accountName ? "checkmark" : "person.crop.circle")
+                    }
                 }
             }
+            Divider()
+            Button { showAddAccount = true } label: {
+                Label("Add account…", systemImage: "plus")
+            }
+            Button {
+                model.section = .keys
+                model.requestImportKey = true
+            } label: {
+                Label("Import key…", systemImage: "square.and.arrow.down")
+            }
+            Button { } label: { Label("Create account (coming soon)", systemImage: "sparkles") }
+                .disabled(true)
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: (model.selectedAccount?.isHardwareBacked ?? false) ? "touchid" : "person.crop.circle")
                     .font(.title3)
                     .foregroundStyle(Brand.accent)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(model.selectedAccount?.name ?? "—")
+                    Text(model.accountName)
                         .font(.callout.weight(.semibold))
-                    Text("@\(model.selectedAccount?.permission ?? "active")")
+                    Text("@\(model.permissionName)")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -73,5 +87,37 @@ private struct AccountSwitcher: View {
         .menuStyle(.button)
         .buttonStyle(.plain)
         .padding(12)
+        .sheet(isPresented: $showAddAccount) { AddAccountSheet() }
+    }
+}
+
+/// Add a watch account by name (validated on refresh).
+private struct AddAccountSheet: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    @State private var name = ""
+
+    var body: some View {
+        VStack(spacing: 18) {
+            VStack(spacing: 8) {
+                Image(systemName: "person.crop.circle.badge.plus")
+                    .font(.system(size: 36)).foregroundStyle(Brand.brandGradient)
+                Text("Add account").font(.title2.weight(.semibold))
+                Text("Enter a PulseVM account name to watch. Signing requires a key you control (Keys).")
+                    .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            }
+            TextField("e.g. treasury.nz", text: $name)
+                .textFieldStyle(.roundedBorder).font(.body.monospaced())
+            Spacer()
+            HStack {
+                Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
+                PrimaryButton(title: "Add", systemImage: "plus") {
+                    model.addAccount(name); dismiss()
+                }
+                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+        }
+        .padding(24).frame(width: 420, height: 300)
+        .background(Brand.navy.gradient.opacity(0.5))
     }
 }

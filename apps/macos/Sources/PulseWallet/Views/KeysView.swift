@@ -2,6 +2,7 @@ import SwiftUI
 
 struct KeysView: View {
     @Environment(KeyStore.self) private var store
+    @Environment(AppModel.self) private var model
 
     @State private var showNew = false
     @State private var showImport = false
@@ -33,6 +34,12 @@ struct KeysView: View {
         .sheet(isPresented: $showNew) { NewEnclaveKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showImport) { ImportKeySheet(error: $errorMessage) }
         .sheet(item: $toDelete) { key in DeleteKeySheet(key: key) }
+        .onChange(of: model.requestImportKey) { _, want in
+            if want { showImport = true; model.requestImportKey = false }
+        }
+        .onAppear {
+            if model.requestImportKey { showImport = true; model.requestImportKey = false }
+        }
     }
 
     private var header: some View {
