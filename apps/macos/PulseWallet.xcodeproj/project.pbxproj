@@ -81,7 +81,7 @@
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_26F8B489-1596-4C3F-AD27-C7F75EE63133" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -199,10 +199,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_D406F756-32C6-4EB5-8B2D-97C3ACF78C4E" /* macos */ = {
+		"TEMP_C840BD4A-10BA-4FE8-99E0-B499E2E06D4E" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_26F8B489-1596-4C3F-AD27-C7F75EE63133" /* Signing.xcconfig */,
+				"TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -392,7 +392,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_26F8B489-1596-4C3F-AD27-C7F75EE63133" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -490,7 +490,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_26F8B489-1596-4C3F-AD27-C7F75EE63133" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
