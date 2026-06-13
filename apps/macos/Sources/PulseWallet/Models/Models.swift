@@ -22,8 +22,19 @@ struct Asset: Identifiable, Hashable {
     var role: AssetRole = .value
 
     var formatted: String {
-        let f = NSDecimalNumber(decimal: amount)
-        return "\(f.stringValue) \(symbol)"
+        return "\(Asset.grouped(amount, precision: precision)) \(symbol)"
+    }
+
+    /// Thousands-separated, fixed-precision amount (e.g. 99,973.4854). Locale-fixed
+    /// to comma-grouping + period-decimal so crypto amounts read consistently.
+    static func grouped(_ amount: Decimal, precision: Int) -> String {
+        let nf = NumberFormatter()
+        nf.numberStyle = .decimal
+        nf.usesGroupingSeparator = true
+        nf.locale = Locale(identifier: "en_US")
+        nf.minimumFractionDigits = precision
+        nf.maximumFractionDigits = precision
+        return nf.string(from: NSDecimalNumber(decimal: amount)) ?? NSDecimalNumber(decimal: amount).stringValue
     }
 }
 
