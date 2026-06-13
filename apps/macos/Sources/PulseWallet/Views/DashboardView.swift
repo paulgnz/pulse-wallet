@@ -2,11 +2,22 @@ import SwiftUI
 
 struct DashboardView: View {
     @Environment(AppModel.self) private var model
+    @Environment(KeyStore.self) private var keyStore
+
+    /// A held key whose public key is in the account's active permission.
+    private var controllingKey: WalletKey? {
+        guard let perms = model.account?.permissions else { return nil }
+        let activeKeys = Set(perms
+            .filter { $0.permName == model.permissionName }
+            .flatMap { $0.requiredAuth.keys.map(\.key) })
+        return keyStore.keys.first { activeKeys.contains($0.pubKey) }
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: Metric.gutter) {
                 balanceHero
+                if controllingKey == nil && model.account != nil { watchOnlyBanner }
                 quickActions
                 if model.account != nil { resources }
                 holdings
@@ -24,15 +35,21 @@ struct DashboardView: View {
                 HStack {
                     Text("Total balance").font(.subheadline).foregroundStyle(.secondary)
                     Spacer()
-                    if model.selectedAccount?.isHardwareBacked == true {
-                        Label("Secure Enclave", systemImage: "touchid")
+                    if let key = controllingKey {
+                        Label(key.isHardwareBacked ? "Secure Enclave" : "Signed in",
+                              systemImage: key.isHardwareBacked ? "touchid" : "key.fill")
                             .font(.caption.weight(.medium))
                             .padding(.horizontal, 8).padding(.vertical, 4)
                             .glassEffect(.regular, in: .capsule)
                             .foregroundStyle(Brand.accent)
-                    } else if model.isLoading {
-                        ProgressView().controlSize(.small)
+                    } else {
+                        Label("Watch-only", systemImage: "eye")
+                            .font(.caption.weight(.medium))
+                            .padding(.horizontal, 8).padding(.vertical, 4)
+                            .glassEffect(.regular, in: .capsule)
+                            .foregroundStyle(.secondary)
                     }
+                    if model.isLoading { ProgressView().controlSize(.small) }
                 }
                 if let err = model.loadError {
                     Label(err, systemImage: "exclamationmark.triangle")
@@ -52,6 +69,23 @@ struct DashboardView: View {
     private var heroBalance: String {
         if let a = model.primaryAsset { return a.formatted }
         return model.isLoading ? "…" : "—"
+    }
+
+    // Shown when no held key controls this account.
+    private var watchOnlyBanner: some View {
+        GlassCard(padding: 14) {
+            HStack(spacing: 12) {
+                Image(systemName: "eye").foregroundStyle(Brand.warn)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Watch-only account").font(.callout.weight(.medium))
+                    Text("Add a key that controls \(model.accountName) to send and sign.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Add key") { model.section = .keys; model.requestImportKey = true }
+                    .buttonStyle(.glass)
+            }
+        }
     }
 
     // MARK: Quick actions
