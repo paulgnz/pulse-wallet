@@ -3,10 +3,13 @@
 <plist version="1.0">
 <dict>
     <!--
-      No keychain-access-groups: a single standalone app uses its own default
-      keychain group (bound to the stable team-signed app identifier), so keys
-      persist across rebuilds without the fragile $(AppIdentifierPrefix) entitlement.
-      Secure Enclave + Keychain + network all work without extra entitlements here.
+      Required for Touch ID / biometric Keychain items (data-protection keychain).
+      $(AppIdentifierPrefix) resolves from DEVELOPMENT_TEAM (locked in Signing.xcconfig),
+      so the group is stable across rebuilds and keys persist.
     -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)dev.pulsevm.wallet</string>
+    </array>
 </dict>
 </plist>
