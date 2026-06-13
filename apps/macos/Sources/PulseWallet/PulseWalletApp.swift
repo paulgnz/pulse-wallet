@@ -5,6 +5,7 @@ import AppKit
 struct PulseWalletApp: App {
     @State private var model = AppModel()
     @State private var keyStore = KeyStore()
+    @State private var themeStore = ThemeStore()
 
     var body: some Scene {
         // Single window (not WindowGroup) — external pulsevm:// events reuse the
@@ -13,8 +14,10 @@ struct PulseWalletApp: App {
             RootView()
                 .environment(model)
                 .environment(keyStore)
+                .environment(themeStore)
                 .frame(minWidth: 880, minHeight: 560)
                 .preferredColorScheme(model.appearanceScheme)
+                .id(themeStore.current.id)   // re-skin the tree on theme switch
                 .onOpenURL { url in
                     NSApp.activate(ignoringOtherApps: true)   // bring wallet to front
                     model.handleURL(url)
@@ -44,6 +47,7 @@ struct PulseWalletApp: App {
         Settings {
             SettingsView()
                 .environment(model)
+                .environment(themeStore)
         }
     }
 }

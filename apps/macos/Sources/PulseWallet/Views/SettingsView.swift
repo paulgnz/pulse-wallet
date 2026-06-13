@@ -2,14 +2,17 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
+    @Environment(ThemeStore.self) private var themeStore
     @State private var requireBiometricsEachTx = true
     @State private var editing: PulseNetwork?
     @State private var addingNew = false
+    @State private var importingTheme = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: Metric.gutter) {
                 networks
+                branding
                 security
                 about
             }
@@ -19,6 +22,39 @@ struct SettingsView: View {
         .frame(minWidth: 480, minHeight: 520)
         .sheet(item: $editing) { net in NetworkEditSheet(network: net) }
         .sheet(isPresented: $addingNew) { NetworkEditSheet(network: nil) }
+        .fileImporter(isPresented: $importingTheme, allowedContentTypes: [.json]) { result in
+            if case .success(let url) = result {
+                let scoped = url.startAccessingSecurityScopedResource()
+                defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+                try? themeStore.importTheme(from: url)
+            }
+        }
+    }
+
+    // MARK: Branding / Theme (white-label)
+    private var branding: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    SectionHeader(title: "Branding", systemImage: "paintpalette")
+                    Spacer()
+                    Button { importingTheme = true } label: {
+                        Label("Import theme…", systemImage: "square.and.arrow.down")
+                    }
+                    .buttonStyle(.glass).font(.caption)
+                    .help("Load a white-label theme (.json)")
+                }
+                Text("Skin the wallet for your organization. Bundled themes below; drop a custom theme JSON to white-label.")
+                    .font(.caption).foregroundStyle(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 12)], spacing: 12) {
+                    ForEach(themeStore.available) { theme in
+                        ThemeSwatch(theme: theme, selected: theme.id == themeStore.current.id) {
+                            themeStore.select(theme.name)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: Networks
@@ -109,6 +145,48 @@ struct SettingsView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+/// A live preview swatch for a theme — shows its background + accent gradient.
+private struct ThemeSwatch: View {
+    let theme: Theme
+    let selected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack(alignment: .bottomLeading) {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(LinearGradient(colors: [Color(hex: theme.navy), Color(hex: theme.ink)],
+                                             startPoint: .top, endPoint: .bottom))
+                        .frame(height: 56)
+                    HStack(spacing: 6) {
+                        Capsule()
+                            .fill(LinearGradient(colors: [Color(hex: theme.accent), Color(hex: theme.glow)],
+                                                 startPoint: .leading, endPoint: .trailing))
+                            .frame(width: 38, height: 8)
+                        Circle().fill(Color(hex: theme.primary)).frame(width: 8, height: 8)
+                    }
+                    .padding(8)
+                }
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.white.opacity(0.08)))
+                HStack(spacing: 5) {
+                    Text(theme.name).font(.caption.weight(.semibold))
+                    Spacer()
+                    if selected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption).foregroundStyle(Brand.success)
+                    }
+                }
+            }
+            .padding(8)
+            .background(.white.opacity(selected ? 0.06 : 0), in: RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(selected ? Brand.accent : .clear, lineWidth: 1.5))
+        }
+        .buttonStyle(.plain)
     }
 }
 
