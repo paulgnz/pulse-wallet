@@ -1,0 +1,14 @@
+[package]
+name = "pulse-wallet-core"
+version = "0.0.1"
+edition = "2021"
+description = "Shared PulseVM wallet core: R1 key/signature encoding, recovery-id derivation, RPC."
+
+[dependencies]
+p256 = { version = "0.13", features = ["ecdsa"] }
+ecdsa = "0.16"
+ripemd = "0.1"
+bs58 = "0.5"
+
+[dev-dependencies]
+hex = "0.4"
