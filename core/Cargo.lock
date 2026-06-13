@@ -265,6 +265,7 @@ dependencies = [
  "hex",
  "k256",
  "p256",
+ "rand_core",
  "ripemd",
  "sha2",
 ]

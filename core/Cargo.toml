@@ -12,6 +12,7 @@ crate-type = ["staticlib", "rlib"]
 p256 = { version = "0.13", features = ["ecdsa"] }
 k256 = { version = "0.13", features = ["ecdsa"] }
 ecdsa = "0.16"
+rand_core = { version = "0.6", features = ["getrandom"] }
 ripemd = "0.1"
 sha2 = "0.10"
 bs58 = "0.5"

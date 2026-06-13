@@ -100,11 +100,24 @@ pub fn decode_pvt_r1(s: &str) -> Result<[u8; 32], String> {
 // Enclave is P-256/R1 only), so the core both holds-and-signs for K1.
 // ===========================================================================
 
+use k256::ecdsa::signature::hazmat::RandomizedPrehashSigner;
 use k256::ecdsa::{
     RecoveryId as K1RecoveryId, Signature as K1Signature, SigningKey as K1SigningKey,
     VerifyingKey as K1VerifyingKey,
 };
+use rand_core::OsRng;
 use sha2::Sha256;
+
+/// Antelope `is_canonical` check on a 64-byte r‖s signature: the high bytes of
+/// r and s must not have the top bit set (and not be a zero with the next byte's
+/// top bit clear). Nodes reject non-canonical K1 signatures.
+fn k1_is_canonical(rs: &[u8]) -> bool {
+    let (r0, r1, s0, s1) = (rs[0], rs[1], rs[32], rs[33]);
+    (r0 & 0x80 == 0)
+        && !(r0 == 0 && (r1 & 0x80 == 0))
+        && (s0 & 0x80 == 0)
+        && !(s0 == 0 && (s1 & 0x80 == 0))
+}
 
 fn sha256d(data: &[u8]) -> [u8; 32] {
     let first = Sha256::digest(data);
@@ -178,37 +191,47 @@ pub fn pub_k1_from_priv(priv32: &[u8; 32]) -> Result<[u8; 33], String> {
     Ok(out)
 }
 
-/// Sign a 32-byte digest with a K1 private key → `SIG_K1_…` (low-s + recid).
+/// Sign a 32-byte digest with a K1 private key → canonical `SIG_K1_…`.
 ///
-/// NOTE: Antelope's strict `isCanonical` (high-bit r/s) retry loop is a TODO;
-/// this produces a valid low-s recoverable signature. Broadcast-tested once the
-/// chain is live again.
+/// Antelope/PulseVM rejects non-canonical signatures, so we sign with a random
+/// nonce and retry until the (low-s) signature passes `is_canonical`, then derive
+/// the recovery id by recover-and-match.
 pub fn sign_k1(priv32: &[u8; 32], digest: &[u8; 32]) -> Result<String, String> {
     let sk = K1SigningKey::from_bytes(priv32.into()).map_err(|e| e.to_string())?;
-    let (sig, _rid): (K1Signature, _) =
-        sk.sign_prehash_recoverable(digest).map_err(|e| e.to_string())?;
-    let sig = sig.normalize_s().unwrap_or(sig);
-
     let pub_ep = sk.verifying_key().to_encoded_point(true);
-    let mut found: Option<u8> = None;
-    for rid in 0u8..4 {
-        if let Ok(recid) = K1RecoveryId::try_from(rid) {
-            if let Ok(vk) = K1VerifyingKey::recover_from_prehash(digest, &sig, recid) {
-                if vk.to_encoded_point(true) == pub_ep {
-                    found = Some(rid);
-                    break;
+
+    for _ in 0..1024 {
+        let sig: K1Signature = sk
+            .sign_prehash_with_rng(&mut OsRng, digest)
+            .map_err(|e| e.to_string())?;
+        let sig = sig.normalize_s().unwrap_or(sig);
+        let bytes = sig.to_bytes();
+        if !k1_is_canonical(bytes.as_slice()) {
+            continue; // re-roll the nonce
+        }
+        let mut rid_found: Option<u8> = None;
+        for rid in 0u8..4 {
+            if let Ok(recid) = K1RecoveryId::try_from(rid) {
+                if let Ok(vk) = K1VerifyingKey::recover_from_prehash(digest, &sig, recid) {
+                    if vk.to_encoded_point(true) == pub_ep {
+                        rid_found = Some(rid);
+                        break;
+                    }
                 }
             }
         }
+        let rid = match rid_found {
+            Some(r) => r,
+            None => continue,
+        };
+        let mut data = Vec::with_capacity(69);
+        data.push(31 + rid);
+        data.extend_from_slice(&bytes);
+        let cs = ripemd_checksum(&data, b"K1");
+        data.extend_from_slice(&cs);
+        return Ok(format!("SIG_K1_{}", bs58::encode(data).into_string()));
     }
-    let rid = found.ok_or("could not derive K1 recovery id")?;
-
-    let mut data = Vec::with_capacity(69);
-    data.push(31 + rid);
-    data.extend_from_slice(&sig.to_bytes());
-    let cs = ripemd_checksum(&data, b"K1");
-    data.extend_from_slice(&cs);
-    Ok(format!("SIG_K1_{}", bs58::encode(data).into_string()))
+    Err("could not find a canonical K1 signature".into())
 }
 
 #[cfg(test)]
@@ -289,5 +312,16 @@ mod tests {
         let raw = decode_pvt_k1(EOS_DEV_WIF).unwrap();
         let sig = sign_k1(&raw, &a32(DIGEST)).unwrap();
         assert!(sig.starts_with("SIG_K1_"));
+    }
+
+    #[test]
+    fn k1_signatures_are_canonical() {
+        let raw = decode_pvt_k1(EOS_DEV_WIF).unwrap();
+        for _ in 0..8 {
+            let sig = sign_k1(&raw, &a32(DIGEST)).unwrap();
+            let body = bs58::decode(sig.strip_prefix("SIG_K1_").unwrap()).into_vec().unwrap();
+            // body = header(1) ‖ r(32) ‖ s(32) ‖ checksum(4)
+            assert!(super::k1_is_canonical(&body[1..65]));
+        }
     }
 }
