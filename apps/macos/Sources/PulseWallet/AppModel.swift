@@ -164,6 +164,12 @@ final class AppModel {
             } else {
                 assets = sorted(Self.coreAssets(from: a))
             }
+
+            // Recent history (best-effort; empty if indexer unavailable).
+            if let actions = try? await hyperion?.getActions(accountName) {
+                let me = accountName
+                activity = actions.compactMap { Self.activityItem(from: $0, account: me) }
+            }
         } catch {
             loadError = error.localizedDescription
         }
@@ -181,6 +187,30 @@ final class AppModel {
             let (l, r) = (rank(lhs), rank(rhs))
             return l != r ? l < r : lhs.symbol < rhs.symbol
         }
+    }
+
+    /// Map a Hyperion action to a display row (transfers get direction/amount).
+    private static func activityItem(from action: Hyperion.ActionItem, account: String) -> ActivityItem? {
+        let d = action.act.data
+        let time = parseChainTime(action.timestamp) ?? Date(timeIntervalSince1970: 0)
+        if action.act.name == "transfer", let qty = d.quantity {
+            let outgoing = d.from == account
+            return ActivityItem(
+                kind: outgoing ? .sent : .received,
+                counterparty: outgoing ? (d.to ?? "—") : (d.from ?? "—"),
+                asset: (outgoing ? "-" : "+") + qty,
+                memo: d.memo ?? "",
+                time: time,
+                txid: String(action.trxId.prefix(8)))
+        }
+        // Non-transfer action → generic contract row.
+        return ActivityItem(
+            kind: .contract,
+            counterparty: action.act.account,
+            asset: action.act.name,
+            memo: d.memo ?? "",
+            time: time,
+            txid: String(action.trxId.prefix(8)))
     }
 
     private static func coreAssets(from account: AccountInfo) -> [Asset] {
