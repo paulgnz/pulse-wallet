@@ -50,6 +50,19 @@ int pwc_build_updateauth(const char *system_contract, const char *account, const
                          uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
                          char *out, size_t out_len);
 
+// Resources (pulse system contract). Each writes "<packed>\n<preimage>\n<digest>".
+int pwc_build_stake(const char *contract, const char *from, const char *receiver,
+                    const char *net_qty, const char *cpu_qty, uint8_t transfer,
+                    const char *chain_id_hex, uint16_t ref_block_num, uint32_t ref_block_prefix,
+                    uint32_t expiration, char *out, size_t out_len);
+int pwc_build_unstake(const char *contract, const char *from, const char *receiver,
+                      const char *net_qty, const char *cpu_qty, const char *chain_id_hex,
+                      uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                      char *out, size_t out_len);
+int pwc_build_refund(const char *contract, const char *owner, const char *chain_id_hex,
+                     uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                     char *out, size_t out_len);
+
 // pulse.msig. Each writes "<packed>\n<preimage>\n<digest>" (hex). 4096-byte buffer.
 int pwc_msig_propose_transfer(const char *contract, const char *proposer, const char *proposal,
                               const char *requested, const char *from, const char *to,

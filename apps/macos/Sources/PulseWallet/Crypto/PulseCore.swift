@@ -52,6 +52,16 @@ protocol PulseCore {
                   chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
                   expiration: UInt32) throws -> BuiltTx
 
+    // Resources (pulse system contract)
+    func buildStake(contract: String, from: String, receiver: String, netQty: String, cpuQty: String,
+                    transfer: Bool, chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                    expiration: UInt32) throws -> BuiltTx
+    func buildUnstake(contract: String, from: String, receiver: String, netQty: String, cpuQty: String,
+                      chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                      expiration: UInt32) throws -> BuiltTx
+    func buildRefund(contract: String, owner: String, chainId: String, refBlockNum: UInt16,
+                     refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
+
     /// Preimage + digest for an externally-supplied packed tx (dapp transport).
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String)
 
@@ -127,6 +137,14 @@ struct PulseCoreStub: PulseCore {
                   expiration: UInt32) throws -> BuiltTx {
         throw PulseCoreError.notImplemented("msigExec")
     }
+    func buildStake(contract: String, from: String, receiver: String, netQty: String, cpuQty: String,
+                    transfer: Bool, chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                    expiration: UInt32) throws -> BuiltTx { throw PulseCoreError.notImplemented("buildStake") }
+    func buildUnstake(contract: String, from: String, receiver: String, netQty: String, cpuQty: String,
+                      chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                      expiration: UInt32) throws -> BuiltTx { throw PulseCoreError.notImplemented("buildUnstake") }
+    func buildRefund(contract: String, owner: String, chainId: String, refBlockNum: UInt16,
+                     refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx { throw PulseCoreError.notImplemented("buildRefund") }
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String) {
         throw PulseCoreError.notImplemented("signingMaterial")
     }

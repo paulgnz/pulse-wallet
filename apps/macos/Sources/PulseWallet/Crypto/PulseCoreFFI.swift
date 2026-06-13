@@ -150,6 +150,29 @@ struct PulseCoreFFI: PulseCore {
         return try parse(out, n, "msigExec")
     }
 
+    func buildStake(contract: String, from: String, receiver: String, netQty: String, cpuQty: String,
+                    transfer: Bool, chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                    expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_build_stake(contract, from, receiver, netQty, cpuQty, transfer ? 1 : 0,
+                                chainId, refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "buildStake")
+    }
+    func buildUnstake(contract: String, from: String, receiver: String, netQty: String, cpuQty: String,
+                      chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                      expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_build_unstake(contract, from, receiver, netQty, cpuQty,
+                                  chainId, refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "buildUnstake")
+    }
+    func buildRefund(contract: String, owner: String, chainId: String, refBlockNum: UInt16,
+                     refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_build_refund(contract, owner, chainId, refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "buildRefund")
+    }
+
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String) {
         var out = [CChar](repeating: 0, count: 16384)
         let n = pwc_signing_material(packedTrx, chainId, &out, out.count)

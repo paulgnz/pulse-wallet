@@ -10,6 +10,7 @@
 		08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE7891077FC4FDC8B7002AE /* Hyperion.swift */; };
 		09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320D8A92D151F0FF17E2DC83 /* KeyStore.swift */; };
 		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
+		18720D060BD811A105F0C63F /* StakeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826C3A0682E237C794F27DED /* StakeSheet.swift */; };
 		227763B316A637302CE0C75F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13029EAE706A34911065861E /* Models.swift */; };
 		2D80351ED5E347B638B5DEB7 /* PulseRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A106B02E0B4966774E12E5 /* PulseRPC.swift */; };
 		2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7565A5201A525117526CF9E4 /* Theme.swift */; };
@@ -64,6 +65,7 @@
 		78440EE6283769BDF3E38093 /* PulseWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWalletApp.swift; sourceTree = "<group>"; };
 		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		7F4AC6D391E73F3C113B9068 /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
+		826C3A0682E237C794F27DED /* StakeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSheet.swift; sourceTree = "<group>"; };
 		988744519E80C7631A1550B1 /* KeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysView.swift; sourceTree = "<group>"; };
 		9BABA36B61663BE346CB123A /* KeyToolkit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyToolkit.swift; sourceTree = "<group>"; };
 		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,7 +79,7 @@
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_278216A3-C670-475F-A89E-248E3B80A89A" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -137,6 +139,7 @@
 				335FC2C0D8FA258ACAC588FE /* SendView.swift */,
 				358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */,
 				7ED00983BCEA7586B91D3F8A /* Sidebar.swift */,
+				826C3A0682E237C794F27DED /* StakeSheet.swift */,
 				7F4AC6D391E73F3C113B9068 /* ToolsView.swift */,
 				F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */,
 				EAE1D7B9716513661393FD3A /* WelcomeSheet.swift */,
@@ -193,10 +196,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_E64A9D37-919B-4B6E-BD72-257179B4E926" /* macos */ = {
+		"TEMP_DD8469E1-8814-4C22-8440-58ADB40CF60A" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */,
+				"TEMP_278216A3-C670-475F-A89E-248E3B80A89A" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -300,6 +303,7 @@
 				493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */,
 				A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */,
 				40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */,
+				18720D060BD811A105F0C63F /* StakeSheet.swift in Sources */,
 				2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */,
 				87D9A358DFD66E49795200DD /* ToolsView.swift in Sources */,
 				57E93E5155AC480F95D08259 /* UpdateAuthSheet.swift in Sources */,
@@ -382,7 +386,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_278216A3-C670-475F-A89E-248E3B80A89A" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -478,7 +482,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_2A05A706-7125-40F7-9D8C-B482318C8ACC" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_278216A3-C670-475F-A89E-248E3B80A89A" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

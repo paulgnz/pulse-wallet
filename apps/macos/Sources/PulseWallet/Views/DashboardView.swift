@@ -4,6 +4,8 @@ struct DashboardView: View {
     @Environment(AppModel.self) private var model
     @Environment(KeyStore.self) private var keyStore
 
+    @State private var showStake = false
+
     /// A held key whose public key is in the account's active permission.
     private var controllingKey: WalletKey? {
         guard let perms = model.account?.permissions else { return nil }
@@ -26,6 +28,7 @@ struct DashboardView: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
+        .sheet(isPresented: $showStake) { StakeSheet() }
     }
 
     // MARK: Hero balance
@@ -107,7 +110,11 @@ struct DashboardView: View {
     @ViewBuilder private var resources: some View {
         if let a = model.account {
             VStack(alignment: .leading, spacing: 10) {
-                SectionHeader(title: "Resources", systemImage: "gauge.with.dots.needle.33percent")
+                HStack {
+                    SectionHeader(title: "Resources", systemImage: "gauge.with.dots.needle.33percent")
+                    Button("Manage") { showStake = true }
+                        .buttonStyle(.glass)
+                }
                 GlassCard(padding: 16) {
                     VStack(spacing: 14) {
                         ResourceBar(label: "CPU", fraction: a.cpuLimit.usedFraction, tint: Brand.accent)

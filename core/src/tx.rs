@@ -263,6 +263,53 @@ pub fn build_msig_signing(
     Ok((packed, preimage, digest))
 }
 
+// === Resources: stake / unstake / refund (pulse system contract) ===========
+
+/// Build + sign-material for a single action on `contract`, authorized by `auth`.
+pub fn build_action_signing(
+    contract: &str,
+    action_name: &str,
+    data: Vec<u8>,
+    auth: PermLevel,
+    chain_id_hex: &str,
+    ref_block_num: u16,
+    ref_block_prefix: u32,
+    expiration: u32,
+) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), String> {
+    let action = Action { account: contract.to_string(), name: action_name.to_string(), auth: vec![auth], data };
+    let packed = serialize_tx(&[action], ref_block_num, ref_block_prefix, expiration);
+    let (preimage, digest) = signing_material(&packed, chain_id_hex)?;
+    Ok((packed, preimage, digest))
+}
+
+/// delegatebw(from, receiver, stake_net_quantity, stake_cpu_quantity, transfer)
+pub fn delegatebw_data(from: &str, receiver: &str, net: &str, cpu: &str, transfer: bool) -> Result<Vec<u8>, String> {
+    let mut d = Vec::new();
+    write_name(from, &mut d);
+    write_name(receiver, &mut d);
+    serialize_asset(net, &mut d)?;
+    serialize_asset(cpu, &mut d)?;
+    d.push(if transfer { 1 } else { 0 });
+    Ok(d)
+}
+
+/// undelegatebw(from, receiver, unstake_net_quantity, unstake_cpu_quantity)
+pub fn undelegatebw_data(from: &str, receiver: &str, net: &str, cpu: &str) -> Result<Vec<u8>, String> {
+    let mut d = Vec::new();
+    write_name(from, &mut d);
+    write_name(receiver, &mut d);
+    serialize_asset(net, &mut d)?;
+    serialize_asset(cpu, &mut d)?;
+    Ok(d)
+}
+
+/// refund(owner)
+pub fn refund_data(owner: &str) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(owner, &mut d);
+    d
+}
+
 // === updateauth (multi-key / threshold permission setup) ===================
 
 use crate::ripemd_checksum;

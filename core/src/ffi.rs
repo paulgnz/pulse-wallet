@@ -6,9 +6,10 @@
 //! chars and SIG_R1 ~101 chars, so a 256-byte buffer is always sufficient.
 
 use crate::tx::{
-    build_msig_propose_transfer_signing, build_msig_signing, build_transfer_signing,
-    build_updateauth_signing, msig_approve_data, msig_exec_data, parse_key_weights,
-    parse_perm_levels, signing_material_hex, PermLevel, TransferParams,
+    build_action_signing, build_msig_propose_transfer_signing, build_msig_signing,
+    build_transfer_signing, build_updateauth_signing, delegatebw_data, msig_approve_data,
+    msig_exec_data, parse_key_weights, parse_perm_levels, refund_data, signing_material_hex,
+    undelegatebw_data, PermLevel, TransferParams,
 };
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, encode_pvt_k1,
@@ -359,6 +360,60 @@ pub unsafe extern "C" fn pwc_build_updateauth(
     emit_tx(build_updateauth_signing(
         sys, account, permission, parent, threshold, &kws,
         PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+// --- Resources: stake / unstake / refund ------------------------------------
+
+/// delegatebw (stake NET+CPU in SYS), signed by `from`@active.
+/// # Safety: string pointers NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_stake(
+    contract: *const c_char, from: *const c_char, receiver: *const c_char,
+    net_qty: *const c_char, cpu_qty: *const c_char, transfer: u8, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32, out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(contract), cstr(from), cstr(receiver), cstr(net_qty), cstr(cpu_qty), cstr(chain_id_hex));
+    let (contract, from, receiver, net, cpu, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(g)) => (a, b, c, d, e, g),
+        _ => return -1,
+    };
+    let data = match delegatebw_data(from, receiver, net, cpu, transfer != 0) { Ok(d) => d, Err(_) => return -1 };
+    emit_tx(build_action_signing(contract, "delegatebw", data,
+        PermLevel { actor: from.to_string(), permission: "active".to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// undelegatebw (unstake NET+CPU), signed by `from`@active.
+/// # Safety: see above.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_unstake(
+    contract: *const c_char, from: *const c_char, receiver: *const c_char,
+    net_qty: *const c_char, cpu_qty: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32, out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(contract), cstr(from), cstr(receiver), cstr(net_qty), cstr(cpu_qty), cstr(chain_id_hex));
+    let (contract, from, receiver, net, cpu, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(g)) => (a, b, c, d, e, g),
+        _ => return -1,
+    };
+    let data = match undelegatebw_data(from, receiver, net, cpu) { Ok(d) => d, Err(_) => return -1 };
+    emit_tx(build_action_signing(contract, "undelegatebw", data,
+        PermLevel { actor: from.to_string(), permission: "active".to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// refund (claim matured unstake), signed by `owner`@active.
+/// # Safety: see above.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_refund(
+    contract: *const c_char, owner: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32, out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(contract), cstr(owner), cstr(chain_id_hex));
+    let (contract, owner, cid) = match f { (Some(a), Some(b), Some(c)) => (a, b, c), _ => return -1 };
+    emit_tx(build_action_signing(contract, "refund", refund_data(owner),
+        PermLevel { actor: owner.to_string(), permission: "active".to_string() },
         cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
 }
 
