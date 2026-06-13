@@ -80,6 +80,7 @@ struct SignSheet: View {
     @Environment(AppModel.self) private var model
     @Environment(KeyStore.self) private var keyStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     let recipient: String
     let amount: String
     let symbol: String
@@ -88,7 +89,7 @@ struct SignSheet: View {
     @State private var state: SignState = .review
     @State private var sigR1: String?
     @State private var packedTrx: String?
-    enum SignState { case review, signing, broadcast, done, failed(String) }
+    enum SignState { case review, signing, signed, broadcasting, sent(String), failed(String) }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -103,7 +104,11 @@ struct SignSheet: View {
                     if !memo.isEmpty { Divider(); row("Memo", memo) }
                 }
             }
-            if let sig = sigR1 { signatureCard(sig) }
+            if case .sent(let txid) = state {
+                sentCard(txid)
+            } else if let sig = sigR1 {
+                signatureCard(sig)
+            }
             Spacer()
             actions
         }
@@ -130,11 +135,24 @@ struct SignSheet: View {
                     .buttonStyle(.glass).controlSize(.large)
                 PrimaryButton(title: "Sign with Touch ID", systemImage: "touchid") { sign() }
             }
-        case .done:
-            PrimaryButton(title: "Done", systemImage: "checkmark") { dismiss() }
+        case .signed:
+            HStack {
+                Button("Close") { dismiss() }
+                    .buttonStyle(.glass).controlSize(.large)
+                PrimaryButton(title: "Broadcast", systemImage: "antenna.radiowaves.left.and.right") { broadcast() }
+            }
+        case .sent(let txid):
+            HStack {
+                if let url = model.explorerTxURL(txid) {
+                    Button { openURL(url) } label: { Label("Explorer", systemImage: "arrow.up.right.square") }
+                        .buttonStyle(.glass).controlSize(.large)
+                }
+                PrimaryButton(title: "Done", systemImage: "checkmark") { dismiss() }
+            }
         case .failed(let msg):
             VStack(spacing: 10) {
                 Text(msg).font(.caption).foregroundStyle(Brand.danger)
+                    .multilineTextAlignment(.center)
                 Button("Close") { dismiss() }.buttonStyle(.glass)
             }
         default:
@@ -165,9 +183,34 @@ struct SignSheet: View {
                 let sig = try await keyStore.sign(preImage: preImage, reason: reason)
                 packedTrx = built.packed
                 sigR1 = sig
-                state = .done
+                state = .signed
             } catch {
                 state = .failed(error.localizedDescription)
+            }
+        }
+    }
+
+    private func broadcast() {
+        guard let sig = sigR1, let packed = packedTrx else { return }
+        state = .broadcasting
+        Task {
+            do {
+                let txid = try await model.broadcast(signatures: [sig], packedTrx: packed)
+                state = .sent(txid)
+                await model.refresh()
+            } catch {
+                state = .failed(error.localizedDescription)
+            }
+        }
+    }
+
+    private func sentCard(_ txid: String) -> some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 6) {
+                Label("Broadcast", systemImage: "checkmark.seal.fill")
+                    .font(.subheadline.weight(.medium)).foregroundStyle(Brand.success)
+                Text(txid).font(.caption2.monospaced()).foregroundStyle(.secondary)
+                    .textSelection(.enabled).lineLimit(2)
             }
         }
     }
@@ -181,17 +224,17 @@ struct SignSheet: View {
                 Text(sig)
                     .font(.caption2.monospaced()).foregroundStyle(.secondary)
                     .textSelection(.enabled).lineLimit(4)
-                Text("Real signature (recovery id derived by the Rust core). Broadcast comes with the tx serializer.")
+                Text("Real signature over the serialized transaction. Tap Broadcast to submit.")
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
     }
 
     private var isWorking: Bool {
-        if case .review = state { return false }
-        if case .done = state { return false }
-        if case .failed = state { return false }
-        return true
+        switch state {
+        case .signing, .broadcasting: return true
+        default: return false
+        }
     }
 
     private func row(_ k: String, _ v: String) -> some View {
@@ -200,20 +243,22 @@ struct SignSheet: View {
 
     private var stateIcon: String {
         switch state {
-        case .review:    return "signature"
-        case .signing:   return "touchid"
-        case .broadcast: return "antenna.radiowaves.left.and.right"
-        case .done:      return "checkmark.seal.fill"
-        case .failed:    return "xmark.seal.fill"
+        case .review:       return "signature"
+        case .signing:      return "touchid"
+        case .signed:       return "checkmark.seal.fill"
+        case .broadcasting: return "antenna.radiowaves.left.and.right"
+        case .sent:         return "paperplane.fill"
+        case .failed:       return "xmark.seal.fill"
         }
     }
     private var stateTitle: String {
         switch state {
-        case .review:    return "Confirm transfer"
-        case .signing:   return "Authenticate"
-        case .broadcast: return "Broadcasting…"
-        case .done:      return "Signed"
-        case .failed:    return "Failed"
+        case .review:       return "Confirm transfer"
+        case .signing:      return "Authenticate"
+        case .signed:       return "Signed"
+        case .broadcasting: return "Broadcasting…"
+        case .sent:         return "Sent"
+        case .failed:       return "Failed"
         }
     }
 }

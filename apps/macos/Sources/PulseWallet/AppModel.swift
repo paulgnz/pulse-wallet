@@ -148,6 +148,12 @@ final class AppModel {
         Task { await refresh() }
     }
 
+    /// Broadcast a signed transaction; returns the tx id.
+    func broadcast(signatures: [String], packedTrx: String) async throws -> String {
+        guard let rpc else { throw PulseRPC.Failure(message: "Invalid endpoint") }
+        return try await rpc.issueTx(signatures: signatures, packedTrx: packedTrx)
+    }
+
     /// Pull chain info + the watched account's real balances/resources.
     func refresh() async {
         guard let rpc else { loadError = "Invalid endpoint"; return }

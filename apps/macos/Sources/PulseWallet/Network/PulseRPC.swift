@@ -112,4 +112,27 @@ struct PulseRPC: Sendable {
                        params: ["code": code, "account": account, "symbol": symbol],
                        as: [String].self)
     }
+
+    /// Tolerates a bare-string result or a {transaction_id|id} object.
+    struct TxResult: Decodable, Sendable {
+        let txid: String
+        init(from decoder: Decoder) throws {
+            if let s = try? decoder.singleValueContainer().decode(String.self) { txid = s; return }
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            txid = (try? c.decode(String.self, forKey: .transactionId))
+                ?? (try? c.decode(String.self, forKey: .id)) ?? "submitted"
+        }
+        enum CodingKeys: String, CodingKey { case transactionId, id }
+    }
+
+    /// Submit a signed transaction. Returns the transaction id.
+    func issueTx(signatures: [String], packedTrx: String) async throws -> String {
+        let result: TxResult = try await call("pulsevm.issueTx", params: [
+            "signatures": signatures,
+            "compression": "none",
+            "packed_context_free_data": "",
+            "packed_trx": packedTrx,
+        ], as: TxResult.self)
+        return result.txid
+    }
 }
