@@ -3,7 +3,6 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
     @State private var requireBiometricsEachTx = true
-    @State private var autoLock = true
     @State private var editing: PulseNetwork?
     @State private var addingNew = false
 
@@ -71,12 +70,13 @@ struct SettingsView: View {
 
     // MARK: Security
     private var security: some View {
-        GlassCard {
+        @Bindable var model = model
+        return GlassCard {
             VStack(alignment: .leading, spacing: 14) {
                 SectionHeader(title: "Security", systemImage: "lock.shield")
                 Toggle("Require Touch ID for every transaction", isOn: $requireBiometricsEachTx)
                 Divider()
-                Toggle("Auto-lock when idle", isOn: $autoLock)
+                Toggle("Lock wallet when inactive", isOn: $model.autoLock)
                 Divider()
                 HStack {
                     Label("Signing key", systemImage: "touchid")

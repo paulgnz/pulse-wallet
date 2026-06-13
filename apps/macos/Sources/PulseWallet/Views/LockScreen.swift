@@ -17,7 +17,11 @@ struct LockScreen: View {
                 }
                 Text("Pulse Wallet is locked").font(.title2.weight(.semibold))
                 Button {
-                    model.unlock()   // hook to LAContext.evaluatePolicy in app code
+                    Task {
+                        if await Biometrics.authenticate(reason: "Unlock PulseVM") {
+                            model.unlock()
+                        }
+                    }
                 } label: {
                     Label("Unlock with Touch ID", systemImage: "touchid")
                         .padding(.horizontal, 8).padding(.vertical, 4)

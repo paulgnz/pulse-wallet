@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(AppModel.self) private var model
+    @Environment(KeyStore.self) private var keyStore
+    @Environment(\.scenePhase) private var scenePhase
     @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
@@ -22,12 +24,25 @@ struct RootView: View {
                         .disabled(model.isLoading)
                         .help("Refresh")
                     }
+                    if !keyStore.keys.isEmpty {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button { model.lock() } label: { Image(systemName: "lock") }
+                                .help("Lock wallet")
+                        }
+                    }
                 }
         }
         .background(Brand.navy.gradient.opacity(0.35))
         .overlay { if model.isLocked { LockScreen() } }
         .animation(.smooth, value: model.isLocked)
         .task { await model.refresh() }
+        .onAppear {
+            // Lock at launch if there are keys to protect.
+            if model.autoLock && !keyStore.keys.isEmpty { model.lock() }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active && model.autoLock && !keyStore.keys.isEmpty { model.lock() }
+        }
     }
 
     @ViewBuilder private var detail: some View {

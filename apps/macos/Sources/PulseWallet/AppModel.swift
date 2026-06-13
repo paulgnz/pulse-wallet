@@ -64,6 +64,7 @@ final class AppModel {
         } else {
             accountName = accountNames[0]
         }
+        autoLock = UserDefaults.standard.object(forKey: "wallet.autoLock") as? Bool ?? true
     }
 
     private func persistAccounts() {
@@ -81,6 +82,7 @@ final class AppModel {
     private(set) var loadError: String?
 
     var isLocked = false
+    var autoLock = true { didSet { UserDefaults.standard.set(autoLock, forKey: "wallet.autoLock") } }
 
     private var rpc: PulseRPC? { PulseRPC(endpoint) }
     private var hyperion: Hyperion? { Hyperion(hyperionEndpoint) }
