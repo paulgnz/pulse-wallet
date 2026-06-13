@@ -47,6 +47,9 @@ protocol PulseCore {
     func msigExec(contract: String, proposer: String, proposal: String, executer: String,
                   chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
                   expiration: UInt32) throws -> BuiltTx
+
+    /// Preimage + digest for an externally-supplied packed tx (dapp transport).
+    func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String)
 }
 
 /// Serialized transaction + its signing material (all hex).
@@ -109,5 +112,8 @@ struct PulseCoreStub: PulseCore {
                   chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
                   expiration: UInt32) throws -> BuiltTx {
         throw PulseCoreError.notImplemented("msigExec")
+    }
+    func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String) {
+        throw PulseCoreError.notImplemented("signingMaterial")
     }
 }

@@ -11,6 +11,13 @@ struct PulseWalletApp: App {
                 .environment(model)
                 .environment(keyStore)
                 .frame(minWidth: 880, minHeight: 560)
+                .onOpenURL { model.handleURL($0) }
+                .sheet(item: Binding(get: { model.pendingRequest },
+                                     set: { model.pendingRequest = $0 })) { request in
+                    DappRequestSheet(request: request)
+                        .environment(model)
+                        .environment(keyStore)
+                }
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentMinSize)

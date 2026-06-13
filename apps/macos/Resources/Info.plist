@@ -16,5 +16,16 @@
     <string>PulseVM</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Pulse Wallet uses Touch ID to authorize transaction signing with your Secure Enclave key.</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>dev.pulsevm.wallet</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>pulsevm</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

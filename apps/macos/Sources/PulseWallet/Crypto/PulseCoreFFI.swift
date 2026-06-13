@@ -130,4 +130,13 @@ struct PulseCoreFFI: PulseCore {
                               refBlockNum, refBlockPrefix, expiration, &out, out.count)
         return try parse(out, n, "msigExec")
     }
+
+    func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String) {
+        var out = [CChar](repeating: 0, count: 16384)
+        let n = pwc_signing_material(packedTrx, chainId, &out, out.count)
+        guard n >= 0 else { throw PulseCoreError.signing("signingMaterial failed") }
+        let parts = String(cString: out).split(separator: "\n", omittingEmptySubsequences: false)
+        guard parts.count == 2 else { throw PulseCoreError.signing("malformed material") }
+        return (String(parts[0]), String(parts[1]))
+    }
 }

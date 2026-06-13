@@ -35,6 +35,9 @@ int pwc_build_transfer(const char *from, const char *to, const char *quantity,
                        uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
                        char *out, size_t out_len);
 
+// Dapp transport: "<preimage>\n<digest>" (hex) for an external packed tx.
+int pwc_signing_material(const char *packed_hex, const char *chain_id_hex, char *out, size_t out_len);
+
 // pulse.msig. Each writes "<packed>\n<preimage>\n<digest>" (hex). 4096-byte buffer.
 int pwc_msig_propose_transfer(const char *contract, const char *proposer, const char *proposal,
                               const char *requested, const char *from, const char *to,

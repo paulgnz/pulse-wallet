@@ -142,6 +142,12 @@ fn signing_material(packed: &[u8], chain_id_hex: &str) -> Result<(Vec<u8>, Vec<u
     Ok((preimage, digest.to_vec()))
 }
 
+/// (preimage, digest) for an externally-provided packed transaction (dapp SDK).
+pub fn signing_material_hex(packed_hex: &str, chain_id_hex: &str) -> Result<(Vec<u8>, Vec<u8>), String> {
+    let packed = hex::decode(packed_hex).map_err(|e| e.to_string())?;
+    signing_material(&packed, chain_id_hex)
+}
+
 /// (packed_trx, preimage, digest) for signing a transfer.
 pub fn build_transfer_signing(
     p: &TransferParams,

@@ -7,7 +7,8 @@
 
 use crate::tx::{
     build_msig_propose_transfer_signing, build_msig_signing, build_transfer_signing,
-    msig_approve_data, msig_exec_data, parse_perm_levels, PermLevel, TransferParams,
+    msig_approve_data, msig_exec_data, parse_perm_levels, signing_material_hex, PermLevel,
+    TransferParams,
 };
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, pub_k1_from_priv,
@@ -273,6 +274,29 @@ fn emit_tx(result: Result<(Vec<u8>, Vec<u8>, Vec<u8>), String>, out: *mut c_char
             let s = format!("{}\n{}\n{}", hex::encode(packed), hex::encode(preimage), hex::encode(digest));
             write_str(out, out_len, &s)
         },
+        Err(_) => -1,
+    }
+}
+
+/// Compute "(preimage)\n(digest)" (hex) for an externally-provided packed tx.
+/// Used by the dapp signing transport (pulsevm://sign). Returns length or -1.
+/// # Safety: `packed_hex`/`chain_id_hex` NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_signing_material(
+    packed_hex: *const c_char,
+    chain_id_hex: *const c_char,
+    out: *mut c_char,
+    out_len: usize,
+) -> c_int {
+    let (packed, cid) = match (cstr(packed_hex), cstr(chain_id_hex)) {
+        (Some(a), Some(b)) => (a, b),
+        _ => return -1,
+    };
+    match signing_material_hex(packed, cid) {
+        Ok((preimage, digest)) => {
+            let s = format!("{}\n{}", hex::encode(preimage), hex::encode(digest));
+            write_str(out, out_len, &s)
+        }
         Err(_) => -1,
     }
 }

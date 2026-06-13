@@ -55,6 +55,9 @@ final class AppModel {
     /// Set by the account menu's "Import key…" to auto-open the import sheet.
     var requestImportKey = false
 
+    /// An incoming dapp request (pulsevm:// URL scheme) awaiting approval.
+    var pendingRequest: DappRequest?
+
     init() {
         if let data = UserDefaults.standard.data(forKey: "wallet.accounts.v1"),
            let arr = try? JSONDecoder().decode([String].self, from: data), !arr.isEmpty {
@@ -150,6 +153,25 @@ final class AppModel {
     func switchNetwork(_ network: PulseNetwork) {
         networks.select(network)
         Task { await refresh() }
+    }
+
+    /// Handle an incoming pulsevm:// deep link from a dapp (login or sign).
+    func handleURL(_ url: URL) {
+        guard url.scheme == "pulsevm" else { return }
+        let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        func q(_ name: String) -> String? { items.first { $0.name == name }?.value }
+        let callback = q("callback").flatMap(URL.init(string:))
+        switch url.host {
+        case "login":
+            pendingRequest = .login(callback: callback)
+        case "sign":
+            guard let packed = q("packed_trx") else { return }
+            let cid = q("chain_id") ?? networks.active.chainId ?? chainInfo?.chainId ?? ""
+            pendingRequest = .sign(chainId: cid, packedTrx: packed,
+                                   summary: q("summary") ?? "External transaction", callback: callback)
+        default:
+            break
+        }
     }
 
     /// Accounts a public key can sign for (reverse lookup via Hyperion).

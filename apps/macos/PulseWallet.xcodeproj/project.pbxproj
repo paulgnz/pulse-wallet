@@ -23,6 +23,7 @@
 		59747BF54046AFE46FF1C001 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5683B2975215EE839C7D7028 /* RootView.swift */; };
 		5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA718630DE93EEEAE5AB4CDC /* DataHex.swift */; };
 		794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78440EE6283769BDF3E38093 /* PulseWalletApp.swift */; };
+		7DC8A70C3F20BC28F2AC8D2C /* DappRequestSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */; };
 		8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */; };
 		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
 		9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988744519E80C7631A1550B1 /* KeysView.swift */; };
@@ -50,6 +51,7 @@
 		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		57F9C43E9860AAD1D468DC9C /* PulseCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCore.swift; sourceTree = "<group>"; };
 		58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
+		5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappRequestSheet.swift; sourceTree = "<group>"; };
 		7565A5201A525117526CF9E4 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		78440EE6283769BDF3E38093 /* PulseWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWalletApp.swift; sourceTree = "<group>"; };
 		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 			children = (
 				B1981660F714156CB20D4B81 /* ActivityView.swift */,
 				F4B1EEFEB2E72680C6C808D3 /* Components.swift */,
+				5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */,
 				0698D056BD05A32CE1905F8C /* DashboardView.swift */,
 				988744519E80C7631A1550B1 /* KeysView.swift */,
 				D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */,
@@ -246,6 +249,7 @@
 				37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */,
 				56F8B096E94C096D1B76B2D6 /* Biometrics.swift in Sources */,
 				C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */,
+				7DC8A70C3F20BC28F2AC8D2C /* DappRequestSheet.swift in Sources */,
 				9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */,
 				5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */,
 				3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */,
