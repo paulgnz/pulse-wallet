@@ -43,7 +43,7 @@ final class KeyStore {
 
     /// Flag any keys whose Keychain material can't be found (no Touch ID prompt).
     func runHealthCheck() {
-        unreadableKeyIDs = Set(keys.filter { !Keychain.exists(account: $0.id) }.map(\.id))
+        unreadableKeyIDs = Set(keys.filter { !SecretVault.exists($0.id) }.map(\.id))
     }
 
     var activeKey: WalletKey? { keys.first { $0.id == activeKeyID } }
@@ -62,7 +62,7 @@ final class KeyStore {
         let handle = try EnclaveSigner.createKey()
         let pub = handle.compressedPublicKey
         let id = UUID().uuidString
-        try Keychain.save(account: id, data: handle.key.dataRepresentation)
+        try SecretVault.saveBlob(id, handle.key.dataRepresentation)
         let key = WalletKey(id: id, label: label.isEmpty ? "Enclave key" : label,
                             kind: .enclave, curve: .r1, pubCompressedHex: pub.hexString,
                             pubKey: core.encodePubR1(compressedPublicKey: pub), createdAt: Date())
@@ -91,7 +91,7 @@ final class KeyStore {
         if let existing = keys.first(where: { $0.pubCompressedHex == hex }) {
             // If the existing entry's material is missing (orphaned by an old
             // build), replace it; otherwise it's a genuine duplicate.
-            if Keychain.exists(account: existing.id) {
+            if SecretVault.exists(existing.id) {
                 throw PulseCoreError.badInput("key already imported (\(existing.label))")
             }
             delete(existing)
@@ -100,7 +100,7 @@ final class KeyStore {
             ? core.encodePubR1(compressedPublicKey: pub)
             : core.encodePubK1(compressedPublicKey: pub)
         let id = UUID().uuidString
-        try Keychain.save(account: id, data: raw)
+        try SecretVault.saveSecret(id, raw)
         let key = WalletKey(id: id, label: label.isEmpty ? "Imported key" : label,
                             kind: .imported, curve: curve, pubCompressedHex: hex,
                             pubKey: pubStr, createdAt: Date())
@@ -113,23 +113,24 @@ final class KeyStore {
     /// Remove a key from the store and Keychain. UI gates this with Touch ID +
     /// a typed "DELETE" confirmation.
     func delete(_ key: WalletKey) {
-        Keychain.delete(account: key.id)
+        SecretVault.delete(key.id)
         keys.removeAll { $0.id == key.id }
         if activeKeyID == key.id { activeKeyID = keys.first?.id }
         persist()
     }
 
-    /// Export an imported key's private key (PVT_…) for backup. Prompts Touch ID
-    /// via the Keychain. Enclave keys are non-exportable by design.
+    /// Export an imported key's private key (PVT_…) for backup. Unwrapping the
+    /// secret runs the Secure Enclave wrapping key → one Touch ID. Enclave signing
+    /// keys are non-exportable by design.
     func exportSecret(_ key: WalletKey, reason: String) async throws -> String {
         guard key.kind == .imported else {
             throw PulseCoreError.badInput("Secure Enclave keys cannot be exported — back up via a recovery key or multisig.")
         }
-        guard await Biometrics.authenticate(reason: reason) else {
-            throw PulseCoreError.signing("Authentication failed or cancelled")
-        }
-        let raw = try Keychain.load(account: key.id)
-        return key.curve == .r1 ? core.encodePvtR1(raw) : core.encodePvtK1(raw)
+        let id = key.id, curve = key.curve
+        let raw = try await Task.detached(priority: .userInitiated) {
+            try SecretVault.loadSecret(id, reason: reason)
+        }.value
+        return curve == .r1 ? core.encodePvtR1(raw) : core.encodePvtK1(raw)
     }
 
     func rename(_ key: WalletKey, to label: String) {
@@ -147,13 +148,8 @@ final class KeyStore {
         guard let key = activeKey else {
             throw PulseCoreError.badInput("No active key. Create or import one in Keys.")
         }
-        // Enclave keys prompt Touch ID during signing (the key's own access control).
-        // Imported keys live in the plain Keychain, so we gate them with Touch ID here.
-        if key.kind == .imported {
-            guard await Biometrics.authenticate(reason: reason) else {
-                throw PulseCoreError.signing("Authentication failed or cancelled")
-            }
-        }
+        // Touch ID is enforced when the secret is unsealed: Enclave signing keys via
+        // their own access control; imported keys via the Secure Enclave wrap-key unwrap.
         return try await KeyStore.performSign(key: key, preImage: preImage, reason: reason)
     }
 
@@ -163,7 +159,7 @@ final class KeyStore {
             let digest = Data(SHA256.hash(data: preImage))
             switch (key.kind, key.curve) {
             case (.enclave, _):
-                let blob = try Keychain.load(account: key.id)
+                let blob = try SecretVault.loadBlob(key.id)
                 let handle = try EnclaveSigner.load(from: blob)
                 let rs = try EnclaveSigner.signPreImage(preImage, with: handle, reason: reason)
                 guard let pub = Data(hexString: key.pubCompressedHex) else {
@@ -171,7 +167,7 @@ final class KeyStore {
                 }
                 return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
             case (.imported, .r1):
-                let raw = try Keychain.load(account: key.id)
+                let raw = try SecretVault.loadSecret(key.id, reason: reason)
                 let priv = try P256.Signing.PrivateKey(rawRepresentation: raw)
                 let rs = try priv.signature(for: preImage).rawRepresentation
                 guard let pub = Data(hexString: key.pubCompressedHex) else {
@@ -179,7 +175,7 @@ final class KeyStore {
                 }
                 return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
             case (.imported, .k1):
-                let raw = try Keychain.load(account: key.id)
+                let raw = try SecretVault.loadSecret(key.id, reason: reason)
                 return try core.signK1(privateKey: raw, digest: digest)
             }
         }.value

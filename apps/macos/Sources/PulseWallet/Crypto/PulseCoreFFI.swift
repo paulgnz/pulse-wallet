@@ -192,4 +192,13 @@ struct PulseCoreFFI: PulseCore {
                                      expiration, &out, out.count)
         return try parse(out, n, "buildUpdateAuth")
     }
+
+    func decodeTransaction(packedTrx: String) -> DecodedTx? {
+        var out = [CChar](repeating: 0, count: 16384)
+        let n = pwc_decode_transaction(packedTrx, &out, out.count)
+        guard n >= 0, let data = String(cString: out).data(using: .utf8) else { return nil }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try? decoder.decode(DecodedTx.self, from: data)
+    }
 }

@@ -7,9 +7,9 @@
 
 use crate::tx::{
     build_action_signing, build_msig_propose_transfer_signing, build_msig_signing,
-    build_transfer_signing, build_updateauth_signing, delegatebw_data, msig_approve_data,
-    msig_exec_data, parse_key_weights, parse_perm_levels, refund_data, signing_material_hex,
-    undelegatebw_data, PermLevel, TransferParams,
+    build_transfer_signing, build_updateauth_signing, decode_transaction, delegatebw_data,
+    msig_approve_data, msig_exec_data, parse_key_weights, parse_perm_levels, refund_data,
+    signing_material_hex, undelegatebw_data, PermLevel, TransferParams,
 };
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, encode_pvt_k1,
@@ -415,6 +415,17 @@ pub unsafe extern "C" fn pwc_build_refund(
     emit_tx(build_action_signing(contract, "refund", refund_data(owner),
         PermLevel { actor: owner.to_string(), permission: "active".to_string() },
         cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// Decode a packed transaction to JSON (for showing the user what they're signing).
+/// # Safety: `packed_hex` NUL-terminated; `out` has `out_len` bytes (use 16384).
+#[no_mangle]
+pub unsafe extern "C" fn pwc_decode_transaction(packed_hex: *const c_char, out: *mut c_char, out_len: usize) -> c_int {
+    let packed = match cstr(packed_hex) { Some(s) => s, None => return -1 };
+    match decode_transaction(packed) {
+        Ok(json) => write_str(out, out_len, &json),
+        Err(_) => -1,
+    }
 }
 
 // --- pulse.msig -------------------------------------------------------------

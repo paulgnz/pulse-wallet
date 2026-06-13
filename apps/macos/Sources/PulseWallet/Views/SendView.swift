@@ -168,13 +168,7 @@ struct SignSheet: View {
             HStack {
                 Button("Cancel") { dismiss() }
                     .buttonStyle(.glass).controlSize(.large)
-                PrimaryButton(title: "Sign with Touch ID", systemImage: "touchid") { sign() }
-            }
-        case .signed:
-            HStack {
-                Button("Close") { dismiss() }
-                    .buttonStyle(.glass).controlSize(.large)
-                PrimaryButton(title: "Broadcast", systemImage: "antenna.radiowaves.left.and.right") { broadcast() }
+                PrimaryButton(title: "Sign & Send", systemImage: "touchid") { sign() }
             }
         case .sent(let txid):
             HStack {
@@ -188,13 +182,20 @@ struct SignSheet: View {
             VStack(spacing: 10) {
                 Text(msg).font(.caption).foregroundStyle(Brand.danger)
                     .multilineTextAlignment(.center)
-                Button("Close") { dismiss() }.buttonStyle(.glass)
+                HStack {
+                    Button("Close") { dismiss() }.buttonStyle(.glass)
+                    // If we already have a signature, retry just the broadcast (no re-sign).
+                    if sigR1 != nil {
+                        PrimaryButton(title: "Retry broadcast", systemImage: "arrow.clockwise") { broadcast() }
+                    }
+                }
             }
         default:
             ProgressView().controlSize(.large)
         }
     }
 
+    /// Build → sign (Touch ID) → broadcast, in one step.
     private func sign() {
         guard let draft = model.makeTransferDraft(to: recipient, amount: amount, symbol: symbol, memo: memo) else {
             state = .failed("Couldn't build the transfer — not connected, or unknown token.")
@@ -205,8 +206,6 @@ struct SignSheet: View {
         let reason = "Sign transfer of \(draft.quantity) to \(draft.to)"
         Task {
             do {
-                // Serialize the real Antelope transaction in the core, then sign its
-                // digest with the active key (Enclave R1 / imported R1 / imported K1).
                 let built = try core.buildTransfer(
                     from: draft.from, to: draft.to, quantity: draft.quantity, memo: draft.memo,
                     contract: draft.contract, actor: draft.actor, permission: draft.permission,
@@ -215,10 +214,9 @@ struct SignSheet: View {
                 guard let preImage = Data(hexString: built.preimage) else {
                     state = .failed("Malformed signing pre-image."); return
                 }
-                let sig = try await keyStore.sign(preImage: preImage, reason: reason)
+                sigR1 = try await keyStore.sign(preImage: preImage, reason: reason)
                 packedTrx = built.packed
-                sigR1 = sig
-                state = .signed
+                broadcast()   // ← sign and send in one flow
             } catch {
                 state = .failed(error.localizedDescription)
             }
@@ -259,7 +257,7 @@ struct SignSheet: View {
                 Text(sig)
                     .font(.caption2.monospaced()).foregroundStyle(.secondary)
                     .textSelection(.enabled).lineLimit(4)
-                Text("Real signature over the serialized transaction. Tap Broadcast to submit.")
+                Text("Real signature over the serialized transaction — broadcasting…")
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }

@@ -65,6 +65,9 @@ protocol PulseCore {
     /// Preimage + digest for an externally-supplied packed tx (dapp transport).
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String)
 
+    /// Decode a packed tx so the user can see what they're signing (nil if undecodable).
+    func decodeTransaction(packedTrx: String) -> DecodedTx?
+
     /// updateauth — set an account permission to threshold-of weighted keys.
     /// `keys` is "PUB_..@weight;PUB_..@weight".
     func buildUpdateAuth(systemContract: String, account: String, permission: String,
@@ -78,6 +81,27 @@ struct BuiltTx: Sendable {
     let packed: String
     let preimage: String
     let digest: String
+}
+
+/// A decoded transaction — what the user is actually about to sign.
+struct DecodedTx: Decodable, Sendable {
+    let expiration: UInt32
+    let refBlockNum: UInt16
+    let actions: [Action]
+
+    struct Action: Decodable, Sendable, Identifiable {
+        let account: String
+        let name: String
+        let authorization: [Auth]
+        let dataHex: String
+        let transfer: Transfer?
+        var id: String { account + "::" + name + dataHex }
+
+        struct Auth: Decodable, Sendable { let actor: String; let permission: String }
+        struct Transfer: Decodable, Sendable {
+            let from: String; let to: String; let quantity: String; let memo: String
+        }
+    }
 }
 
 enum PulseCoreError: Error, LocalizedError {
@@ -148,6 +172,7 @@ struct PulseCoreStub: PulseCore {
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String) {
         throw PulseCoreError.notImplemented("signingMaterial")
     }
+    func decodeTransaction(packedTrx: String) -> DecodedTx? { nil }
     func buildUpdateAuth(systemContract: String, account: String, permission: String,
                          parent: String, threshold: UInt32, keys: String,
                          authActor: String, authPerm: String, chainId: String,

@@ -43,6 +43,9 @@ int pwc_build_transfer(const char *from, const char *to, const char *quantity,
 // Dapp transport: "<preimage>\n<digest>" (hex) for an external packed tx.
 int pwc_signing_material(const char *packed_hex, const char *chain_id_hex, char *out, size_t out_len);
 
+// Decode a packed tx to JSON (show the user what they're signing). 16384-byte buffer.
+int pwc_decode_transaction(const char *packed_hex, char *out, size_t out_len);
+
 // updateauth: keys = "PUB_..@weight;PUB_..@weight". Writes packed/preimage/digest.
 int pwc_build_updateauth(const char *system_contract, const char *account, const char *permission,
                          const char *parent, uint32_t threshold, const char *keys,

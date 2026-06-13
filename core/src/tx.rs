@@ -17,6 +17,20 @@ fn sha256(data: &[u8]) -> [u8; 32] {
     r
 }
 
+/// uint64 → EOSIO/Antelope name string (inverse of name_to_u64).
+pub fn u64_to_name(value: u64) -> String {
+    let charmap = b".12345abcdefghijklmnopqrstuvwxyz";
+    let mut s = [b'.'; 13];
+    let mut tmp = value;
+    for i in 0..=12usize {
+        let mask = if i == 0 { 0x0f } else { 0x1f };
+        s[12 - i] = charmap[(tmp & mask) as usize];
+        tmp >>= if i == 0 { 4 } else { 5 };
+    }
+    let out: String = s.iter().map(|&c| c as char).collect();
+    out.trim_end_matches('.').to_string()
+}
+
 /// EOSIO/Antelope name (≤12 chars of [.a-z1-5]) → uint64.
 pub fn name_to_u64(s: &str) -> u64 {
     fn char_value(c: u8) -> u64 {
@@ -140,6 +154,99 @@ fn signing_material(packed: &[u8], chain_id_hex: &str) -> Result<(Vec<u8>, Vec<u
     preimage.extend_from_slice(&cfd_hash);
     let digest = sha256(&preimage);
     Ok((preimage, digest.to_vec()))
+}
+
+// === Deserialization (decode-before-sign) ==================================
+
+struct Reader<'a> { b: &'a [u8], pos: usize }
+impl<'a> Reader<'a> {
+    fn new(b: &'a [u8]) -> Self { Reader { b, pos: 0 } }
+    fn take(&mut self, n: usize) -> Result<&'a [u8], String> {
+        if self.pos + n > self.b.len() { return Err("unexpected end of data".into()); }
+        let s = &self.b[self.pos..self.pos + n];
+        self.pos += n;
+        Ok(s)
+    }
+    fn u8(&mut self) -> Result<u8, String> { Ok(self.take(1)?[0]) }
+    fn u16(&mut self) -> Result<u16, String> { let s = self.take(2)?; Ok(u16::from_le_bytes([s[0], s[1]])) }
+    fn u32(&mut self) -> Result<u32, String> { let s = self.take(4)?; Ok(u32::from_le_bytes([s[0], s[1], s[2], s[3]])) }
+    fn name(&mut self) -> Result<String, String> {
+        let s = self.take(8)?;
+        let mut a = [0u8; 8]; a.copy_from_slice(s);
+        Ok(u64_to_name(u64::from_le_bytes(a)))
+    }
+    fn varuint32(&mut self) -> Result<u32, String> {
+        let (mut v, mut shift) = (0u32, 0u32);
+        loop {
+            let b = self.u8()?;
+            v |= ((b & 0x7f) as u32) << shift;
+            if b & 0x80 == 0 { break; }
+            shift += 7;
+            if shift > 35 { return Err("varuint too long".into()); }
+        }
+        Ok(v)
+    }
+    fn asset(&mut self) -> Result<String, String> {
+        let amt = i64::from_le_bytes(self.take(8)?.try_into().unwrap());
+        let precision = self.u8()? as usize;
+        let symbytes = self.take(7)?;
+        let symbol: String = symbytes.iter().take_while(|&&c| c != 0).map(|&c| c as char).collect();
+        let neg = amt < 0;
+        let mut digits = amt.unsigned_abs().to_string();
+        while digits.len() <= precision { digits.insert(0, '0'); }
+        let s = if precision > 0 {
+            let dot = digits.len() - precision;
+            format!("{}.{}", &digits[..dot], &digits[dot..])
+        } else { digits };
+        Ok(format!("{}{} {}", if neg { "-" } else { "" }, s, symbol))
+    }
+}
+
+/// Decode a packed transaction into JSON: { expiration, ref_block_num, actions:[
+/// { account, name, authorization:[{actor,permission}], data_hex, transfer?{from,to,quantity,memo} } ] }
+pub fn decode_transaction(packed_hex: &str) -> Result<String, String> {
+    let bytes = hex::decode(packed_hex).map_err(|e| e.to_string())?;
+    let mut r = Reader::new(&bytes);
+    let expiration = r.u32()?;
+    let ref_block_num = r.u16()?;
+    let _ref_block_prefix = r.u32()?;
+    let _max_net = r.varuint32()?;
+    let _max_cpu = r.u8()?;
+    let _delay = r.varuint32()?;
+    let cfa = r.varuint32()?;
+    if cfa != 0 { return Err("context-free actions not supported".into()); }
+    let n_actions = r.varuint32()?;
+    let mut actions = Vec::new();
+    for _ in 0..n_actions {
+        let account = r.name()?;
+        let name = r.name()?;
+        let n_auth = r.varuint32()?;
+        let mut auth = Vec::new();
+        for _ in 0..n_auth {
+            let actor = r.name()?;
+            let permission = r.name()?;
+            auth.push(serde_json::json!({ "actor": actor, "permission": permission }));
+        }
+        let data_len = r.varuint32()? as usize;
+        let data = r.take(data_len)?.to_vec();
+        let mut obj = serde_json::json!({
+            "account": account, "name": name, "authorization": auth, "data_hex": hex::encode(&data),
+        });
+        // Decode known action shapes.
+        if name == "transfer" {
+            let mut dr = Reader::new(&data);
+            if let (Ok(from), Ok(to), Ok(quantity)) = (dr.name(), dr.name(), dr.asset()) {
+                let memo = dr.varuint32().ok()
+                    .and_then(|len| dr.take(len as usize).ok())
+                    .map(|m| String::from_utf8_lossy(m).to_string())
+                    .unwrap_or_default();
+                obj["transfer"] = serde_json::json!({ "from": from, "to": to, "quantity": quantity, "memo": memo });
+            }
+        }
+        actions.push(obj);
+    }
+    let out = serde_json::json!({ "expiration": expiration, "ref_block_num": ref_block_num, "actions": actions });
+    Ok(out.to_string())
 }
 
 /// (preimage, digest) for an externally-provided packed transaction (dapp SDK).
@@ -489,6 +596,31 @@ mod tx_tests {
         // deterministic
         let (_, _, digest2) = build_transfer_signing(&p, cid).unwrap();
         assert_eq!(digest, digest2);
+    }
+
+    #[test]
+    fn name_round_trips() {
+        for n in ["eosio", "eosio.token", "pulse.token", "protonnz", "a", ""] {
+            assert_eq!(u64_to_name(name_to_u64(n)), n);
+        }
+    }
+
+    #[test]
+    fn decode_transaction_round_trips_transfer() {
+        let p = TransferParams {
+            from: "protonnz", to: "hello", quantity: "1.2340 XPR", memo: "hi there",
+            contract: "pulse.token", actor: "protonnz", permission: "active",
+            ref_block_num: 0x0ade, ref_block_prefix: 0x12345678, expiration: 1_760_000_000,
+        };
+        let packed = serialize_transfer_tx(&p).unwrap();
+        let json = decode_transaction(&hex::encode(&packed)).unwrap();
+        // sanity: the decoded JSON names the right pieces
+        assert!(json.contains("\"account\":\"pulse.token\""));
+        assert!(json.contains("\"name\":\"transfer\""));
+        assert!(json.contains("\"actor\":\"protonnz\""));
+        assert!(json.contains("\"to\":\"hello\""));
+        assert!(json.contains("1.2340 XPR"));
+        assert!(json.contains("hi there"));
     }
 
     #[test]
