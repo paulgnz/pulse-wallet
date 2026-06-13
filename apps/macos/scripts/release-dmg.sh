@@ -42,8 +42,10 @@ else echo "  (skipping; using existing Vendor/libpulse_wallet_core.a)"; fi
 BUILD_NO=$(git rev-list --count HEAD 2>/dev/null || echo 1)
 echo "▶︎ Archiving Release (build $BUILD_NO)…"
 rm -rf "$ARCHIVE" "$EXPORT_DIR"
+# Contain DerivedData in build/ so the archive's intermediate PulseVM.app copy
+# doesn't linger in ~/Library/.../DerivedData and hijack the pulsevm:// handler.
 xcodebuild -project PulseWallet.xcodeproj -scheme "$SCHEME" -configuration Release \
-    -archivePath "$ARCHIVE" archive \
+    -archivePath "$ARCHIVE" -derivedDataPath "$BUILD_DIR/dd" archive \
     DEVELOPMENT_TEAM=UKU2H2D5Z7 \
     CURRENT_PROJECT_VERSION="$BUILD_NO" \
     -quiet
@@ -84,7 +86,7 @@ fi
 # PulseVM.app copies linger on disk and register themselves as competing
 # pulsevm:// handlers (LaunchServices may then launch the wrong build).
 echo "▶︎ Cleaning up build copies (keeping the .dmg)…"
-rm -rf "$STAGE" "$EXPORT_DIR" "$ARCHIVE"
+rm -rf "$STAGE" "$EXPORT_DIR" "$ARCHIVE" "$BUILD_DIR/dd"
 LSREG=/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
 [ -x "$LSREG" ] && "$LSREG" -kill -r -domain local -domain user >/dev/null 2>&1 || true
 
