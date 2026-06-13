@@ -17,6 +17,9 @@ settings:
     ENABLE_HARDENED_RUNTIME: true
     CODE_SIGN_STYLE: Automatic
     SWIFT_STRICT_CONCURRENCY: complete
+    # Xcode-recommended settings (baked in so they survive `xcodegen generate`)
+    DEAD_CODE_STRIPPING: true
+    ENABLE_USER_SCRIPT_SANDBOXING: true
 
 targets:
   PulseWallet:

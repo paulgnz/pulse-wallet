@@ -16,9 +16,16 @@ open PulseWallet.xcodeproj
 the spec and regenerate rather than hand-editing the project. Requires
 `brew install xcodegen`. Builds clean today against macOS 26 / Swift 6.
 
-In Xcode, set your **Development Team** under Signing & Capabilities (the
-entitlements request Keychain + the Secure Enclave). Run on a Mac with Apple
-silicon or a T2 chip to exercise the Enclave path.
+In Xcode, set your **Development Team** under Signing & Capabilities, then run on
+a Mac with Apple silicon or a T2 chip to exercise the Enclave path.
+
+> **Required:** a Development Team must be selected. The `keychain-access-groups`
+> entitlement uses `$(AppIdentifierPrefix)`, which only resolves with a real team.
+> Without one, the app is signed ad-hoc and `libsecinit` traps at launch
+> (`EXC_BREAKPOINT` in `_libsecinit_appsandbox`). If you want team-free local
+> builds, remove the `keychain-access-groups` block from
+> `Resources/PulseWallet.entitlements` — Secure Enclave keys don't require it for
+> a single standalone app.
 
 ## Layout
 
