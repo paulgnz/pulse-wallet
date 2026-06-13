@@ -1,0 +1,421 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
+		227763B316A637302CE0C75F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13029EAE706A34911065861E /* Models.swift */; };
+		2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7565A5201A525117526CF9E4 /* Theme.swift */; };
+		37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F55D58BFECA263D8B812953C /* AppModel.swift */; };
+		3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28704358E20940217081D30E /* EnclaveSigner.swift */; };
+		3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1981660F714156CB20D4B81 /* ActivityView.swift */; };
+		40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED00983BCEA7586B91D3F8A /* Sidebar.swift */; };
+		493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FC2C0D8FA258ACAC588FE /* SendView.swift */; };
+		59747BF54046AFE46FF1C001 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5683B2975215EE839C7D7028 /* RootView.swift */; };
+		794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78440EE6283769BDF3E38093 /* PulseWalletApp.swift */; };
+		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
+		A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */; };
+		AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F9C43E9860AAD1D468DC9C /* PulseCore.swift */; };
+		B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */; };
+		B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */; };
+		C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B1EEFEB2E72680C6C808D3 /* Components.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0698D056BD05A32CE1905F8C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		13029EAE706A34911065861E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		28704358E20940217081D30E /* EnclaveSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnclaveSigner.swift; sourceTree = "<group>"; };
+		335FC2C0D8FA258ACAC588FE /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
+		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		57F9C43E9860AAD1D468DC9C /* PulseCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCore.swift; sourceTree = "<group>"; };
+		58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
+		7565A5201A525117526CF9E4 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		78440EE6283769BDF3E38093 /* PulseWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWalletApp.swift; sourceTree = "<group>"; };
+		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
+		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1981660F714156CB20D4B81 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreen.swift; sourceTree = "<group>"; };
+		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		15B50EBACB7F935BCC464F48 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1D0DFAE0EFFBBD5008ECEDE7 = {
+			isa = PBXGroup;
+			children = (
+				38573CD364D78478731A93FC /* Resources */,
+				D5B7171F1B2011B539E0D41B /* Sources */,
+				15B50EBACB7F935BCC464F48 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		38573CD364D78478731A93FC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3415124985CAAF63350F0BB7 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		397385A935231FBFA6F0AAFA /* PulseWallet */ = {
+			isa = PBXGroup;
+			children = (
+				A681EFCEBC3738C1E176A3BA /* Crypto */,
+				DCF1FE27AD6AA4AC0E24C886 /* Design */,
+				4013BC0C099F9A70F860B656 /* Models */,
+				3C40CA16AB27649DE789ACC1 /* Views */,
+				F55D58BFECA263D8B812953C /* AppModel.swift */,
+				78440EE6283769BDF3E38093 /* PulseWalletApp.swift */,
+			);
+			path = PulseWallet;
+			sourceTree = "<group>";
+		};
+		3C40CA16AB27649DE789ACC1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B1981660F714156CB20D4B81 /* ActivityView.swift */,
+				F4B1EEFEB2E72680C6C808D3 /* Components.swift */,
+				0698D056BD05A32CE1905F8C /* DashboardView.swift */,
+				D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */,
+				58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */,
+				5683B2975215EE839C7D7028 /* RootView.swift */,
+				335FC2C0D8FA258ACAC588FE /* SendView.swift */,
+				358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */,
+				7ED00983BCEA7586B91D3F8A /* Sidebar.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4013BC0C099F9A70F860B656 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				13029EAE706A34911065861E /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A681EFCEBC3738C1E176A3BA /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				28704358E20940217081D30E /* EnclaveSigner.swift */,
+				57F9C43E9860AAD1D468DC9C /* PulseCore.swift */,
+			);
+			path = Crypto;
+			sourceTree = "<group>";
+		};
+		D5B7171F1B2011B539E0D41B /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				397385A935231FBFA6F0AAFA /* PulseWallet */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		DCF1FE27AD6AA4AC0E24C886 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				7565A5201A525117526CF9E4 /* Theme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9797A17FE371865CA33CDBD1 /* PulseWallet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5098A92703B96C056A18DB3D /* Build configuration list for PBXNativeTarget "PulseWallet" */;
+			buildPhases = (
+				BA9CDAECB010DABA55DEC183 /* Sources */,
+				0523510C0FFD2F9387BB6438 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PulseWallet;
+			packageProductDependencies = (
+			);
+			productName = PulseWallet;
+			productReference = B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CF3B2637FA26BC8D6AED64E9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					9797A17FE371865CA33CDBD1 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9CE0E83037587E673DFB468F /* Build configuration list for PBXProject "PulseWallet" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1D0DFAE0EFFBBD5008ECEDE7;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 15B50EBACB7F935BCC464F48 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9797A17FE371865CA33CDBD1 /* PulseWallet */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0523510C0FFD2F9387BB6438 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				136D57B564649E7D600689EE /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BA9CDAECB010DABA55DEC183 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */,
+				37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */,
+				C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */,
+				9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */,
+				3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */,
+				B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */,
+				227763B316A637302CE0C75F /* Models.swift in Sources */,
+				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,
+				794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */,
+				B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */,
+				59747BF54046AFE46FF1C001 /* RootView.swift in Sources */,
+				493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */,
+				A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */,
+				40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */,
+				2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		398908271860AD3036B1C9F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.0.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Resources/PulseWallet.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pulsevm.wallet;
+				PRODUCT_NAME = "Pulse Wallet";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6FD955059479A4103B3CA154 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.0.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Resources/PulseWallet.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pulsevm.wallet;
+				PRODUCT_NAME = "Pulse Wallet";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5098A92703B96C056A18DB3D /* Build configuration list for PBXNativeTarget "PulseWallet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F6DBD0E0632EFEC875ADF1C /* Debug */,
+				D1BEC9BEA8C2B7BEE726581D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9CE0E83037587E673DFB468F /* Build configuration list for PBXProject "PulseWallet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				398908271860AD3036B1C9F4 /* Debug */,
+				6FD955059479A4103B3CA154 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CF3B2637FA26BC8D6AED64E9 /* Project object */;
+}

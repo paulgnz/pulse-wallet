@@ -1,0 +1,42 @@
+import Foundation
+
+/// Swift-facing surface of the shared Rust core (`pulse-wallet-core`).
+///
+/// The Rust core owns all chain logic that must match the network exactly:
+///   • recovery-id derivation + SIG_R1 assembly (validated vs pulsevm-js)
+///   • PUB_R1 encoding
+///   • transaction serialization + the signing digest
+///   • RPC / REST client
+///
+/// It is exposed to Swift via a uniffi binding. Until that binding is generated,
+/// this protocol lets the UI compile and run against `PulseCoreStub`. Swapping in
+/// the generated `PulseCoreFFI` is a one-line change in `AppModel`.
+protocol PulseCore {
+    /// 33-byte compressed SEC1 pubkey  →  "PUB_R1_…"
+    func encodePubR1(compressedPublicKey: Data) -> String
+
+    /// raw r‖s (64B) + 32B digest + 33B compressed pubkey  →  "SIG_R1_…"
+    /// Derives the recovery id by recover-and-match; normalizes to low-s.
+    func assembleSigR1(rs: Data, digest: Data, compressedPublicKey: Data) throws -> String
+
+    /// Build the signing digest for a transfer action (chain-id bound).
+    func transferDigest(from: String, to: String, quantity: String,
+                        memo: String, chainID: String) throws -> (preImage: Data, digest: Data)
+}
+
+enum PulseCoreError: Error { case notImplemented(String) }
+
+/// Stand-in until the uniffi binding ships. Returns clearly-fake values so the
+/// UI is exercisable without claiming to be real.
+struct PulseCoreStub: PulseCore {
+    func encodePubR1(compressedPublicKey: Data) -> String {
+        "PUB_R1_stub\(compressedPublicKey.prefix(3).map { String(format: "%02x", $0) }.joined())"
+    }
+    func assembleSigR1(rs: Data, digest: Data, compressedPublicKey: Data) throws -> String {
+        throw PulseCoreError.notImplemented("assembleSigR1 — wire pulse-wallet-core via uniffi")
+    }
+    func transferDigest(from: String, to: String, quantity: String,
+                        memo: String, chainID: String) throws -> (preImage: Data, digest: Data) {
+        throw PulseCoreError.notImplemented("transferDigest — port serializer into pulse-wallet-core")
+    }
+}
