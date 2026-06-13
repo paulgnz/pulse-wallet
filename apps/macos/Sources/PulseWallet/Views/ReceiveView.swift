@@ -24,6 +24,12 @@ struct ReceiveView: View {
                         }
                         .padding(.vertical, 8)
 
+                        if let name = model.selectedAccount?.name, !name.isEmpty {
+                            QRCodeView(content: name)
+                            Text("Scan to send to this account")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+
                         Button {
                             copyName()
                         } label: {
