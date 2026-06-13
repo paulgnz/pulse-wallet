@@ -14,6 +14,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."                              # apps/macos
 
+# --no-notarize : skip Apple notarization for a quick internal send. The DMG is
+# still Developer ID-signed, but recipients must right-click → Open the first time
+# (or run: xattr -dr com.apple.quarantine /Applications/PulseVM.app).
+NOTARIZE=1
+[ "${1:-}" = "--no-notarize" ] && NOTARIZE=0
+
 APP_NAME="PulseVM"
 SCHEME="PulseWallet"
 DEV_ID="Developer ID Application: Paul Grey (UKU2H2D5Z7)"
@@ -62,13 +68,19 @@ cp -R "$APP" "$STAGE/"
 ln -s /Applications "$STAGE/Applications"
 hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null
 
-echo "▶︎ Notarizing (this can take a few minutes)…"
-xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
-
-echo "▶︎ Stapling the ticket…"
-xcrun stapler staple "$DMG"
-xcrun stapler validate "$DMG"
+if [ "$NOTARIZE" = "1" ]; then
+    echo "▶︎ Notarizing (this can take a few minutes)…"
+    xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
+    echo "▶︎ Stapling the ticket…"
+    xcrun stapler staple "$DMG"
+    xcrun stapler validate "$DMG"
+fi
 
 echo ""
 echo "✅ Done →  $(cd "$(dirname "$DMG")" && pwd)/$(basename "$DMG")"
-echo "   Send that file. Recipients double-click it, drag PulseVM → Applications, done."
+if [ "$NOTARIZE" = "1" ]; then
+    echo "   Send that file. Recipients double-click it, drag PulseVM → Applications, done."
+else
+    echo "   ⚠︎  NOT notarized (--no-notarize). Recipients must right-click → Open the first"
+    echo "      time, or run: xattr -dr com.apple.quarantine /Applications/PulseVM.app"
+fi
