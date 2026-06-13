@@ -194,6 +194,35 @@ final class AppModel {
         return rows.map(\.proposalName)
     }
 
+    // Approvals inbox — who has approved / is still requested on each proposal.
+    private struct ApprovalLevel: Decodable, Sendable {
+        struct Level: Decodable, Sendable { let actor: String; let permission: String }
+        let level: Level
+    }
+    private struct Approvals2Row: Decodable, Sendable {
+        let proposalName: String
+        let requestedApprovals: [ApprovalLevel]
+        let providedApprovals: [ApprovalLevel]
+    }
+    struct ProposalStatus: Identifiable, Sendable {
+        let name: String
+        let provided: [String]
+        let requested: [String]
+        var id: String { name }
+    }
+
+    /// Per-proposal approval status (provided vs still-requested approvers).
+    func proposalStatuses(by proposer: String) async -> [ProposalStatus] {
+        guard let rpc else { return [] }
+        let rows = (try? await rpc.getTableRows(
+            code: msigContract, scope: proposer, table: "approvals2", as: Approvals2Row.self)) ?? []
+        return rows.map { r in
+            ProposalStatus(name: r.proposalName,
+                           provided: r.providedApprovals.map(\.level.actor),
+                           requested: r.requestedApprovals.map(\.level.actor))
+        }
+    }
+
     /// Build the TAPOS triple from current chain head (nil if not connected).
     func taposContext() -> (chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32)? {
         guard let info = chainInfo, let prefix = Self.refBlockPrefix(blockIdHex: info.headBlockId)

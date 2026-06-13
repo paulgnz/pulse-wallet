@@ -5,6 +5,7 @@ struct MultisigView: View {
     @Environment(KeyStore.self) private var keyStore
 
     @State private var proposals: [String] = []
+    @State private var statuses: [AppModel.ProposalStatus] = []
     @State private var loading = false
     @State private var status: String?
     @State private var showPropose = false
@@ -56,17 +57,41 @@ struct MultisigView: View {
             } else {
                 ForEach(proposals, id: \.self) { name in
                     GlassCard(padding: 14) {
-                        HStack {
-                            Image(systemName: "doc.badge.gearshape").foregroundStyle(Brand.accent)
-                            Text(name).font(.body.monospaced().weight(.medium))
-                            Spacer()
-                            Button("Approve") { approve(proposer: model.accountName, name: name) }
-                                .buttonStyle(.glass)
-                            Button("Execute") { exec(proposer: model.accountName, name: name) }
-                                .buttonStyle(.glassProminent).tint(Brand.primary)
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "doc.badge.gearshape").foregroundStyle(Brand.accent)
+                                Text(name).font(.body.monospaced().weight(.medium))
+                                Spacer()
+                                Button("Approve") { approve(proposer: model.accountName, name: name) }
+                                    .buttonStyle(.glass)
+                                Button("Execute") { exec(proposer: model.accountName, name: name) }
+                                    .buttonStyle(.glassProminent).tint(Brand.primary)
+                            }
+                            if let st = statuses.first(where: { $0.name == name }) {
+                                approvalStatus(st)
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /// Approvals inbox row: who approved, who's still pending.
+    private func approvalStatus(_ st: AppModel.ProposalStatus) -> some View {
+        let total = st.provided.count + st.requested.count
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.seal").font(.caption2).foregroundStyle(Brand.success)
+                Text("\(st.provided.count) / \(total) approvals").font(.caption.weight(.medium))
+            }
+            if !st.provided.isEmpty {
+                Text("Approved: \(st.provided.joined(separator: ", "))")
+                    .font(.caption2).foregroundStyle(Brand.success).lineLimit(1).truncationMode(.tail)
+            }
+            if !st.requested.isEmpty {
+                Text("Pending: \(st.requested.joined(separator: ", "))")
+                    .font(.caption2).foregroundStyle(Brand.warn).lineLimit(1).truncationMode(.tail)
             }
         }
     }
@@ -92,7 +117,10 @@ struct MultisigView: View {
 
     private func load() async {
         loading = true
-        proposals = await model.proposals(by: model.accountName)
+        async let p = model.proposals(by: model.accountName)
+        async let s = model.proposalStatuses(by: model.accountName)
+        proposals = await p
+        statuses = await s
         loading = false
     }
 
