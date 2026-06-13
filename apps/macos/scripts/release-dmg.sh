@@ -35,8 +35,6 @@ echo "▶︎ Archiving Release…"
 rm -rf "$ARCHIVE" "$EXPORT_DIR"
 xcodebuild -project PulseWallet.xcodeproj -scheme "$SCHEME" -configuration Release \
     -archivePath "$ARCHIVE" archive \
-    CODE_SIGN_STYLE=Manual \
-    CODE_SIGN_IDENTITY="$DEV_ID" \
     DEVELOPMENT_TEAM=UKU2H2D5Z7 \
     -quiet
 
@@ -47,7 +45,7 @@ cat > "$BUILD_DIR/ExportOptions.plist" <<PLIST
 <plist version="1.0"><dict>
   <key>method</key><string>developer-id</string>
   <key>teamID</key><string>UKU2H2D5Z7</string>
-  <key>signingStyle</key><string>manual</string>
+  <key>signingStyle</key><string>automatic</string>
 </dict></plist>
 PLIST
 xcodebuild -exportArchive -archivePath "$ARCHIVE" \
