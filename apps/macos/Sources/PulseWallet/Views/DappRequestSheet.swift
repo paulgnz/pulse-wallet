@@ -175,7 +175,7 @@ struct DappRequestSheet: View {
                 }
                 done = true
             } catch {
-                self.error = error.localizedDescription
+                self.error = FriendlyError.explain(error, paused: model.networkPaused).errorDescription
             }
             working = false
         }

@@ -262,10 +262,18 @@ final class AppModel {
                 UInt32(Date().timeIntervalSince1970) + 3600)  // proposals: longer expiry
     }
 
-    /// Broadcast a signed transaction; returns the tx id.
+    /// Broadcast a signed transaction; returns the tx id. On failure, throws a
+    /// `WalletError` with friendly guidance — and, if the chain is paused, a
+    /// warning that the (valid, signed) tx will land once validators resume.
     func broadcast(signatures: [String], packedTrx: String) async throws -> String {
-        guard let rpc else { throw PulseRPC.Failure(message: "Invalid endpoint") }
-        return try await rpc.issueTx(signatures: signatures, packedTrx: packedTrx)
+        guard let rpc else {
+            throw WalletError.error("No network endpoint", "Fix this network's RPC URL in Settings → Networks.")
+        }
+        do {
+            return try await rpc.issueTx(signatures: signatures, packedTrx: packedTrx)
+        } catch {
+            throw FriendlyError.explain(error, paused: networkPaused, headBlock: chainInfo?.headBlockNum)
+        }
     }
 
     /// Pull chain info + the watched account's real balances/resources.

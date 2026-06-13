@@ -124,7 +124,7 @@ struct SignSheet: View {
     @State private var state: SignState = .review
     @State private var sigR1: String?
     @State private var packedTrx: String?
-    enum SignState { case review, signing, signed, broadcasting, sent(String), failed(String) }
+    enum SignState { case review, signing, signed, broadcasting, sent(String), failed(WalletError) }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -178,10 +178,16 @@ struct SignSheet: View {
                 }
                 PrimaryButton(title: "Done", systemImage: "checkmark") { dismiss() }
             }
-        case .failed(let msg):
+        case .failed(let e):
             VStack(spacing: 10) {
-                Text(msg).font(.caption).foregroundStyle(Brand.danger)
-                    .multilineTextAlignment(.center)
+                VStack(spacing: 3) {
+                    Text(e.title).font(.callout.weight(.semibold))
+                        .foregroundStyle(e.severity == .warning ? Brand.warn : Brand.danger)
+                    if !e.detail.isEmpty {
+                        Text(e.detail).font(.caption).foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                }
                 HStack {
                     Button("Close") { dismiss() }.buttonStyle(.glass)
                     // If we already have a signature, retry just the broadcast (no re-sign).
@@ -198,7 +204,7 @@ struct SignSheet: View {
     /// Build → sign (Touch ID) → broadcast, in one step.
     private func sign() {
         guard let draft = model.makeTransferDraft(to: recipient, amount: amount, symbol: symbol, memo: memo) else {
-            state = .failed("Couldn't build the transfer — not connected, or unknown token.")
+            state = .failed(.error("Couldn't build the transfer", "Not connected, or unknown token."))
             return
         }
         state = .signing
@@ -212,13 +218,13 @@ struct SignSheet: View {
                     chainId: draft.chainId, refBlockNum: draft.refBlockNum,
                     refBlockPrefix: draft.refBlockPrefix, expiration: draft.expiration)
                 guard let preImage = Data(hexString: built.preimage) else {
-                    state = .failed("Malformed signing pre-image."); return
+                    state = .failed(.error("Malformed signing pre-image.")); return
                 }
                 sigR1 = try await keyStore.sign(preImage: preImage, reason: reason)
                 packedTrx = built.packed
                 broadcast()   // ← sign and send in one flow
             } catch {
-                state = .failed(error.localizedDescription)
+                state = .failed(FriendlyError.explain(error, paused: model.networkPaused, headBlock: model.chainInfo?.headBlockNum))
             }
         }
     }
@@ -232,7 +238,7 @@ struct SignSheet: View {
                 state = .sent(txid)
                 await model.refresh()
             } catch {
-                state = .failed(error.localizedDescription)
+                state = .failed(FriendlyError.explain(error, paused: model.networkPaused, headBlock: model.chainInfo?.headBlockNum))
             }
         }
     }
@@ -281,7 +287,7 @@ struct SignSheet: View {
         case .signed:       return "checkmark.seal.fill"
         case .broadcasting: return "antenna.radiowaves.left.and.right"
         case .sent:         return "paperplane.fill"
-        case .failed:       return "xmark.seal.fill"
+        case .failed(let e): return e.severity == .warning ? "clock.badge.checkmark" : "xmark.seal.fill"
         }
     }
     private var stateTitle: String {
@@ -291,7 +297,7 @@ struct SignSheet: View {
         case .signed:       return "Signed"
         case .broadcasting: return "Broadcasting…"
         case .sent:         return "Sent"
-        case .failed:       return "Failed"
+        case .failed(let e): return e.severity == .warning ? "Signed — waiting for the chain" : "Couldn't send"
         }
     }
 }
