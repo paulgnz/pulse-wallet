@@ -38,6 +38,7 @@
 		BEC49AA9E87AF795843DA76A /* MultisigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0963F1C4442FCBABC7261C01 /* MultisigView.swift */; };
 		C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132057A53EF31C9B091E1859 /* Keychain.swift */; };
 		C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B1EEFEB2E72680C6C808D3 /* Components.swift */; };
+		CE97F5DBE443A1B4C8B3DA56 /* RotateKeySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D662578D2653106B2A91782 /* RotateKeySheet.swift */; };
 		EB049CD866A5520D483A4CCC /* ExportKeySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +53,7 @@
 		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		37A106B02E0B4966774E12E5 /* PulseRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseRPC.swift; sourceTree = "<group>"; };
+		3D662578D2653106B2A91782 /* RotateKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotateKeySheet.swift; sourceTree = "<group>"; };
 		49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeySheet.swift; sourceTree = "<group>"; };
 		50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCoreFFI.swift; sourceTree = "<group>"; };
 		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				0963F1C4442FCBABC7261C01 /* MultisigView.swift */,
 				58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */,
 				5683B2975215EE839C7D7028 /* RootView.swift */,
+				3D662578D2653106B2A91782 /* RotateKeySheet.swift */,
 				335FC2C0D8FA258ACAC588FE /* SendView.swift */,
 				358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */,
 				7ED00983BCEA7586B91D3F8A /* Sidebar.swift */,
@@ -284,6 +287,7 @@
 				794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */,
 				B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */,
 				59747BF54046AFE46FF1C001 /* RootView.swift in Sources */,
+				CE97F5DBE443A1B4C8B3DA56 /* RotateKeySheet.swift in Sources */,
 				493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */,
 				A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */,
 				40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */,
