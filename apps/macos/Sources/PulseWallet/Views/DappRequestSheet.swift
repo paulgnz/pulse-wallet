@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 /// An incoming dapp request via the pulsevm:// URL scheme.
 enum DappRequest: Identifiable, Sendable {
@@ -90,8 +91,9 @@ struct DappRequestSheet: View {
             do {
                 switch request {
                 case .login(let cb):
-                    guard let key = keyStore.activeKey else { throw PulseCoreError.badInput("No active key") }
-                    callback(cb, items: ["account": model.accountName, "key": key.pubKey])
+                    // Login returns the account (and active pubkey if one is held).
+                    callback(cb, items: ["account": model.accountName,
+                                         "key": keyStore.activeKey?.pubKey ?? ""])
                 case .sign(let chainId, let packed, _, let cb):
                     let material = try model.core.signingMaterial(packedTrx: packed, chainId: chainId)
                     guard let preImage = Data(hexString: material.preimage) else {
@@ -113,7 +115,7 @@ struct DappRequestSheet: View {
         var q = comps.queryItems ?? []
         q.append(contentsOf: items.map { URLQueryItem(name: $0.key, value: $0.value) })
         comps.queryItems = q
-        if let final = comps.url { openURL(final) }
+        if let final = comps.url { NSWorkspace.shared.open(final) }
     }
 
     private func row(_ k: String, _ v: String) -> some View {
