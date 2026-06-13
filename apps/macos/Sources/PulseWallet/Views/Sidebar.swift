@@ -96,6 +96,7 @@ private struct AccountSwitcher: View {
             }
             .padding(10)
             .glassEffect(.regular, in: .rect(cornerRadius: 12))
+            .contentShape(.rect(cornerRadius: 12))   // whole capsule is clickable, not just the text
         }
         .menuStyle(.button)
         .buttonStyle(.plain)

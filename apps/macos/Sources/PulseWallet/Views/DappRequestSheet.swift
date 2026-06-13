@@ -31,6 +31,8 @@ struct DappRequestSheet: View {
     @State private var working = false
     @State private var error: String?
     @State private var done = false
+    @State private var decoded: DecodedTx?
+    @State private var decodeFailed = false
 
     var body: some View {
         VStack(spacing: 18) {
@@ -39,22 +41,90 @@ struct DappRequestSheet: View {
                     .font(.system(size: 40)).foregroundStyle(Brand.brandGradient)
                 Text(title).font(.title2.weight(.semibold))
             }
-            GlassCard {
-                VStack(alignment: .leading, spacing: 10) {
-                    row("Account", model.accountName)
-                    Divider()
-                    row("Signing key", keyStore.activeKey?.label ?? "—")
-                    if case .sign(_, _, let summary, _) = request {
-                        Divider(); row("Request", summary)
+
+            if isSign, let mismatch = chainMismatch {
+                warningBanner(mismatch)
+            }
+
+            ScrollView {
+                VStack(spacing: 12) {
+                    GlassCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            row("Account", model.accountName)
+                            Divider()
+                            row("Signing key", keyStore.activeKey?.label ?? "—")
+                        }
                     }
+                    if isSign { signDetail }
                 }
             }
+            .frame(maxHeight: .infinity)
+
             if let error { Text(error).font(.caption).foregroundStyle(Brand.danger).multilineTextAlignment(.center) }
-            Spacer()
             actions
         }
-        .padding(24).frame(width: 420, height: 380)
+        .padding(24).frame(width: 460, height: isSign ? 560 : 360)
         .background(BrandBackground())
+        .task {
+            if case .sign(_, let packed, _, _) = request {
+                if let d = model.core.decodeTransaction(packedTrx: packed) { decoded = d }
+                else { decodeFailed = true }
+            }
+        }
+    }
+
+    private var isSign: Bool { if case .sign = request { return true }; return false }
+
+    /// Returns (requestChain, walletChain) when they differ — nil when they match or unknown.
+    private var chainMismatch: (req: String, wallet: String)? {
+        guard case .sign(let chainId, _, _, _) = request, !chainId.isEmpty else { return nil }
+        guard let wallet = model.networks.active.chainId ?? model.chainInfo?.chainId, !wallet.isEmpty
+        else { return nil }
+        return chainId == wallet ? nil : (chainId, wallet)
+    }
+
+    @ViewBuilder private var signDetail: some View {
+        if let decoded {
+            ForEach(decoded.actions) { action in ActionCard(action: action) }
+            GlassCard(padding: 12) {
+                row("Expires", expirationText(decoded.expiration))
+            }
+        } else if decodeFailed {
+            // Couldn't decode — fall back to the dapp-supplied summary, clearly labeled.
+            GlassCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Could not decode this transaction", systemImage: "exclamationmark.triangle")
+                        .font(.callout.weight(.semibold)).foregroundStyle(Brand.warn)
+                    if case .sign(_, _, let summary, _) = request {
+                        Text(summary).font(.caption).foregroundStyle(.secondary)
+                    }
+                    Text("Only sign if you trust this dapp — the contents can't be verified.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+        } else {
+            ProgressView("Decoding…").frame(maxWidth: .infinity).padding()
+        }
+    }
+
+    private func warningBanner(_ m: (req: String, wallet: String)) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Different network").font(.callout.weight(.semibold))
+                Text("Built for chain \(m.req.prefix(8))… but you're on \(m.wallet.prefix(8))…")
+                    .font(.caption2.monospaced())
+            }
+            Spacer()
+        }
+        .padding(12).foregroundStyle(Brand.danger)
+        .background(Brand.danger.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func expirationText(_ secsSinceEpoch: UInt32) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(secsSinceEpoch))
+        let fmt = DateFormatter(); fmt.dateStyle = .none; fmt.timeStyle = .medium
+        return fmt.string(from: date)
     }
 
     private var title: String {
@@ -122,5 +192,63 @@ struct DappRequestSheet: View {
     private func row(_ k: String, _ v: String) -> some View {
         HStack { Text(k).foregroundStyle(.secondary); Spacer()
             Text(v).fontWeight(.medium).lineLimit(1).truncationMode(.middle) }
+    }
+}
+
+/// Renders one decoded action — transfers get a friendly summary; everything
+/// else shows account::name + the raw data so nothing is hidden.
+private struct ActionCard: View {
+    let action: DecodedTx.Action
+
+    var body: some View {
+        GlassCard(padding: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: icon).foregroundStyle(Brand.accent)
+                    Text("\(action.account) · \(action.name)")
+                        .font(.callout.weight(.semibold).monospaced())
+                    Spacer()
+                }
+                if let t = action.transfer {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(t.quantity).font(.title3.weight(.bold))
+                            Spacer()
+                        }
+                        Text("\(t.from)  →  \(t.to)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                        if !t.memo.isEmpty {
+                            Text("memo: \(t.memo)").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                } else {
+                    Text("data: \(dataPreview)").font(.caption2.monospaced())
+                        .foregroundStyle(.secondary).lineLimit(2).truncationMode(.middle)
+                }
+                if !action.authorization.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(action.authorization.indices, id: \.self) { i in
+                            let a = action.authorization[i]
+                            Text("\(a.actor)@\(a.permission)")
+                                .font(.caption2.monospaced())
+                                .padding(.horizontal, 7).padding(.vertical, 2)
+                                .background(.secondary.opacity(0.15), in: .capsule)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var icon: String {
+        if action.transfer != nil { return "arrow.left.arrow.right" }
+        switch action.name {
+        case "updateauth", "deleteauth", "linkauth", "unlinkauth": return "key.fill"
+        case "delegatebw", "undelegatebw", "refund": return "bolt.fill"
+        case "buyram", "buyrambytes", "sellram": return "memorychip"
+        default: return "doc.text"
+        }
+    }
+    private var dataPreview: String {
+        action.dataHex.isEmpty ? "(none)" : "0x" + action.dataHex
     }
 }
