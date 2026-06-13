@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import UniformTypeIdentifiers
 
 struct ActivityView: View {
     @Environment(AppModel.self) private var model
@@ -6,6 +8,20 @@ struct ActivityView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
+                HStack {
+                    SectionHeader(title: "Activity", systemImage: "clock.arrow.circlepath")
+                    if !model.activity.isEmpty {
+                        Button { exportCSV() } label: {
+                            Label("Export CSV", systemImage: "square.and.arrow.up")
+                        }
+                        .buttonStyle(.glass)
+                    }
+                }
+                if model.activity.isEmpty {
+                    GlassCard(padding: 14) {
+                        Text("No activity yet.").font(.callout).foregroundStyle(.secondary)
+                    }
+                }
                 ForEach(model.activity) { item in
                     ActivityRow(item: item)
                 }
@@ -13,6 +29,25 @@ struct ActivityView: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
+    }
+
+    /// Export the activity list as a CSV for audit / accounting.
+    private func exportCSV() {
+        let header = "kind,counterparty,asset,memo,time,txid\n"
+        let iso = ISO8601DateFormatter()
+        let rows = model.activity.map { i in
+            func esc(_ s: String) -> String { "\"\(s.replacingOccurrences(of: "\"", with: "\"\""))\"" }
+            return [i.kind.rawValue, i.counterparty, i.asset, i.memo, iso.string(from: i.time), i.txid]
+                .map(esc).joined(separator: ",")
+        }.joined(separator: "\n")
+        let csv = header + rows + "\n"
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.nameFieldStringValue = "\(model.accountName)-activity.csv"
+        if panel.runModal() == .OK, let url = panel.url {
+            try? csv.data(using: .utf8)?.write(to: url)
+        }
     }
 }
 

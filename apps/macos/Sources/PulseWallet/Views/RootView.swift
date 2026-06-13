@@ -5,6 +5,7 @@ struct RootView: View {
     @Environment(KeyStore.self) private var keyStore
     @Environment(\.scenePhase) private var scenePhase
     @State private var columnVisibility = NavigationSplitViewVisibility.all
+    @State private var showWelcome = !UserDefaults.standard.bool(forKey: "wallet.didOnboard")
 
     var body: some View {
         @Bindable var model = model
@@ -36,6 +37,7 @@ struct RootView: View {
         .overlay { if model.isLocked { LockScreen() } }
         .animation(.smooth, value: model.isLocked)
         .task { await model.refresh() }
+        .sheet(isPresented: $showWelcome) { WelcomeSheet() }
         .onAppear {
             // Lock at launch if there are keys to protect.
             if model.autoLock && !keyStore.keys.isEmpty { model.lock() }
