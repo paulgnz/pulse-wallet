@@ -23,8 +23,8 @@ struct PulseWalletApp: App {
                     model.handleURL(url)
                 }
                 .sheet(item: Binding(get: { model.pendingRequest },
-                                     set: { model.pendingRequest = $0 })) { request in
-                    DappRequestSheet(request: request)
+                                     set: { model.pendingRequest = $0 })) { pending in
+                    DappRequestSheet(request: pending.request)
                         .environment(model)
                         .environment(keyStore)
                 }

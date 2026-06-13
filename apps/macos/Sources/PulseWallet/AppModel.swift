@@ -63,7 +63,7 @@ final class AppModel {
     var requestImportKey = false
 
     /// An incoming dapp request (pulsevm:// URL scheme) awaiting approval.
-    var pendingRequest: DappRequest?
+    var pendingRequest: PendingRequest?
 
     init() {
         if let data = UserDefaults.standard.data(forKey: "wallet.accounts.v1"),
@@ -199,13 +199,13 @@ final class AppModel {
         let callback = q("callback").flatMap(URL.init(string:))
         switch url.host {
         case "login":
-            pendingRequest = .login(callback: callback)
+            pendingRequest = PendingRequest(request: .login(callback: callback))
         case "sign":
             guard let packed = q("packed_trx") else { return }
             let cid = q("chain_id") ?? networks.active.chainId ?? chainInfo?.chainId ?? ""
             // Query values use form-encoding where '+' means space.
             let summary = (q("summary") ?? "External transaction").replacingOccurrences(of: "+", with: " ")
-            pendingRequest = .sign(chainId: cid, packedTrx: packed, summary: summary, callback: callback)
+            pendingRequest = PendingRequest(request: .sign(chainId: cid, packedTrx: packed, summary: summary, callback: callback))
         default:
             break
         }

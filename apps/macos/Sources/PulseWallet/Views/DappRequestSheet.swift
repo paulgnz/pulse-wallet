@@ -20,6 +20,15 @@ enum DappRequest: Identifiable, Sendable {
     }
 }
 
+/// Wraps a request with a unique id so each `.sheet(item:)` presentation is a
+/// fresh view. Without this, two logins share the same DappRequest.id, and
+/// SwiftUI reuses the previous sheet's @State — showing a stale "Approved"
+/// screen and leaving the request unprocessed.
+struct PendingRequest: Identifiable, Sendable {
+    let id = UUID()
+    let request: DappRequest
+}
+
 /// Approval UI for a dapp login/sign request — the desktop end of the SDK.
 struct DappRequestSheet: View {
     @Environment(AppModel.self) private var model
@@ -161,6 +170,10 @@ struct DappRequestSheet: View {
             do {
                 switch request {
                 case .login(let cb):
+                    // Confirm the user is present before releasing their identity to
+                    // the dapp (matches the Touch ID affordance on the button).
+                    let ok = await Biometrics.authenticate(reason: "Connect \(model.accountName) to this dapp")
+                    if !ok { working = false; return }
                     // Login returns the account, the permission the key controls, and its pubkey.
                     callback(cb, items: ["account": model.accountName,
                                          "permission": model.permissionName,
