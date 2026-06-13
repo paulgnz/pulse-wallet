@@ -89,7 +89,12 @@ final class KeyStore {
         }
         let hex = pub.hexString
         if let existing = keys.first(where: { $0.pubCompressedHex == hex }) {
-            throw PulseCoreError.badInput("key already imported (\(existing.label))")
+            // If the existing entry's material is missing (orphaned by an old
+            // build), replace it; otherwise it's a genuine duplicate.
+            if Keychain.exists(account: existing.id) {
+                throw PulseCoreError.badInput("key already imported (\(existing.label))")
+            }
+            delete(existing)
         }
         let pubStr = curve == .r1
             ? core.encodePubR1(compressedPublicKey: pub)
