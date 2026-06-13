@@ -4,7 +4,7 @@ import Observation
 
 /// A managed wallet key. Private material lives in the Keychain / Secure Enclave;
 /// only this metadata is persisted in defaults.
-struct WalletKey: Identifiable, Codable, Hashable {
+struct WalletKey: Identifiable, Codable, Hashable, Sendable {
     enum Kind: String, Codable { case enclave, imported }
     enum Curve: String, Codable { case r1, k1 }
     let id: String                 // UUID, also the Keychain account name
@@ -109,6 +109,46 @@ final class KeyStore {
         guard let idx = keys.firstIndex(of: key) else { return }
         keys[idx].label = label
         persist()
+    }
+
+    // MARK: Signing
+
+    /// Sign a pre-image with the active key, returning a chain-acceptable
+    /// signature (SIG_R1 for R1 keys, SIG_K1 for K1). Touch ID is prompted by the
+    /// Enclave (R1 hardware) or the Keychain (imported keys).
+    func sign(preImage: Data, reason: String) async throws -> String {
+        guard let key = activeKey else {
+            throw PulseCoreError.badInput("No active key. Create or import one in Keys.")
+        }
+        return try await KeyStore.performSign(key: key, preImage: preImage, reason: reason)
+    }
+
+    nonisolated static func performSign(key: WalletKey, preImage: Data, reason: String) async throws -> String {
+        try await Task.detached(priority: .userInitiated) {
+            let core = PulseCoreFFI()
+            let digest = Data(SHA256.hash(data: preImage))
+            switch (key.kind, key.curve) {
+            case (.enclave, _):
+                let blob = try Keychain.load(account: key.id, reason: reason)
+                let handle = try EnclaveSigner.load(from: blob)
+                let rs = try EnclaveSigner.signPreImage(preImage, with: handle, reason: reason)
+                guard let pub = Data(hexString: key.pubCompressedHex) else {
+                    throw PulseCoreError.badInput("bad stored pubkey")
+                }
+                return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
+            case (.imported, .r1):
+                let raw = try Keychain.load(account: key.id, reason: reason)
+                let priv = try P256.Signing.PrivateKey(rawRepresentation: raw)
+                let rs = try priv.signature(for: preImage).rawRepresentation
+                guard let pub = Data(hexString: key.pubCompressedHex) else {
+                    throw PulseCoreError.badInput("bad stored pubkey")
+                }
+                return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
+            case (.imported, .k1):
+                let raw = try Keychain.load(account: key.id, reason: reason)
+                return try core.signK1(privateKey: raw, digest: digest)
+            }
+        }.value
     }
 
     private func rawSecret(from secret: String, curve: WalletKey.Curve) throws -> Data {

@@ -78,6 +78,7 @@ struct SendView: View {
 /// Biometric signing confirmation — the moment Secure Enclave shines.
 struct SignSheet: View {
     @Environment(AppModel.self) private var model
+    @Environment(KeyStore.self) private var keyStore
     @Environment(\.dismiss) private var dismiss
     let recipient: String
     let amount: String
@@ -145,18 +146,12 @@ struct SignSheet: View {
         let account = model.selectedAccount?.name ?? "default"
         let summary = "\(account)->\(recipient):\(amount) \(symbol):\(memo)"
         let reason = "Sign transfer of \(amount) \(symbol) to \(recipient)"
-        let core = model.core
         Task {
             do {
-                // Touch ID → Secure Enclave r‖s, then the Rust core derives the
-                // recovery id and assembles a chain-acceptable SIG_R1.
+                // Sign with the active key (Enclave R1 / imported R1 / imported K1).
                 // NOTE: we currently sign a transfer *summary*; once the core's
                 // serializer lands we sign the canonical tx digest + broadcast.
-                let signed = try await EnclaveSigner.sign(
-                    account: account, preImage: Data(summary.utf8), reason: reason)
-                sigR1 = try core.assembleSigR1(
-                    rs: signed.rs, digest: signed.digest,
-                    compressedPublicKey: signed.publicKeyCompressed)
+                sigR1 = try await keyStore.sign(preImage: Data(summary.utf8), reason: reason)
                 state = .done
             } catch {
                 state = .failed(error.localizedDescription)
@@ -167,12 +162,13 @@ struct SignSheet: View {
     private func signatureCard(_ sig: String) -> some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 6) {
-                Label("Signed with Secure Enclave", systemImage: "checkmark.seal.fill")
+                Label("Signed with \(keyStore.activeKey?.label ?? "active key")",
+                      systemImage: "checkmark.seal.fill")
                     .font(.subheadline.weight(.medium)).foregroundStyle(Brand.success)
                 Text(sig)
                     .font(.caption2.monospaced()).foregroundStyle(.secondary)
                     .textSelection(.enabled).lineLimit(4)
-                Text("Real SIG_R1 (recovery id derived by the Rust core). Broadcast comes with the tx serializer.")
+                Text("Real signature (recovery id derived by the Rust core). Broadcast comes with the tx serializer.")
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
