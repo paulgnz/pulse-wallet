@@ -23,7 +23,8 @@ struct KeysView: View {
                                isActive: store.activeKeyID == key.id,
                                unreadable: store.unreadableKeyIDs.contains(key.id),
                                onUse: { store.activeKeyID = key.id },
-                               onDelete: { toDelete = key })
+                               onDelete: { toDelete = key },
+                               onReimport: { store.delete(key); showImport = true })
                     }
                 }
                 if let err = errorMessage {
@@ -94,6 +95,7 @@ private struct KeyRow: View {
     var unreadable: Bool = false
     var onUse: () -> Void
     var onDelete: () -> Void
+    var onReimport: () -> Void = {}
     @State private var copied = false
     @State private var accounts: [String] = []
     @State private var showExport = false
@@ -117,8 +119,12 @@ private struct KeyRow: View {
                         if unreadable { badge("⚠ Re-import", tint: Brand.danger) }
                     }
                     if unreadable {
-                        Text("Key material missing from the Keychain — delete and re-import to sign.")
-                            .font(.caption2).foregroundStyle(Brand.danger)
+                        HStack(spacing: 8) {
+                            Text("Key material missing from the Keychain.")
+                                .font(.caption2).foregroundStyle(Brand.danger)
+                            Button("Re-import now", action: onReimport)
+                                .buttonStyle(.link).font(.caption2)
+                        }
                     }
                     Text(key.pubKey)
                         .font(.caption.monospaced()).foregroundStyle(.secondary)
