@@ -5,7 +5,8 @@
 //! error (null pointer, buffer too small, or invalid input). PUB_R1 is ~57
 //! chars and SIG_R1 ~101 chars, so a 256-byte buffer is always sufficient.
 
-use crate::{assemble_sig_r1, encode_pub_r1};
+use crate::{assemble_sig_r1, decode_pvt_r1, encode_pub_r1};
+use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
 use std::slice;
 
@@ -69,6 +70,30 @@ pub unsafe extern "C" fn pwc_assemble_sig_r1(
 
     match assemble_sig_r1(&r, &s, &d, &p) {
         Ok(sig) => write_str(out, out_len, &sig),
+        Err(_) => -1,
+    }
+}
+
+/// Decode a `PVT_R1_…` private-key string into 32 raw bytes (`out32`).
+/// Returns 0 on success, -1 on bad prefix / base58 / checksum / length.
+///
+/// # Safety
+/// `s` must be a valid NUL-terminated C string; `out32` must point to 32
+/// writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_decode_pvt_r1(s: *const c_char, out32: *mut u8) -> c_int {
+    if s.is_null() || out32.is_null() {
+        return -1;
+    }
+    let text = match CStr::from_ptr(s).to_str() {
+        Ok(t) => t,
+        Err(_) => return -1,
+    };
+    match decode_pvt_r1(text) {
+        Ok(key) => {
+            slice::from_raw_parts_mut(out32, 32).copy_from_slice(&key);
+            0
+        }
         Err(_) => -1,
     }
 }

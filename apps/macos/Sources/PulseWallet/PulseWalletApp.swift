@@ -3,11 +3,13 @@ import SwiftUI
 @main
 struct PulseWalletApp: App {
     @State private var model = AppModel()
+    @State private var keyStore = KeyStore()
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environment(model)
+                .environment(keyStore)
                 .frame(minWidth: 880, minHeight: 560)
         }
         .windowStyle(.hiddenTitleBar)

@@ -19,6 +19,9 @@ protocol PulseCore {
     /// Derives the recovery id by recover-and-match; normalizes to low-s.
     func assembleSigR1(rs: Data, digest: Data, compressedPublicKey: Data) throws -> String
 
+    /// Decode a "PVT_R1_…" private key to its raw 32 bytes (nil if invalid).
+    func decodePvtR1(_ wif: String) -> Data?
+
     /// Build the signing digest for a transfer action (chain-id bound).
     func transferDigest(from: String, to: String, quantity: String,
                         memo: String, chainID: String) throws -> (preImage: Data, digest: Data)
@@ -47,6 +50,8 @@ struct PulseCoreStub: PulseCore {
     func assembleSigR1(rs: Data, digest: Data, compressedPublicKey: Data) throws -> String {
         throw PulseCoreError.notImplemented("assembleSigR1 — wire pulse-wallet-core via uniffi")
     }
+    func decodePvtR1(_ wif: String) -> Data? { nil }
+
     func transferDigest(from: String, to: String, quantity: String,
                         memo: String, chainID: String) throws -> (preImage: Data, digest: Data) {
         throw PulseCoreError.notImplemented("transferDigest — port serializer into pulse-wallet-core")

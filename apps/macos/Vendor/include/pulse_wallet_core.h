@@ -18,6 +18,9 @@ int pwc_encode_pub_r1(const uint8_t *pub33, char *out, size_t out_len);
 int pwc_assemble_sig_r1(const uint8_t *rs64, const uint8_t *digest32,
                         const uint8_t *pub33, char *out, size_t out_len);
 
+// "PVT_R1_…" -> 32 raw private-key bytes into out32. Returns 0 ok, -1 on error.
+int pwc_decode_pvt_r1(const char *s, uint8_t *out32);
+
 #ifdef __cplusplus
 }
 #endif

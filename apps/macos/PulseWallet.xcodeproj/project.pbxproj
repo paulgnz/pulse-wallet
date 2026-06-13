@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE7891077FC4FDC8B7002AE /* Hyperion.swift */; };
+		09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320D8A92D151F0FF17E2DC83 /* KeyStore.swift */; };
 		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
 		227763B316A637302CE0C75F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13029EAE706A34911065861E /* Models.swift */; };
 		2D80351ED5E347B638B5DEB7 /* PulseRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A106B02E0B4966774E12E5 /* PulseRPC.swift */; };
@@ -17,21 +18,27 @@
 		3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1981660F714156CB20D4B81 /* ActivityView.swift */; };
 		40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED00983BCEA7586B91D3F8A /* Sidebar.swift */; };
 		493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FC2C0D8FA258ACAC588FE /* SendView.swift */; };
+		56F8B096E94C096D1B76B2D6 /* Biometrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE2872F95290C0C2024BCB1 /* Biometrics.swift */; };
 		59747BF54046AFE46FF1C001 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5683B2975215EE839C7D7028 /* RootView.swift */; };
+		5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA718630DE93EEEAE5AB4CDC /* DataHex.swift */; };
 		794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78440EE6283769BDF3E38093 /* PulseWalletApp.swift */; };
 		8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */; };
 		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
+		9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988744519E80C7631A1550B1 /* KeysView.swift */; };
 		A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */; };
 		AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F9C43E9860AAD1D468DC9C /* PulseCore.swift */; };
 		B02802B9063C4CF7FF5BA02D /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */; };
 		B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */; };
+		C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132057A53EF31C9B091E1859 /* Keychain.swift */; };
 		C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B1EEFEB2E72680C6C808D3 /* Components.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0698D056BD05A32CE1905F8C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		13029EAE706A34911065861E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		132057A53EF31C9B091E1859 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		28704358E20940217081D30E /* EnclaveSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnclaveSigner.swift; sourceTree = "<group>"; };
+		320D8A92D151F0FF17E2DC83 /* KeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyStore.swift; sourceTree = "<group>"; };
 		335FC2C0D8FA258ACAC588FE /* SendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -43,10 +50,13 @@
 		7565A5201A525117526CF9E4 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		78440EE6283769BDF3E38093 /* PulseWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWalletApp.swift; sourceTree = "<group>"; };
 		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
+		988744519E80C7631A1550B1 /* KeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysView.swift; sourceTree = "<group>"; };
 		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1981660F714156CB20D4B81 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		BCE2872F95290C0C2024BCB1 /* Biometrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometrics.swift; sourceTree = "<group>"; };
 		CFE7891077FC4FDC8B7002AE /* Hyperion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hyperion.swift; sourceTree = "<group>"; };
 		D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreen.swift; sourceTree = "<group>"; };
+		EA718630DE93EEEAE5AB4CDC /* DataHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHex.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,6 +107,7 @@
 				B1981660F714156CB20D4B81 /* ActivityView.swift */,
 				F4B1EEFEB2E72680C6C808D3 /* Components.swift */,
 				0698D056BD05A32CE1905F8C /* DashboardView.swift */,
+				988744519E80C7631A1550B1 /* KeysView.swift */,
 				D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */,
 				58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */,
 				5683B2975215EE839C7D7028 /* RootView.swift */,
@@ -118,7 +129,11 @@
 		A681EFCEBC3738C1E176A3BA /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
+				BCE2872F95290C0C2024BCB1 /* Biometrics.swift */,
+				EA718630DE93EEEAE5AB4CDC /* DataHex.swift */,
 				28704358E20940217081D30E /* EnclaveSigner.swift */,
+				132057A53EF31C9B091E1859 /* Keychain.swift */,
+				320D8A92D151F0FF17E2DC83 /* KeyStore.swift */,
 				57F9C43E9860AAD1D468DC9C /* PulseCore.swift */,
 				50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */,
 			);
@@ -223,10 +238,15 @@
 			files = (
 				3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */,
 				37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */,
+				56F8B096E94C096D1B76B2D6 /* Biometrics.swift in Sources */,
 				C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */,
 				9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */,
+				5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */,
 				3895E99543B8DB5F8125578C /* EnclaveSigner.swift in Sources */,
 				08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */,
+				09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */,
+				C447C2AFEA7008F528234F3E /* Keychain.swift in Sources */,
+				9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */,
 				B855A1A6BE956D3AE1EDAB27 /* LockScreen.swift in Sources */,
 				227763B316A637302CE0C75F /* Models.swift in Sources */,
 				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,

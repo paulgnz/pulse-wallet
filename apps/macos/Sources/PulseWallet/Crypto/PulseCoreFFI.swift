@@ -38,6 +38,12 @@ struct PulseCoreFFI: PulseCore {
         return String(cString: out)
     }
 
+    func decodePvtR1(_ wif: String) -> Data? {
+        var out = [UInt8](repeating: 0, count: 32)
+        let ok = wif.withCString { pwc_decode_pvt_r1($0, &out) }
+        return ok == 0 ? Data(out) : nil
+    }
+
     func transferDigest(from: String, to: String, quantity: String,
                         memo: String, chainID: String) throws -> (preImage: Data, digest: Data) {
         throw PulseCoreError.notImplemented("transferDigest — port serializer into pulse-wallet-core")

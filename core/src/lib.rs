@@ -69,6 +69,30 @@ pub fn assemble_sig_r1(
     Ok(format!("SIG_R1_{}", bs58::encode(data).into_string()))
 }
 
+/// Encode a 32-byte secp256r1 private key as a `PVT_R1_…` string.
+/// Format: "PVT_R1_" + base58( key(32) ‖ ripemd160(key‖"R1")[0..4] ).
+pub fn encode_pvt_r1(key: &[u8; 32]) -> String {
+    let mut data = key.to_vec();
+    data.extend_from_slice(&ripemd_checksum(key, b"R1"));
+    format!("PVT_R1_{}", bs58::encode(data).into_string())
+}
+
+/// Decode a `PVT_R1_…` string to the raw 32-byte private key, verifying checksum.
+pub fn decode_pvt_r1(s: &str) -> Result<[u8; 32], String> {
+    let body = s.strip_prefix("PVT_R1_").ok_or("expected PVT_R1_ prefix")?;
+    let data = bs58::decode(body).into_vec().map_err(|e| e.to_string())?;
+    if data.len() != 36 {
+        return Err(format!("bad length {} (want 36)", data.len()));
+    }
+    let (key, cs) = data.split_at(32);
+    if &ripemd_checksum(key, b"R1")[..] != cs {
+        return Err("checksum mismatch".into());
+    }
+    let mut out = [0u8; 32];
+    out.copy_from_slice(key);
+    Ok(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -92,5 +116,21 @@ mod tests {
     fn sig_r1_matches_pulsevm_js() {
         let got = assemble_sig_r1(&a32(R), &a32(S), &a32(DIGEST), &a33(PUBCOMP)).unwrap();
         assert_eq!(got, EXPECT_SIG);
+    }
+
+    #[test]
+    fn pvt_r1_round_trips() {
+        let key = a32(R); // any 32 bytes
+        let wif = encode_pvt_r1(&key);
+        assert!(wif.starts_with("PVT_R1_"));
+        assert_eq!(decode_pvt_r1(&wif).unwrap(), key);
+    }
+
+    #[test]
+    fn pvt_r1_rejects_bad_checksum() {
+        let mut wif = encode_pvt_r1(&a32(R));
+        wif.pop();
+        wif.push('x');
+        assert!(decode_pvt_r1(&wif).is_err());
     }
 }

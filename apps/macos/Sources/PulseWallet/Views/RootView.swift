@@ -36,6 +36,7 @@ struct RootView: View {
         case .send:     SendView()
         case .receive:  ReceiveView()
         case .activity: ActivityView()
+        case .keys:     KeysView()
         case .settings: SettingsView()
         }
     }

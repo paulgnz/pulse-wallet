@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 enum WalletSection: String, CaseIterable, Identifiable {
-    case wallet, send, receive, activity, settings
+    case wallet, send, receive, activity, keys, settings
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -10,6 +10,7 @@ enum WalletSection: String, CaseIterable, Identifiable {
         case .send:     return "Send"
         case .receive:  return "Receive"
         case .activity: return "Activity"
+        case .keys:     return "Keys"
         case .settings: return "Settings"
         }
     }
@@ -19,6 +20,7 @@ enum WalletSection: String, CaseIterable, Identifiable {
         case .send:     return "arrow.up.right.circle"
         case .receive:  return "arrow.down.left.circle"
         case .activity: return "clock.arrow.circlepath"
+        case .keys:     return "key.horizontal"
         case .settings: return "gearshape"
         }
     }
