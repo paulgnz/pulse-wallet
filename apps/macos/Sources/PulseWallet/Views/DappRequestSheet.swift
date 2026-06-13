@@ -196,6 +196,12 @@ struct DappRequestSheet: View {
                     callback(cb, items: ["signature": sig])
                 }
                 done = true
+                // Relay flow does no browser navigation, so the wallet stays
+                // frontmost — step aside and return focus to the dapp's browser.
+                if relay != nil {
+                    dismiss()
+                    NSApp.hide(nil)
+                }
             } catch {
                 self.error = FriendlyError.explain(error, paused: model.networkPaused).errorDescription
             }
