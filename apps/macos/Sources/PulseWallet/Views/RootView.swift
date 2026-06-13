@@ -34,6 +34,7 @@ struct RootView: View {
                 }
         }
         .background(BrandBackground())
+        .tint(Brand.accent)   // selection highlight + controls follow the theme, not system blue
         .overlay { if model.isLocked { LockScreen() } }
         .animation(.smooth, value: model.isLocked)
         .task { await model.refresh() }

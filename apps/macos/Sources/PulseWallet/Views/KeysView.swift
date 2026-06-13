@@ -191,7 +191,7 @@ private struct NewEnclaveKeySheet: View {
             sheetHeader("Create Secure Enclave Key", systemImage: "touchid",
                         subtitle: "A new P-256 key is generated inside this Mac's Secure Enclave. The private key never leaves the chip; signing requires Touch ID.")
             TextField("Label (e.g. Treasury signer)", text: $label)
-                .textFieldStyle(.roundedBorder)
+                .pulseField()
             Spacer()
             HStack {
                 Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
@@ -221,9 +221,9 @@ private struct ImportKeySheet: View {
         VStack(alignment: .leading, spacing: 14) {
             sheetHeader("Import Key", systemImage: "square.and.arrow.down",
                         subtitle: "Paste a PVT_R1_…/PVT_K1_… key (or WIF / 64-char hex). It is stored in the Keychain behind Touch ID and never displayed again.")
-            TextField("Label", text: $label).textFieldStyle(.roundedBorder)
+            TextField("Label", text: $label).pulseField()
             SecureField("PVT_R1_… / PVT_K1_… / WIF / hex", text: $secret)
-                .textFieldStyle(.roundedBorder).font(.callout.monospaced())
+                .pulseField(mono: true)
                 .onChange(of: secret) { _, new in curve = KeyStore.detectCurve(new) }
             Picker("Curve", selection: $curve) {
                 Text("R1 (secp256r1)").tag(WalletKey.Curve.r1)
@@ -281,7 +281,7 @@ private struct DeleteKeySheet: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Type DELETE to confirm").font(.caption).foregroundStyle(.secondary)
                 TextField("DELETE", text: $confirmText)
-                    .textFieldStyle(.roundedBorder).font(.body.monospaced())
+                    .pulseField(mono: true)
             }
             if let failed {
                 Label(failed, systemImage: "exclamationmark.triangle")

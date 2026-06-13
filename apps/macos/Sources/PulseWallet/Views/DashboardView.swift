@@ -60,6 +60,7 @@ struct DashboardView: View {
                 } else {
                     Text(heroBalance)
                         .font(.system(size: 44, weight: .bold, design: .rounded))
+                        .monospacedDigit()
                         .foregroundStyle(Brand.brandGradient)
                         .contentTransition(.numericText())
                     Text("\(model.accountName) @ \(model.permissionName)")

@@ -42,7 +42,7 @@ struct ExportKeySheet: View {
                     Text("Type REVEAL and authenticate to show the key")
                         .font(.caption).foregroundStyle(.secondary)
                     TextField("REVEAL", text: $confirm)
-                        .textFieldStyle(.roundedBorder).font(.body.monospaced())
+                        .pulseField(mono: true)
                 }
             }
             if let failed { Text(failed).font(.caption).foregroundStyle(Brand.danger) }

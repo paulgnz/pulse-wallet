@@ -102,9 +102,9 @@ struct MultisigView: View {
             GlassCard {
                 VStack(alignment: .leading, spacing: 10) {
                     TextField("Proposer account", text: $approveProposer)
-                        .textFieldStyle(.roundedBorder).font(.callout.monospaced())
+                        .pulseField(mono: true)
                     TextField("Proposal name", text: $approveName)
-                        .textFieldStyle(.roundedBorder).font(.callout.monospaced())
+                        .pulseField(mono: true)
                     Button("Approve as \(model.accountName)") {
                         approve(proposer: approveProposer, name: approveName)
                     }
@@ -221,7 +221,7 @@ private struct ProposeSheet: View {
     private func group(_ label: String, @ViewBuilder _ content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.caption.weight(.medium)).foregroundStyle(.secondary)
-            content().textFieldStyle(.roundedBorder)
+            content().pulseField(mono: true)
         }
     }
 

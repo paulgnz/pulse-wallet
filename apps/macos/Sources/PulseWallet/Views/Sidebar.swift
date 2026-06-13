@@ -124,7 +124,7 @@ private struct AddAccountSheet: View {
                     .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
             }
             TextField("e.g. treasury.nz", text: $name)
-                .textFieldStyle(.roundedBorder).font(.body.monospaced())
+                .pulseField(mono: true)
             Spacer()
             HStack {
                 Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)

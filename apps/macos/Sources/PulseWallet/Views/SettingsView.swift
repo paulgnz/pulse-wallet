@@ -148,7 +148,8 @@ struct SettingsView: View {
     }
 }
 
-/// A live preview swatch for a theme — shows its background + accent gradient.
+/// A live preview swatch for a theme — a mini wallet card: themed background,
+/// a "balance" line, an accent pill (selection/CTA), and the status palette.
 private struct ThemeSwatch: View {
     let theme: Theme
     let selected: Bool
@@ -157,34 +158,46 @@ private struct ThemeSwatch: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 8) {
-                ZStack(alignment: .bottomLeading) {
-                    RoundedRectangle(cornerRadius: 10)
+                ZStack(alignment: .topLeading) {
+                    RoundedRectangle(cornerRadius: 11)
                         .fill(LinearGradient(colors: [Color(hex: theme.navy), Color(hex: theme.ink)],
                                              startPoint: .top, endPoint: .bottom))
-                        .frame(height: 56)
-                    HStack(spacing: 6) {
-                        Capsule()
-                            .fill(LinearGradient(colors: [Color(hex: theme.accent), Color(hex: theme.glow)],
-                                                 startPoint: .leading, endPoint: .trailing))
-                            .frame(width: 38, height: 8)
-                        Circle().fill(Color(hex: theme.primary)).frame(width: 8, height: 8)
+                    VStack(alignment: .leading, spacing: 7) {
+                        // Faux balance — shows the accent→glow text gradient.
+                        Text("1,234").font(.system(size: 15, weight: .bold, design: .rounded))
+                            .foregroundStyle(LinearGradient(
+                                colors: [Color(hex: theme.accent), Color(hex: theme.glow)],
+                                startPoint: .leading, endPoint: .trailing))
+                        // Faux selected row — the accent pill (what was system-blue before).
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(Color(hex: theme.accent))
+                            .frame(width: 64, height: 12)
+                        Spacer(minLength: 0)
+                        // Status palette.
+                        HStack(spacing: 5) {
+                            ForEach([theme.success, theme.warn, theme.danger], id: \.self) { c in
+                                Circle().fill(Color(hex: c)).frame(width: 8, height: 8)
+                            }
+                        }
                     }
-                    .padding(8)
+                    .padding(10)
                 }
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.white.opacity(0.08)))
+                .frame(height: 84)
+                .overlay(RoundedRectangle(cornerRadius: 11).strokeBorder(.white.opacity(0.07)))
+
                 HStack(spacing: 5) {
                     Text(theme.name).font(.caption.weight(.semibold))
                     Spacer()
                     if selected {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.caption).foregroundStyle(Brand.success)
+                            .font(.caption).foregroundStyle(Brand.accent)
                     }
                 }
             }
-            .padding(8)
-            .background(.white.opacity(selected ? 0.06 : 0), in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(selected ? Brand.accent : .clear, lineWidth: 1.5))
+            .padding(7)
+            .background(.primary.opacity(selected ? 0.06 : 0), in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(selected ? Brand.accent : .clear, lineWidth: 2))
         }
         .buttonStyle(.plain)
     }
@@ -250,9 +263,7 @@ private struct NetworkEditSheet: View {
     private func field(_ title: String, _ placeholder: String, _ text: Binding<String>, mono: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title).font(.caption.weight(.medium)).foregroundStyle(.secondary)
-            TextField(placeholder, text: text)
-                .textFieldStyle(.roundedBorder)
-                .font(mono ? .callout.monospaced() : .callout)
+            TextField(placeholder, text: text).pulseField(mono: mono)
         }
     }
 

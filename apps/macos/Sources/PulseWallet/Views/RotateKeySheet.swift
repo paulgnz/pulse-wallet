@@ -148,7 +148,7 @@ struct RotateKeySheet: View {
             }
             VStack(alignment: .leading, spacing: 4) {
                 Text("Type CONFIRM to rotate").font(.caption).foregroundStyle(.secondary)
-                TextField("CONFIRM", text: $confirmText).textFieldStyle(.roundedBorder).font(.body.monospaced())
+                TextField("CONFIRM", text: $confirmText).pulseField(mono: true)
             }
         }
     }
@@ -259,7 +259,7 @@ struct RotateKeySheet: View {
     private func field(_ label: String, @ViewBuilder _ c: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.caption.weight(.medium)).foregroundStyle(.secondary)
-            c().textFieldStyle(.roundedBorder)
+            c().pulseField(mono: true)
         }
     }
     private func row(_ k: String, _ v: String) -> some View {

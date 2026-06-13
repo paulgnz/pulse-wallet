@@ -46,6 +46,35 @@ struct ResourceBar: View {
     }
 }
 
+/// A themed text-field chrome: plain field inside a rounded, theme-aware
+/// container with an animated accent focus ring. Replaces `.roundedBorder`
+/// (whose stock grey bezel ignores the theme and looks wrong on dark palettes).
+/// Use via `.pulseField()` so every form field looks consistent.
+struct PulseFieldChrome: ViewModifier {
+    var mono: Bool = false
+    @FocusState private var focused: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .textFieldStyle(.plain)
+            .font(mono ? .callout.monospaced() : .callout)
+            .padding(.horizontal, 12).padding(.vertical, 9)
+            .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 9))
+            .overlay(
+                RoundedRectangle(cornerRadius: 9)
+                    .strokeBorder(focused ? Brand.accent : .primary.opacity(0.12),
+                                  lineWidth: focused ? 1.6 : 1))
+            .focused($focused)
+            .animation(.easeOut(duration: 0.12), value: focused)
+    }
+}
+
+extension View {
+    /// Apply the themed field chrome (see `PulseFieldChrome`). `mono: true` for
+    /// addresses, keys, and other monospace input.
+    func pulseField(mono: Bool = false) -> some View { modifier(PulseFieldChrome(mono: mono)) }
+}
+
 /// Primary action — uses the macOS Tahoe prominent glass button style.
 struct PrimaryButton: View {
     let title: String

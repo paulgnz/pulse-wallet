@@ -67,7 +67,7 @@ struct StakeSheet: View {
     private func field(_ label: String, @ViewBuilder _ c: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.caption.weight(.medium)).foregroundStyle(.secondary)
-            c().textFieldStyle(.roundedBorder)
+            c().pulseField(mono: true)
         }
     }
 
