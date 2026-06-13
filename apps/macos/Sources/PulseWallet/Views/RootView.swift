@@ -52,6 +52,15 @@ struct RootView: View {
         case .wallet:   DashboardView()
         case .send:     SendView()
         case .receive:  ReceiveView()
+        case .stablecoin:
+            ComingSoonView(icon: "dollarsign.circle", title: "Stablecoin",
+                blurb: "Hold, send, and redeem regulated stablecoins like Metal Dollar (USDM) directly in your PulseVM wallet.",
+                bullets: ["Issue / redeem with the token issuer", "On-chain transfers with instant finality",
+                          "Per-asset compliance controls (freeze, allow-lists)"])
+        case .staking:
+            ComingSoonView(icon: "chart.line.uptrend.xyaxis", title: "Staking",
+                blurb: "Stake to earn and manage rewards. (CPU/NET resource staking is available now under Wallet → Resources → Manage.)",
+                bullets: ["Yield/reward staking", "Auto-compounding", "Validator/delegation selection"])
         case .activity: ActivityView()
         case .multisig: MultisigView()
         case .keys:     KeysView()

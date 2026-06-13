@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0093BAD19BA60039704185CE /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0E759D6B7D50CB345B1E32 /* ComingSoonView.swift */; };
 		08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE7891077FC4FDC8B7002AE /* Hyperion.swift */; };
 		09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320D8A92D151F0FF17E2DC83 /* KeyStore.swift */; };
 		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
@@ -73,6 +74,7 @@
 		B031CB39F049EBE1AE8FB4F9 /* PulseWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1981660F714156CB20D4B81 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		BCE2872F95290C0C2024BCB1 /* Biometrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometrics.swift; sourceTree = "<group>"; };
+		CD0E759D6B7D50CB345B1E32 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		CFE7891077FC4FDC8B7002AE /* Hyperion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hyperion.swift; sourceTree = "<group>"; };
 		D58EA5335982886F7C739E10 /* NetworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStore.swift; sourceTree = "<group>"; };
 		D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreen.swift; sourceTree = "<group>"; };
@@ -81,7 +83,7 @@
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_54468414-99F8-477C-9632-5207F4E4741D" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				B1981660F714156CB20D4B81 /* ActivityView.swift */,
+				CD0E759D6B7D50CB345B1E32 /* ComingSoonView.swift */,
 				F4B1EEFEB2E72680C6C808D3 /* Components.swift */,
 				5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */,
 				0698D056BD05A32CE1905F8C /* DashboardView.swift */,
@@ -199,10 +202,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_C840BD4A-10BA-4FE8-99E0-B499E2E06D4E" /* macos */ = {
+		"TEMP_0B28B67D-6D0D-47D5-8865-F4E7091B6777" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */,
+				"TEMP_54468414-99F8-477C-9632-5207F4E4741D" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 				3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */,
 				37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */,
 				56F8B096E94C096D1B76B2D6 /* Biometrics.swift in Sources */,
+				0093BAD19BA60039704185CE /* ComingSoonView.swift in Sources */,
 				C6D6CD8087EF2F3CF92A335D /* Components.swift in Sources */,
 				7DC8A70C3F20BC28F2AC8D2C /* DappRequestSheet.swift in Sources */,
 				9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */,
@@ -392,7 +396,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_54468414-99F8-477C-9632-5207F4E4741D" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -490,7 +494,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_6099A25F-863E-4376-AD6C-9951A45E0F39" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_54468414-99F8-477C-9632-5207F4E4741D" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

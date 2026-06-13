@@ -231,6 +231,9 @@ struct RotateKeySheet: View {
     }
 
     private func rotate() {
+        guard model.keyControlsAccount(store.activeKey?.pubKey) else {
+            status = "Your current active key doesn't control \(model.accountName) — you can't sign the change. Set a controlling key active first."; return
+        }
         guard let ctx = model.taposContext(), let nk = newKey else { status = "Not connected."; return }
         working = true
         let me = model.accountName, perm = permission, par = parent

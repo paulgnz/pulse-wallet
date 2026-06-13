@@ -3,30 +3,34 @@ import Observation
 import SwiftUI
 
 enum WalletSection: String, CaseIterable, Identifiable {
-    case wallet, send, receive, activity, multisig, keys, tools, settings
+    case wallet, send, receive, stablecoin, staking, activity, multisig, keys, tools, settings
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .wallet:   return "Wallet"
-        case .send:     return "Send"
-        case .receive:  return "Receive"
-        case .activity: return "Activity"
-        case .multisig: return "Multisig"
-        case .keys:     return "Keys"
-        case .tools:    return "Tools"
-        case .settings: return "Settings"
+        case .wallet:     return "Wallet"
+        case .send:       return "Send"
+        case .receive:    return "Receive"
+        case .stablecoin: return "Stablecoin"
+        case .staking:    return "Staking"
+        case .activity:   return "Activity"
+        case .multisig:   return "Multisig"
+        case .keys:       return "Keys"
+        case .tools:      return "Tools"
+        case .settings:   return "Settings"
         }
     }
     var symbol: String {
         switch self {
-        case .wallet:   return "wallet.bifold"
-        case .send:     return "arrow.up.right.circle"
-        case .receive:  return "arrow.down.left.circle"
-        case .activity: return "clock.arrow.circlepath"
-        case .multisig: return "person.2.badge.key"
-        case .keys:     return "key.horizontal"
-        case .tools:    return "wrench.and.screwdriver"
-        case .settings: return "gearshape"
+        case .wallet:     return "wallet.bifold"
+        case .send:       return "arrow.up.right.circle"
+        case .receive:    return "arrow.down.left.circle"
+        case .stablecoin: return "dollarsign.circle"
+        case .staking:    return "chart.line.uptrend.xyaxis"
+        case .activity:   return "clock.arrow.circlepath"
+        case .multisig:   return "person.2.badge.key"
+        case .keys:       return "key.horizontal"
+        case .tools:      return "wrench.and.screwdriver"
+        case .settings:   return "gearshape"
         }
     }
 }
@@ -124,6 +128,9 @@ final class AppModel {
         guard let pub, !pub.isEmpty, let perms = account?.permissions else { return [] }
         return perms.filter { p in p.requiredAuth.keys.contains { $0.key == pub } }.map(\.permName)
     }
+
+    /// True if `pub` is a key on any of the loaded account's permissions.
+    func keyControlsAccount(_ pub: String?) -> Bool { !permissions(forKey: pub).isEmpty }
 
     /// Default `permissionName` to a permission the active key actually controls.
     func selectBestPermission(forKey pub: String?) {

@@ -156,6 +156,9 @@ struct MultisigView: View {
     }
 
     private func submit(_ tx: BuiltTx, reason: String) async throws {
+        guard model.keyControlsAccount(keyStore.activeKey?.pubKey) else {
+            throw PulseCoreError.badInput("Your active key doesn't control \(model.accountName). Set a controlling key active in Keys.")
+        }
         guard let preImage = Data(hexString: tx.preimage) else { return }
         let sig = try await keyStore.sign(preImage: preImage, reason: reason)
         let txid = try await model.broadcast(signatures: [sig], packedTrx: tx.packed)
@@ -223,6 +226,10 @@ private struct ProposeSheet: View {
     }
 
     private func propose() {
+        guard model.keyControlsAccount(keyStore.activeKey?.pubKey) else {
+            error = "Your active key doesn't control \(model.accountName). Set a controlling key active in Keys."
+            return
+        }
         guard let ctx = model.taposContext(),
               let asset = model.assets.first(where: { $0.symbol == symbol }),
               let qty = AppModel.formatQuantity(amount, precision: asset.precision, symbol: symbol) else {

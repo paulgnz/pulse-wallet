@@ -72,6 +72,10 @@ struct StakeSheet: View {
     }
 
     private func submit() {
+        guard model.keyControlsAccount(keyStore.activeKey?.pubKey) else {
+            status = "Your active key doesn't control \(model.accountName). Set a controlling key active in Keys."
+            return
+        }
         guard let ctx = model.taposContext() else { status = "Not connected."; return }
         let me = model.accountName
         let rcv = receiver.trimmingCharacters(in: .whitespaces).isEmpty ? me : receiver.trimmingCharacters(in: .whitespaces)

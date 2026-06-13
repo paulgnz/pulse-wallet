@@ -68,6 +68,9 @@ struct UpdateAuthSheet: View {
     }
 
     private func submit() {
+        guard model.keyControlsAccount(keyStore.activeKey?.pubKey) else {
+            status = "Your active key doesn't control \(model.accountName). Set a controlling key active in Keys."; return
+        }
         guard let ctx = model.taposContext(), let th = UInt32(threshold.trimmingCharacters(in: .whitespaces)) else {
             status = "Not connected or bad threshold."; return
         }
