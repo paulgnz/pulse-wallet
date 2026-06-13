@@ -9,6 +9,9 @@ enum KeychainError: Error, LocalizedError {
         switch self {
         case .accessControl: return "Could not create access control"
         case .status(let s):
+            if s == errSecItemNotFound {
+                return "This key's private material isn't in the Keychain — it may be from a previous build. Delete the key in Keys and re-import it."
+            }
             let msg = SecCopyErrorMessageString(s, nil) as String? ?? "OSStatus \(s)"
             return "Keychain error: \(msg)"
         }

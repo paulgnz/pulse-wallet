@@ -169,8 +169,9 @@ final class AppModel {
         case "sign":
             guard let packed = q("packed_trx") else { return }
             let cid = q("chain_id") ?? networks.active.chainId ?? chainInfo?.chainId ?? ""
-            pendingRequest = .sign(chainId: cid, packedTrx: packed,
-                                   summary: q("summary") ?? "External transaction", callback: callback)
+            // Query values use form-encoding where '+' means space.
+            let summary = (q("summary") ?? "External transaction").replacingOccurrences(of: "+", with: " ")
+            pendingRequest = .sign(chainId: cid, packedTrx: packed, summary: summary, callback: callback)
         default:
             break
         }
