@@ -132,13 +132,18 @@ final class AppModel {
     /// True if `pub` is a key on any of the loaded account's permissions.
     func keyControlsAccount(_ pub: String?) -> Bool { !permissions(forKey: pub).isEmpty }
 
-    /// Default `permissionName` to a permission the active key actually controls.
+    /// Default `permissionName` to a permission the active key controls — always
+    /// preferring `active` over the higher-privilege `owner` for everyday use.
     func selectBestPermission(forKey pub: String?) {
         let authorized = permissions(forKey: pub)
         if !authorized.contains(permissionName) {
-            permissionName = authorized.first ?? "active"
+            permissionName = authorized.contains("active") ? "active" : (authorized.first ?? "active")
         }
     }
+
+    /// True when signing with a high-privilege permission (owner can change keys,
+    /// recover the account, etc.) — the UI flags this in red so it's deliberate.
+    var signingWithOwner: Bool { permissionName == "owner" }
 
     func explorerAccountURL(_ name: String) -> URL? { networks.active.accountURL(name) }
     func explorerTxURL(_ txid: String) -> URL? { networks.active.txURL(txid) }

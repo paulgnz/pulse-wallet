@@ -35,6 +35,15 @@ struct RootView: View {
         }
         .background(BrandBackground())
         .tint(Brand.accent)   // selection highlight + controls follow the theme, not system blue
+        .safeAreaInset(edge: .top) { if model.signingWithOwner { OwnerWarningBanner() } }
+        .overlay {
+            // Red frame whenever signing is set to the high-privilege owner permission.
+            if model.signingWithOwner {
+                RoundedRectangle(cornerRadius: 0).strokeBorder(Brand.danger, lineWidth: 3)
+                    .ignoresSafeArea().allowsHitTesting(false)
+            }
+        }
+        .animation(.smooth, value: model.signingWithOwner)
         .overlay { if model.isLocked { LockScreen() } }
         .animation(.smooth, value: model.isLocked)
         .task { await model.refresh() }
@@ -68,6 +77,24 @@ struct RootView: View {
         case .tools:    ToolsView()
         case .settings: SettingsView()
         }
+    }
+}
+
+/// Persistent red bar shown while signing is set to the owner permission.
+struct OwnerWarningBanner: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.shield.fill")
+            Text("Signing as **owner** — the highest-privilege permission. Use **active** for everyday transactions.")
+                .font(.callout)
+            Spacer()
+            Button("Switch to active") { model.permissionName = "active" }
+                .buttonStyle(.borderless).font(.callout.weight(.semibold))
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 14).padding(.vertical, 8)
+        .background(Brand.danger)
     }
 }
 

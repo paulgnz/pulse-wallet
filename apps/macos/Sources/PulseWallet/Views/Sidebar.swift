@@ -6,17 +6,48 @@ struct Sidebar: View {
     var body: some View {
         @Bindable var model = model
 
-        List(selection: $model.section) {
+        // Custom selection (not List's binding) so the highlight follows the
+        // active theme accent on every palette — macOS's native sidebar
+        // selection ignores SwiftUI .tint() and forces the system accent.
+        List {
             Section {
                 ForEach(WalletSection.allCases) { item in
-                    Label(item.title, systemImage: item.symbol)
-                        .tag(item)
+                    SidebarRow(item: item, selected: model.section == item) { model.section = item }
+                        .listRowInsets(EdgeInsets(top: 1, leading: 6, bottom: 1, trailing: 6))
+                        .listRowSeparator(.hidden)
                 }
             }
         }
         .listStyle(.sidebar)
         .safeAreaInset(edge: .top) { BrandHeader() }
         .safeAreaInset(edge: .bottom) { AccountSwitcher() }
+    }
+}
+
+/// A sidebar item with theme-controlled selection (solid accent fill +
+/// contrast-aware text), replacing the system blue highlight.
+private struct SidebarRow: View {
+    let item: WalletSection
+    let selected: Bool
+    let action: () -> Void
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Label(item.title, systemImage: item.symbol)
+                .font(.body.weight(selected ? .semibold : .regular))
+                .foregroundStyle(selected ? Brand.onAccent : Color.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 6).padding(.horizontal, 10)
+                .background {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(selected ? AnyShapeStyle(Brand.accent)
+                                       : AnyShapeStyle(hovering ? Color.primary.opacity(0.07) : Color.clear))
+                }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
     }
 }
 
@@ -62,7 +93,9 @@ private struct AccountSwitcher: View {
                 Section("Sign with permission") {
                     ForEach(authorizedPermissions, id: \.self) { perm in
                         Button { model.permissionName = perm } label: {
-                            Label("@\(perm)", systemImage: perm == model.permissionName ? "checkmark" : "key")
+                            Label(perm == "owner" ? "@owner — elevated" : "@\(perm)",
+                                  systemImage: perm == model.permissionName ? "checkmark"
+                                             : (perm == "owner" ? "exclamationmark.shield" : "key"))
                         }
                     }
                 }
@@ -87,8 +120,14 @@ private struct AccountSwitcher: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(model.accountName)
                         .font(.callout.weight(.semibold))
-                    Text("@\(model.permissionName)")
-                        .font(.caption).foregroundStyle(.secondary)
+                    HStack(spacing: 4) {
+                        if model.signingWithOwner {
+                            Image(systemName: "exclamationmark.shield.fill").font(.caption2)
+                        }
+                        Text("@\(model.permissionName)")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(model.signingWithOwner ? Brand.danger : .secondary)
                 }
                 Spacer()
                 Image(systemName: "chevron.up.chevron.down")

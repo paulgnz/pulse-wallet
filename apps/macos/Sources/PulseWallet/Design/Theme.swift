@@ -85,6 +85,17 @@ enum Brand {
     static var accent: Color { Color(lightHex: Theme.active.accentLight ?? Theme.active.accent, darkHex: Theme.active.accent) }
     static var glow: Color { Color(lightHex: Theme.active.glowLight ?? Theme.active.glow, darkHex: Theme.active.glow) }
     static var success: Color { Color(hex: Theme.active.success) }
+
+    /// A foreground (black or white) that stays readable on an `accent` fill —
+    /// e.g. selected sidebar rows. Adapts per light/dark since accent does too.
+    static var onAccent: Color {
+        func contrast(_ hex: UInt32) -> UInt32 {
+            let r = Double((hex >> 16) & 0xFF), g = Double((hex >> 8) & 0xFF), b = Double(hex & 0xFF)
+            return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? 0x111111 : 0xFFFFFF
+        }
+        let t = Theme.active
+        return Color(lightHex: contrast(t.accentLight ?? t.accent), darkHex: contrast(t.accent))
+    }
     static var warn: Color { Color(hex: Theme.active.warn) }
     static var danger: Color { Color(hex: Theme.active.danger) }
 
