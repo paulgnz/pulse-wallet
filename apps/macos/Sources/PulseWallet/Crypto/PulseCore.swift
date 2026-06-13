@@ -28,9 +28,11 @@ protocol PulseCore {
     func encodePubK1(compressedPublicKey: Data) -> String
     func signK1(privateKey: Data, digest: Data) throws -> String
 
-    /// Build the signing digest for a transfer action (chain-id bound).
-    func transferDigest(from: String, to: String, quantity: String,
-                        memo: String, chainID: String) throws -> (preImage: Data, digest: Data)
+    /// Serialize a transfer and return its signing material (hex strings).
+    func buildTransfer(from: String, to: String, quantity: String, memo: String,
+                       contract: String, actor: String, permission: String,
+                       chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                       expiration: UInt32) throws -> (packed: String, preimage: String, digest: String)
 }
 
 enum PulseCoreError: Error, LocalizedError {
@@ -63,9 +65,10 @@ struct PulseCoreStub: PulseCore {
     func signK1(privateKey: Data, digest: Data) throws -> String {
         throw PulseCoreError.notImplemented("signK1")
     }
-
-    func transferDigest(from: String, to: String, quantity: String,
-                        memo: String, chainID: String) throws -> (preImage: Data, digest: Data) {
-        throw PulseCoreError.notImplemented("transferDigest — port serializer into pulse-wallet-core")
+    func buildTransfer(from: String, to: String, quantity: String, memo: String,
+                       contract: String, actor: String, permission: String,
+                       chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                       expiration: UInt32) throws -> (packed: String, preimage: String, digest: String) {
+        throw PulseCoreError.notImplemented("buildTransfer")
     }
 }

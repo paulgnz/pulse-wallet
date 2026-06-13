@@ -5,9 +5,11 @@ import Foundation
 struct ChainInfo: Decodable, Sendable {
     let chainId: String
     let headBlockNum: Int
+    let headBlockId: String
     let headBlockTime: String
     let headBlockProducer: String
     let lastIrreversibleBlockNum: Int
+    let lastIrreversibleBlockId: String
     let serverVersion: String
 }
 

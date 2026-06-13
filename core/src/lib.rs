@@ -14,6 +14,7 @@ use p256::ecdsa::{Signature, VerifyingKey};
 use ripemd::{Digest, Ripemd160};
 
 pub mod ffi;
+pub mod tx;
 
 fn ripemd_checksum(data: &[u8], suffix: &[u8]) -> [u8; 4] {
     let mut h = Ripemd160::new();

@@ -27,6 +27,14 @@ int pwc_pub_k1(const uint8_t *priv32, uint8_t *out33);          // raw32 -> comp
 int pwc_encode_pub_k1(const uint8_t *pub33, char *out, size_t out_len); // -> "PUB_K1_…"
 int pwc_sign_k1(const uint8_t *priv32, const uint8_t *digest32, char *out, size_t out_len);
 
+// Serialize a transfer + signing material. Writes "<packed>\n<preimage>\n<digest>"
+// (hex) into out. Use a 4096-byte buffer. Returns length or -1.
+int pwc_build_transfer(const char *from, const char *to, const char *quantity,
+                       const char *memo, const char *contract, const char *actor,
+                       const char *permission, const char *chain_id_hex,
+                       uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                       char *out, size_t out_len);
+
 #ifdef __cplusplus
 }
 #endif

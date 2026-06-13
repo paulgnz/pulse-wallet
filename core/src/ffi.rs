@@ -5,6 +5,7 @@
 //! error (null pointer, buffer too small, or invalid input). PUB_R1 is ~57
 //! chars and SIG_R1 ~101 chars, so a 256-byte buffer is always sufficient.
 
+use crate::tx::{build_transfer_signing, TransferParams};
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, pub_k1_from_priv,
     sign_k1,
@@ -12,6 +13,14 @@ use crate::{
 use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
 use std::slice;
+
+/// Read a C string slice (None on null / invalid UTF-8).
+unsafe fn cstr<'a>(p: *const c_char) -> Option<&'a str> {
+    if p.is_null() {
+        return None;
+    }
+    CStr::from_ptr(p).to_str().ok()
+}
 
 /// # Safety
 /// `out` must point to at least `out_len` writable bytes.
@@ -185,6 +194,72 @@ pub unsafe extern "C" fn pwc_sign_k1(
     d.copy_from_slice(slice::from_raw_parts(digest32, 32));
     match sign_k1(&p, &d) {
         Ok(sig) => write_str(out, out_len, &sig),
+        Err(_) => -1,
+    }
+}
+
+// --- Transaction building ---------------------------------------------------
+
+/// Serialize a transfer + compute its signing material. Writes three hex lines
+/// into `out`: "<packed_trx>\n<preimage>\n<digest>". Returns length or -1.
+/// Use a 4096-byte buffer. Compute ref_block_num/prefix/expiration from getInfo.
+///
+/// # Safety
+/// All string pointers are NUL-terminated C strings; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_transfer(
+    from: *const c_char,
+    to: *const c_char,
+    quantity: *const c_char,
+    memo: *const c_char,
+    contract: *const c_char,
+    actor: *const c_char,
+    permission: *const c_char,
+    chain_id_hex: *const c_char,
+    ref_block_num: u16,
+    ref_block_prefix: u32,
+    expiration: u32,
+    out: *mut c_char,
+    out_len: usize,
+) -> c_int {
+    let fields = (
+        cstr(from),
+        cstr(to),
+        cstr(quantity),
+        cstr(memo),
+        cstr(contract),
+        cstr(actor),
+        cstr(permission),
+        cstr(chain_id_hex),
+    );
+    let (from, to, quantity, memo, contract, actor, permission, cid) = match fields {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(f), Some(g), Some(h)) => {
+            (a, b, c, d, e, f, g, h)
+        }
+        _ => return -1,
+    };
+    let params = TransferParams {
+        from,
+        to,
+        quantity,
+        memo,
+        contract,
+        actor,
+        permission,
+        ref_block_num,
+        ref_block_prefix,
+        expiration,
+    };
+    match build_transfer_signing(&params, cid) {
+        Ok((packed, preimage, digest)) => {
+            let s = format!(
+                "{}\n{}\n{}",
+                hex::encode(packed),
+                hex::encode(preimage),
+                hex::encode(digest)
+            );
+            write_str(out, out_len, &s)
+        }
         Err(_) => -1,
     }
 }

@@ -87,6 +87,7 @@ struct SignSheet: View {
 
     @State private var state: SignState = .review
     @State private var sigR1: String?
+    @State private var packedTrx: String?
     enum SignState { case review, signing, broadcast, done, failed(String) }
 
     var body: some View {
@@ -142,16 +143,28 @@ struct SignSheet: View {
     }
 
     private func sign() {
+        guard let draft = model.makeTransferDraft(to: recipient, amount: amount, symbol: symbol, memo: memo) else {
+            state = .failed("Couldn't build the transfer — not connected, or unknown token.")
+            return
+        }
         state = .signing
-        let account = model.selectedAccount?.name ?? "default"
-        let summary = "\(account)->\(recipient):\(amount) \(symbol):\(memo)"
-        let reason = "Sign transfer of \(amount) \(symbol) to \(recipient)"
+        let core = model.core
+        let reason = "Sign transfer of \(draft.quantity) to \(draft.to)"
         Task {
             do {
-                // Sign with the active key (Enclave R1 / imported R1 / imported K1).
-                // NOTE: we currently sign a transfer *summary*; once the core's
-                // serializer lands we sign the canonical tx digest + broadcast.
-                sigR1 = try await keyStore.sign(preImage: Data(summary.utf8), reason: reason)
+                // Serialize the real Antelope transaction in the core, then sign its
+                // digest with the active key (Enclave R1 / imported R1 / imported K1).
+                let built = try core.buildTransfer(
+                    from: draft.from, to: draft.to, quantity: draft.quantity, memo: draft.memo,
+                    contract: draft.contract, actor: draft.actor, permission: draft.permission,
+                    chainId: draft.chainId, refBlockNum: draft.refBlockNum,
+                    refBlockPrefix: draft.refBlockPrefix, expiration: draft.expiration)
+                guard let preImage = Data(hexString: built.preimage) else {
+                    state = .failed("Malformed signing pre-image."); return
+                }
+                let sig = try await keyStore.sign(preImage: preImage, reason: reason)
+                packedTrx = built.packed
+                sigR1 = sig
                 state = .done
             } catch {
                 state = .failed(error.localizedDescription)

@@ -82,8 +82,17 @@ struct PulseCoreFFI: PulseCore {
         return String(cString: out)
     }
 
-    func transferDigest(from: String, to: String, quantity: String,
-                        memo: String, chainID: String) throws -> (preImage: Data, digest: Data) {
-        throw PulseCoreError.notImplemented("transferDigest — port serializer into pulse-wallet-core")
+    func buildTransfer(from: String, to: String, quantity: String, memo: String,
+                       contract: String, actor: String, permission: String,
+                       chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32,
+                       expiration: UInt32) throws -> (packed: String, preimage: String, digest: String) {
+        var out = [CChar](repeating: 0, count: 4096)
+        let n = pwc_build_transfer(from, to, quantity, memo, contract, actor, permission,
+                                   chainId, refBlockNum, refBlockPrefix, expiration,
+                                   &out, out.count)
+        guard n >= 0 else { throw PulseCoreError.signing("buildTransfer failed (bad params?)") }
+        let parts = String(cString: out).split(separator: "\n", omittingEmptySubsequences: false)
+        guard parts.count == 3 else { throw PulseCoreError.signing("malformed tx output") }
+        return (String(parts[0]), String(parts[1]), String(parts[2]))
     }
 }

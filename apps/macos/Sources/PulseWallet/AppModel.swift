@@ -224,6 +224,51 @@ final class AppModel {
         return [asset]
     }
 
+    /// Everything the core needs to build + sign a transfer.
+    struct TransferDraft: Sendable {
+        let from, to, quantity, memo, contract, actor, permission, chainId: String
+        let refBlockNum: UInt16
+        let refBlockPrefix: UInt32
+        let expiration: UInt32
+    }
+
+    /// Assemble a transfer draft from live chain state. nil if data is missing
+    /// (not connected, unknown token, etc.).
+    func makeTransferDraft(to: String, amount: String, symbol: String, memo: String) -> TransferDraft? {
+        guard let info = chainInfo,
+              let asset = assets.first(where: { $0.symbol == symbol }),
+              let qty = Self.formatQuantity(amount, precision: asset.precision, symbol: symbol),
+              let prefix = Self.refBlockPrefix(blockIdHex: info.headBlockId)
+        else { return nil }
+        let chainId = networks.active.chainId ?? info.chainId
+        return TransferDraft(
+            from: accountName, to: to.trimmingCharacters(in: .whitespaces),
+            quantity: qty, memo: memo, contract: asset.contract,
+            actor: accountName, permission: permissionName, chainId: chainId,
+            refBlockNum: UInt16(truncatingIfNeeded: info.headBlockNum),
+            refBlockPrefix: prefix,
+            expiration: UInt32(Date().timeIntervalSince1970) + 120)
+    }
+
+    static func formatQuantity(_ amount: String, precision: Int, symbol: String) -> String? {
+        guard let d = Decimal(string: amount.trimmingCharacters(in: .whitespaces)) else { return nil }
+        let f = NumberFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.numberStyle = .decimal
+        f.usesGroupingSeparator = false
+        f.minimumIntegerDigits = 1
+        f.minimumFractionDigits = precision
+        f.maximumFractionDigits = precision
+        guard let s = f.string(from: NSDecimalNumber(decimal: d)) else { return nil }
+        return "\(s) \(symbol)"
+    }
+
+    /// ref_block_prefix = uint32 LE at bytes [8..12] of the block id.
+    static func refBlockPrefix(blockIdHex: String) -> UInt32? {
+        guard let d = Data(hexString: blockIdHex), d.count >= 12 else { return nil }
+        return UInt32(d[8]) | (UInt32(d[9]) << 8) | (UInt32(d[10]) << 16) | (UInt32(d[11]) << 24)
+    }
+
     /// Parse chain timestamps like "2026-06-11T22:18:20.000" (UTC, no zone).
     static func parseChainTime(_ s: String) -> Date? {
         let f = DateFormatter()
