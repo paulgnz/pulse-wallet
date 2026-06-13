@@ -1,7 +1,8 @@
 //! Antelope/PulseVM transaction serialization + signing digest.
 //!
-//! Signing digest = sha256( chain_id(32) ‖ packed_trx ‖ sha256(context_free_data) ).
-//! With no context-free data, the trailing hash is sha256(<empty>).
+//! Signing digest = sha256( chain_id(32) ‖ packed_trx ‖ cfd_digest ).
+//! cfd_digest = sha256(context_free_data), or 32 ZERO bytes when there is no
+//! context-free data (matches nodeos `transaction::sig_digest`).
 //!
 //! `build_transfer_signing` returns (packed_trx, preimage, digest):
 //!  - R1 keys sign the PRE-IMAGE (CryptoKit/Enclave hash it with SHA-256 → digest)
@@ -147,7 +148,11 @@ fn signing_material(packed: &[u8], chain_id_hex: &str) -> Result<(Vec<u8>, Vec<u
     if chain_id.len() != 32 {
         return Err("chain_id must be 32 bytes".into());
     }
-    let cfd_hash = sha256(&[]); // empty context-free data
+    // Antelope sig_digest: when there is NO context-free data, the trailing 32
+    // bytes are a ZERO digest (nodeos `digest_type()`), NOT sha256(empty). Using
+    // sha256(empty) makes the node recover a different key → "transaction
+    // declares authority X but does not have signatures for it".
+    let cfd_hash = [0u8; 32];
     let mut preimage = Vec::with_capacity(32 + packed.len() + 32);
     preimage.extend_from_slice(&chain_id);
     preimage.extend_from_slice(packed);
