@@ -6,6 +6,7 @@ struct KeysView: View {
 
     @State private var showNew = false
     @State private var showImport = false
+    @State private var showUpdateAuth = false
     @State private var toDelete: WalletKey?
     @State private var errorMessage: String?
 
@@ -33,6 +34,7 @@ struct KeysView: View {
         .scrollContentBackground(.hidden)
         .sheet(isPresented: $showNew) { NewEnclaveKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showImport) { ImportKeySheet(error: $errorMessage) }
+        .sheet(isPresented: $showUpdateAuth) { UpdateAuthSheet() }
         .sheet(item: $toDelete) { key in DeleteKeySheet(key: key) }
         .onChange(of: model.requestImportKey) { _, want in
             if want { showImport = true; model.requestImportKey = false }
@@ -51,6 +53,11 @@ struct KeysView: View {
                 }
                 Button { showImport = true } label: {
                     Label("Import Key", systemImage: "square.and.arrow.down")
+                        .frame(maxWidth: .infinity).padding(.vertical, 4)
+                }
+                .buttonStyle(.glass).controlSize(.large)
+                Button { showUpdateAuth = true } label: {
+                    Label("Set Account Keys", systemImage: "person.badge.key")
                         .frame(maxWidth: .infinity).padding(.vertical, 4)
                 }
                 .buttonStyle(.glass).controlSize(.large)

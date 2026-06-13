@@ -139,4 +139,15 @@ struct PulseCoreFFI: PulseCore {
         guard parts.count == 2 else { throw PulseCoreError.signing("malformed material") }
         return (String(parts[0]), String(parts[1]))
     }
+
+    func buildUpdateAuth(systemContract: String, account: String, permission: String,
+                         parent: String, threshold: UInt32, keys: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 8192)
+        let n = pwc_build_updateauth(systemContract, account, permission, parent, threshold, keys,
+                                     authActor, authPerm, chainId, refBlockNum, refBlockPrefix,
+                                     expiration, &out, out.count)
+        return try parse(out, n, "buildUpdateAuth")
+    }
 }

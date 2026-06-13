@@ -263,6 +263,107 @@ pub fn build_msig_signing(
     Ok((packed, preimage, digest))
 }
 
+// === updateauth (multi-key / threshold permission setup) ===================
+
+use crate::ripemd_checksum;
+
+/// Antelope binary public key: type byte (0=K1, 1=R1) ‖ 33-byte compressed key.
+pub fn pub_to_binary(s: &str) -> Result<Vec<u8>, String> {
+    let (ty, body, suffix): (u8, &str, &[u8]) = if let Some(b) = s.strip_prefix("PUB_K1_") {
+        (0, b, b"K1")
+    } else if let Some(b) = s.strip_prefix("PUB_R1_") {
+        (1, b, b"R1")
+    } else {
+        return Err("expected PUB_K1_/PUB_R1_".into());
+    };
+    let data = bs58::decode(body).into_vec().map_err(|e| e.to_string())?;
+    if data.len() != 37 {
+        return Err("bad public key length".into());
+    }
+    let (key, cs) = data.split_at(33);
+    if &ripemd_checksum(key, suffix)[..] != cs {
+        return Err("public key checksum mismatch".into());
+    }
+    let mut out = Vec::with_capacity(34);
+    out.push(ty);
+    out.extend_from_slice(key);
+    Ok(out)
+}
+
+pub struct KeyWeight {
+    pub key: String,
+    pub weight: u16,
+}
+
+/// Parse "PUB_..@1;PUB_..@2" into weighted keys (default weight 1).
+pub fn parse_key_weights(s: &str) -> Vec<KeyWeight> {
+    s.split(';')
+        .map(|p| p.trim())
+        .filter(|p| !p.is_empty())
+        .map(|p| {
+            let mut it = p.splitn(2, '@');
+            let key = it.next().unwrap_or("").to_string();
+            let weight = it.next().and_then(|w| w.trim().parse().ok()).unwrap_or(1);
+            KeyWeight { key, weight }
+        })
+        .collect()
+}
+
+/// authority { threshold:u32, keys:key_weight[], accounts:[], waits:[] }.
+/// Keys are sorted by their binary form (Antelope requires canonical order).
+fn serialize_authority(threshold: u32, keys: &[KeyWeight], out: &mut Vec<u8>) -> Result<(), String> {
+    let mut encoded: Vec<(Vec<u8>, u16)> = Vec::with_capacity(keys.len());
+    for kw in keys {
+        encoded.push((pub_to_binary(&kw.key)?, kw.weight));
+    }
+    encoded.sort_by(|a, b| a.0.cmp(&b.0));
+    out.extend_from_slice(&threshold.to_le_bytes());
+    write_varuint32(encoded.len() as u32, out);
+    for (bin, weight) in &encoded {
+        out.extend_from_slice(bin);
+        out.extend_from_slice(&weight.to_le_bytes());
+    }
+    write_varuint32(0, out); // accounts
+    write_varuint32(0, out); // waits
+    Ok(())
+}
+
+fn updateauth_data(account: &str, permission: &str, parent: &str, threshold: u32, keys: &[KeyWeight]) -> Result<Vec<u8>, String> {
+    let mut d = Vec::new();
+    write_name(account, &mut d);
+    write_name(permission, &mut d);
+    write_name(parent, &mut d);
+    serialize_authority(threshold, keys, &mut d)?;
+    Ok(d)
+}
+
+/// Build + sign-material for `updateauth` on the system contract.
+#[allow(clippy::too_many_arguments)]
+pub fn build_updateauth_signing(
+    system_contract: &str,
+    account: &str,
+    permission: &str,
+    parent: &str,
+    threshold: u32,
+    keys: &[KeyWeight],
+    auth: PermLevel,
+    chain_id_hex: &str,
+    ref_block_num: u16,
+    ref_block_prefix: u32,
+    expiration: u32,
+) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), String> {
+    let data = updateauth_data(account, permission, parent, threshold, keys)?;
+    let action = Action {
+        account: system_contract.to_string(),
+        name: "updateauth".to_string(),
+        auth: vec![auth],
+        data,
+    };
+    let packed = serialize_tx(&[action], ref_block_num, ref_block_prefix, expiration);
+    let (preimage, digest) = signing_material(&packed, chain_id_hex)?;
+    Ok((packed, preimage, digest))
+}
+
 /// Build + sign-material to propose a single transfer via pulse.msig.
 #[allow(clippy::too_many_arguments)]
 pub fn build_msig_propose_transfer_signing(
@@ -359,6 +460,32 @@ mod tx_tests {
         let d = msig_approve_data("proposer", "prop1", &level);
         // proposer(8) + proposal(8) + actor(8) + permission(8) = 32 bytes
         assert_eq!(d.len(), 32);
+    }
+
+    #[test]
+    fn pub_to_binary_matches_k1_key() {
+        // PUB_K1 of the EOS dev key → type 0 ‖ 33-byte compressed key
+        let pubk1 = "PUB_K1_6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5BoDq63";
+        let bin = pub_to_binary(pubk1).unwrap();
+        assert_eq!(bin.len(), 34);
+        assert_eq!(bin[0], 0); // K1
+        let raw = crate::decode_pvt_k1("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3").unwrap();
+        let pub_c = crate::pub_k1_from_priv(&raw).unwrap();
+        assert_eq!(&bin[1..], &pub_c[..]);
+    }
+
+    #[test]
+    fn updateauth_keys_sorted_and_built() {
+        let keys = parse_key_weights("PUB_K1_6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5BoDq63@2");
+        assert_eq!(keys.len(), 1);
+        assert_eq!(keys[0].weight, 2);
+        let cid = "0d6f033e887fae475d641104b6e87762b6c869e87a101afeeb64d608ab376618";
+        let (packed, _, digest) = build_updateauth_signing(
+            "pulse", "protonnz", "active", "owner", 1, &keys,
+            PermLevel { actor: "protonnz".into(), permission: "owner".into() },
+            cid, 1, 2, 1_760_000_000).unwrap();
+        assert!(!packed.is_empty());
+        assert_eq!(digest.len(), 32);
     }
 
     #[test]

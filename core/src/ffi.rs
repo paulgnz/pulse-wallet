@@ -7,8 +7,8 @@
 
 use crate::tx::{
     build_msig_propose_transfer_signing, build_msig_signing, build_transfer_signing,
-    msig_approve_data, msig_exec_data, parse_perm_levels, signing_material_hex, PermLevel,
-    TransferParams,
+    build_updateauth_signing, msig_approve_data, msig_exec_data, parse_key_weights,
+    parse_perm_levels, signing_material_hex, PermLevel, TransferParams,
 };
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, pub_k1_from_priv,
@@ -299,6 +299,31 @@ pub unsafe extern "C" fn pwc_signing_material(
         }
         Err(_) => -1,
     }
+}
+
+/// updateauth: set `account`'s `permission` to threshold-of weighted keys.
+/// `keys` is "PUB_..@weight;PUB_..@weight". Signed by `auth`.
+/// # Safety: string pointers NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_updateauth(
+    system_contract: *const c_char, account: *const c_char, permission: *const c_char,
+    parent: *const c_char, threshold: u32, keys: *const c_char,
+    auth_actor: *const c_char, auth_perm: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(system_contract), cstr(account), cstr(permission), cstr(parent),
+             cstr(keys), cstr(auth_actor), cstr(auth_perm), cstr(chain_id_hex));
+    let (sys, account, permission, parent, keys, aa, ap, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(g), Some(h), Some(i)) =>
+            (a, b, c, d, e, g, h, i),
+        _ => return -1,
+    };
+    let kws = parse_key_weights(keys);
+    emit_tx(build_updateauth_signing(
+        sys, account, permission, parent, threshold, &kws,
+        PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
 }
 
 // --- pulse.msig -------------------------------------------------------------

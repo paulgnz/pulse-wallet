@@ -50,6 +50,13 @@ protocol PulseCore {
 
     /// Preimage + digest for an externally-supplied packed tx (dapp transport).
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String)
+
+    /// updateauth — set an account permission to threshold-of weighted keys.
+    /// `keys` is "PUB_..@weight;PUB_..@weight".
+    func buildUpdateAuth(systemContract: String, account: String, permission: String,
+                         parent: String, threshold: UInt32, keys: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
 }
 
 /// Serialized transaction + its signing material (all hex).
@@ -115,5 +122,11 @@ struct PulseCoreStub: PulseCore {
     }
     func signingMaterial(packedTrx: String, chainId: String) throws -> (preimage: String, digest: String) {
         throw PulseCoreError.notImplemented("signingMaterial")
+    }
+    func buildUpdateAuth(systemContract: String, account: String, permission: String,
+                         parent: String, threshold: UInt32, keys: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("buildUpdateAuth")
     }
 }
