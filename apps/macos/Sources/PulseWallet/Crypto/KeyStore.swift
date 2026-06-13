@@ -25,6 +25,9 @@ final class KeyStore {
     private let defaultsKey = "wallet.keys.v1"
     private let core: PulseCore = PulseCoreFFI()
     private(set) var keys: [WalletKey] = []
+    /// Key ids whose private material is missing/unreadable in the Keychain
+    /// (e.g. orphaned by a prior build signed with a different identity).
+    private(set) var unreadableKeyIDs: Set<String> = []
     var activeKeyID: String? {
         didSet { UserDefaults.standard.set(activeKeyID, forKey: "wallet.activeKeyID") }
     }
@@ -35,6 +38,12 @@ final class KeyStore {
             keys = arr
         }
         activeKeyID = UserDefaults.standard.string(forKey: "wallet.activeKeyID")
+        runHealthCheck()
+    }
+
+    /// Flag any keys whose Keychain material can't be found (no Touch ID prompt).
+    func runHealthCheck() {
+        unreadableKeyIDs = Set(keys.filter { !Keychain.exists(account: $0.id) }.map(\.id))
     }
 
     var activeKey: WalletKey? { keys.first { $0.id == activeKeyID } }

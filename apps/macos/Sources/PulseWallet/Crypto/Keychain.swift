@@ -66,6 +66,22 @@ enum Keychain {
         return data
     }
 
+    /// Check an item exists WITHOUT prompting Touch ID (for health checks).
+    /// errSecInteractionNotAllowed means it's there but biometric-gated → present.
+    static func exists(account: String) -> Bool {
+        let ctx = LAContext()
+        ctx.interactionNotAllowed = true   // never prompt during a health check
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnAttributes as String: true,
+            kSecUseAuthenticationContext as String: ctx,
+        ]
+        let status = SecItemCopyMatching(query as CFDictionary, nil)
+        return status == errSecSuccess || status == errSecInteractionNotAllowed
+    }
+
     @discardableResult
     static func delete(account: String) -> Bool {
         let query: [String: Any] = [

@@ -21,6 +21,7 @@ struct KeysView: View {
                     ForEach(store.keys) { key in
                         KeyRow(key: key,
                                isActive: store.activeKeyID == key.id,
+                               unreadable: store.unreadableKeyIDs.contains(key.id),
                                onUse: { store.activeKeyID = key.id },
                                onDelete: { toDelete = key })
                     }
@@ -33,6 +34,7 @@ struct KeysView: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
+        .task { store.runHealthCheck() }
         .sheet(isPresented: $showNew) { NewEnclaveKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showImport) { ImportKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showUpdateAuth) { UpdateAuthSheet() }
@@ -89,6 +91,7 @@ private struct KeyRow: View {
     @Environment(AppModel.self) private var model
     let key: WalletKey
     let isActive: Bool
+    var unreadable: Bool = false
     var onUse: () -> Void
     var onDelete: () -> Void
     @State private var copied = false
@@ -111,6 +114,11 @@ private struct KeyRow: View {
                               tint: key.isHardwareBacked ? Brand.accent : Brand.glow)
                         badge(key.curve.rawValue.uppercased(), tint: .gray)
                         if isActive { badge("Active", tint: Brand.success) }
+                        if unreadable { badge("⚠ Re-import", tint: Brand.danger) }
+                    }
+                    if unreadable {
+                        Text("Key material missing from the Keychain — delete and re-import to sign.")
+                            .font(.caption2).foregroundStyle(Brand.danger)
                     }
                     Text(key.pubKey)
                         .font(.caption.monospaced()).foregroundStyle(.secondary)
