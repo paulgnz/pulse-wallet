@@ -70,6 +70,7 @@ struct KeysView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "person.text.rectangle").foregroundStyle(Brand.accent)
                         Text("\(model.accountName)’s account keys").font(.headline)
+                        InfoHint(text: Explain.ownerVsActive, title: "Owner vs active")
                         Spacer()
                         Text("on-chain").font(.caption2.weight(.semibold))
                             .padding(.horizontal, 6).padding(.vertical, 2)
@@ -108,6 +109,9 @@ struct KeysView: View {
                     .font(.caption).foregroundStyle(perm.permName == "owner" ? Brand.warn : Brand.accent)
                 Text("@\(perm.permName)").font(.subheadline.weight(.semibold))
                 Text("threshold \(perm.requiredAuth.threshold)").font(.caption2).foregroundStyle(.secondary)
+                if perm.requiredAuth.keys.count > 1 {
+                    InfoHint(text: Explain.threshold, title: "Threshold & multisig")
+                }
                 if perm.permName != "owner" {
                     Text("· parent @\(perm.parent)").font(.caption2).foregroundStyle(.secondary)
                 }
@@ -243,6 +247,8 @@ private struct KeyRow: View {
                             else { badge("Linked · \(perms.joined(separator: "/"))", tint: Brand.accent) }
                         }
                         if unreadable { badge("⚠ Re-import", tint: Brand.danger) }
+                        // Explain the signing-vs-linked distinction once, on the signing row.
+                        if isActive { InfoHint(text: Explain.signingVsLinked, title: "Signing key vs linked") }
                     }
                     if unreadable {
                         HStack(spacing: 8) {
@@ -359,11 +365,14 @@ private struct ImportKeySheet: View {
             SecureField("PVT_R1_… / PVT_K1_… / WIF / hex", text: $secret)
                 .pulseField(mono: true)
                 .onChange(of: secret) { _, new in curve = KeyStore.detectCurve(new) }
-            Picker("Curve", selection: $curve) {
-                Text("R1 (secp256r1)").tag(WalletKey.Curve.r1)
-                Text("K1 (secp256k1)").tag(WalletKey.Curve.k1)
+            HStack(spacing: 6) {
+                Picker("Curve", selection: $curve) {
+                    Text("R1 (secp256r1)").tag(WalletKey.Curve.r1)
+                    Text("K1 (secp256k1)").tag(WalletKey.Curve.k1)
+                }
+                .pickerStyle(.segmented)
+                InfoHint(text: Explain.curves, title: "R1 vs K1 keys")
             }
-            .pickerStyle(.segmented)
             if let e = localError {
                 Label(e, systemImage: "exclamationmark.triangle")
                     .font(.caption).foregroundStyle(Brand.danger)
