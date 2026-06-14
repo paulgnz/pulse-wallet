@@ -97,7 +97,7 @@
 		F4032B3283902766E647154A /* AccountHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHealth.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_35B917FC-48A9-400A-A21C-D413090FEAD1" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -231,10 +231,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_D47CAE16-75C1-4F76-B575-E5F338E0BB98" /* macos */ = {
+		"TEMP_B097EC94-D797-483C-96D9-B8C05F4A8149" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */,
+				"TEMP_35B917FC-48A9-400A-A21C-D413090FEAD1" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -416,7 +416,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -432,7 +432,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_35B917FC-48A9-400A-A21C-D413090FEAD1" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -515,7 +515,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.2.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -530,7 +530,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_35B917FC-48A9-400A-A21C-D413090FEAD1" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

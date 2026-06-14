@@ -44,14 +44,31 @@ final class NetworkStore {
         } else {
             loaded = NetworkStore.seed
         }
-        self.networks = loaded
+        var nets = loaded
+        // Migration: ensure the XPR Network Pulse Testnet is always present (so
+        // existing installs get it without re-seeding), keyed by its chain id.
+        if !nets.contains(where: { $0.chainId == NetworkStore.pulseTestnet.chainId }) {
+            nets.append(NetworkStore.pulseTestnet)
+        }
+        self.networks = nets
         if let s = UserDefaults.standard.string(forKey: selKey), let uid = UUID(uuidString: s),
-           loaded.contains(where: { $0.id == uid }) {
+           nets.contains(where: { $0.id == uid }) {
             self.selectedID = uid
         } else {
-            self.selectedID = loaded[0].id
+            self.selectedID = nets[0].id
         }
+        persist()
     }
+
+    /// Our self-hosted XPR Network Pulse Testnet (stable id → idempotent migration).
+    static let pulseTestnet = PulseNetwork(
+        id: UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!,
+        label: "XPR Network Pulse Testnet",
+        rpc: "https://5.78.114.28.sslip.io",
+        hyperion: "",
+        explorer: "https://pulse-explorer.vercel.app",
+        chainId: "47e1b7605ad091d456bc33161ec5e52f11bb9ba9fadc6aec914e70a20c0f2821",
+        primarySymbol: "XPR")
 
     static var seed: [PulseNetwork] {
         [PulseNetwork(
@@ -60,7 +77,8 @@ final class NetworkStore {
             hyperion: "https://hyperion.a-chain-testnet.protonnz.com",
             explorer: "https://a-chain-testnet.metalblockchain.org",
             chainId: "0d6f033e887fae475d641104b6e87762b6c869e87a101afeeb64d608ab376618",
-            primarySymbol: "XPR")]
+            primarySymbol: "XPR"),
+         pulseTestnet]
     }
 
     var active: PulseNetwork { networks.first { $0.id == selectedID } ?? networks[0] }
