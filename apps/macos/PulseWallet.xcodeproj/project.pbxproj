@@ -47,6 +47,7 @@
 		CE97F5DBE443A1B4C8B3DA56 /* RotateKeySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D662578D2653106B2A91782 /* RotateKeySheet.swift */; };
 		EB049CD866A5520D483A4CCC /* ExportKeySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */; };
 		EE3BA5A63E951B6D3A251EBC /* ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903CE20D793F6AAC583A8F9C /* ThemeStore.swift */; };
+		FFE2D71763F5DFE9F8B08A13 /* YubiKeySheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39AB1E94A8D538B465083D8A /* YubiKeySheets.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +62,7 @@
 		3415124985CAAF63350F0BB7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		37A106B02E0B4966774E12E5 /* PulseRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseRPC.swift; sourceTree = "<group>"; };
+		39AB1E94A8D538B465083D8A /* YubiKeySheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKeySheets.swift; sourceTree = "<group>"; };
 		3D662578D2653106B2A91782 /* RotateKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotateKeySheet.swift; sourceTree = "<group>"; };
 		3FD55C57997F0C2DBAF1EFF3 /* YubiKeyPIV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKeyPIV.swift; sourceTree = "<group>"; };
 		49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeySheet.swift; sourceTree = "<group>"; };
@@ -91,7 +93,7 @@
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_F64F982A-360C-459A-88E2-827A041CD1E9" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -157,6 +159,7 @@
 				7F4AC6D391E73F3C113B9068 /* ToolsView.swift */,
 				F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */,
 				EAE1D7B9716513661393FD3A /* WelcomeSheet.swift */,
+				39AB1E94A8D538B465083D8A /* YubiKeySheets.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -222,10 +225,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_C5429178-C8EE-456F-8FB4-3C485483B0B8" /* macos */ = {
+		"TEMP_82C51DC2-9774-4794-829F-631FF67D024F" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */,
+				"TEMP_F64F982A-360C-459A-88E2-827A041CD1E9" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				AB530338B4CD02518EB0DEF8 /* WalletError.swift in Sources */,
 				B02FE8BFF708DAA3B089A101 /* WelcomeSheet.swift in Sources */,
 				89E3B60CDE9432BE91A99A8B /* YubiKeyPIV.swift in Sources */,
+				FFE2D71763F5DFE9F8B08A13 /* YubiKeySheets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,7 +424,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_F64F982A-360C-459A-88E2-827A041CD1E9" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -518,7 +522,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_F64F982A-360C-459A-88E2-827A041CD1E9" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

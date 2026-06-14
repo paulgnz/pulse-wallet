@@ -8,6 +8,8 @@ struct KeysView: View {
     @State private var showImport = false
     @State private var showUpdateAuth = false
     @State private var showRotate = false
+    @State private var showYubiKey = false
+    @State private var toLink: WalletKey?
     @State private var toDelete: WalletKey?
     @State private var errorMessage: String?
 
@@ -24,6 +26,7 @@ struct KeysView: View {
                                unreadable: store.unreadableKeyIDs.contains(key.id),
                                onUse: { store.activeKeyID = key.id },
                                onDelete: { toDelete = key },
+                               onLink: { toLink = key },
                                onReimport: { store.delete(key); showImport = true })
                     }
                 }
@@ -40,6 +43,8 @@ struct KeysView: View {
         .sheet(isPresented: $showImport) { ImportKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showUpdateAuth) { UpdateAuthSheet() }
         .sheet(isPresented: $showRotate) { RotateKeySheet() }
+        .sheet(isPresented: $showYubiKey) { AddYubiKeySheet(error: $errorMessage) }
+        .sheet(item: $toLink) { key in LinkKeySheet(key: key) }
         .sheet(item: $toDelete) { key in DeleteKeySheet(key: key) }
         .onChange(of: model.requestImportKey) { _, want in
             if want { showImport = true; model.requestImportKey = false }
@@ -61,6 +66,9 @@ struct KeysView: View {
             HStack(spacing: 12) {
                 glassBtn("Set Account Keys", "person.badge.key") { showUpdateAuth = true }
                 glassBtn("Rotate Key", "arrow.triangle.2.circlepath") { showRotate = true }
+            }
+            HStack(spacing: 12) {
+                glassBtn("Add YubiKey", "key.radiowaves.forward") { showYubiKey = true }
             }
         }
     }
@@ -95,6 +103,7 @@ private struct KeyRow: View {
     var unreadable: Bool = false
     var onUse: () -> Void
     var onDelete: () -> Void
+    var onLink: () -> Void = {}
     var onReimport: () -> Void = {}
     @State private var copied = false
     @State private var accounts: [String] = []
@@ -139,6 +148,7 @@ private struct KeyRow: View {
                 Menu {
                     Button("Copy public key") { copyPub() }
                     if !isActive { Button("Set as active") { onUse() } }
+                    Button("Link to account…") { onLink() }
                     if !key.isHardwareBacked {
                         Button("Export private key…") { showExport = true }
                     }
