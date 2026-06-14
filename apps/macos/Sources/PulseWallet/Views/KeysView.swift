@@ -161,7 +161,10 @@ private struct KeyRow: View {
                 Menu {
                     Button("Copy public key") { copyPub() }
                     if !isActive { Button("Use for signing") { onUse() } }
-                    Button("Link to account…") { onLink() }
+                    // Only offer linking when the key isn't already on the account's perms.
+                    if model.account != nil, model.permissions(forKey: key.pubKey).isEmpty {
+                        Button("Link to account…") { onLink() }
+                    }
                     if !key.isHardwareBacked {
                         Button("Export private key…") { showExport = true }
                     }
