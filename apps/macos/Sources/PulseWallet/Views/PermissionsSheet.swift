@@ -116,10 +116,19 @@ struct PermissionsSheet: View {
         let isOpen = expanded.contains(p.wrappedValue.id)
         GlassCard(padding: 14) {
             VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text(p.wrappedValue.name.isEmpty ? "New permission" : "@\(p.wrappedValue.name)")
-                        .font(.subheadline.weight(.semibold))
-                    Spacer()
+                HStack(spacing: 8) {
+                    // The whole title row toggles expand/collapse — a big, easy tap target.
+                    Button { toggle(p.wrappedValue.id) } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: isOpen ? "chevron.up" : "chevron.down")
+                                .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                            Text(p.wrappedValue.name.isEmpty ? "New permission" : "@\(p.wrappedValue.name)")
+                                .font(.subheadline.weight(.semibold))
+                            Spacer(minLength: 0)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                     if isOpen {
                         if !p.wrappedValue.isNew {
                             Button(role: .destructive) { submitDelete(p.wrappedValue) } label: {
@@ -130,9 +139,6 @@ struct PermissionsSheet: View {
                             Label("Save", systemImage: "checkmark").font(.caption)
                         }.buttonStyle(.glassProminent).tint(Brand.success).controlSize(.small)
                     }
-                    Button { toggle(p.wrappedValue.id) } label: {
-                        Image(systemName: isOpen ? "chevron.up" : "chevron.down")
-                    }.buttonStyle(.plain)
                 }
                 if isOpen {
                     HStack {

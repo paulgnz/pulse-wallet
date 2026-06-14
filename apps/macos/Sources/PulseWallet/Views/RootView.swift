@@ -110,14 +110,17 @@ struct NetworkPill: View {
     private var dot: Color { model.chainInfo == nil ? Brand.warn : (paused ? Brand.warn : Brand.success) }
 
     var body: some View {
-        HStack(spacing: 6) {
-            Circle().fill(dot).frame(width: 7, height: 7)
-                .shadow(color: dot.opacity(0.8), radius: 4)
-            Text(model.chainName).font(.callout.weight(.medium))
+        HStack(spacing: 7) {
+            Circle().fill(dot).frame(width: 6, height: 6)
+                .overlay(Circle().fill(dot).blur(radius: 2.5).opacity(0.7))
+            Text(model.chainName).font(.callout.weight(.semibold))
             if paused, let n = model.chainInfo?.headBlockNum {
-                Text("· paused @ \(n)").font(.caption).foregroundStyle(.secondary)
+                Text("paused").font(.caption.weight(.medium)).foregroundStyle(Brand.warn)
+                Text(n.formatted()).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
         }
+        .padding(.vertical, 2).padding(.horizontal, 4)
+        .fixedSize()
         // The .principal toolbar item already provides a glass capsule on Tahoe —
         // don't add a second one here, or it renders as a pill-inside-a-pill.
         .help(model.chainInfo.map { "Head \($0.headBlockNum) · v\($0.serverVersion)" } ?? "Connecting…")
