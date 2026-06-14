@@ -3,10 +3,18 @@ import AppKit
 
 /// Guided, safety-first key rotation: generate a new key → **back up old + new** →
 /// confirm → updateauth. Designed so a user can't accidentally lose account access.
+///
+/// Two entry points:
+///  • Generic ("Rotate Key" button) — replace a permission's authority with a fresh key.
+///  • Emergency ("Rotate this key" on a key row) — a specific key may be leaked/compromised;
+///    pre-targets the permission it's on and swaps just that key out (keeping co-signers).
 struct RotateKeySheet: View {
     @Environment(AppModel.self) private var model
     @Environment(KeyStore.self) private var store
     @Environment(\.dismiss) private var dismiss
+
+    /// When set, this flow is an EMERGENCY rotation of a specific (possibly compromised) key.
+    var compromisedKey: WalletKey? = nil
 
     enum Method: String, CaseIterable, Identifiable {
         case enclave = "Secure Enclave (R1)"
@@ -31,6 +39,16 @@ struct RotateKeySheet: View {
     @State private var txid: String?
 
     private var rotatingOwner: Bool { permission == "owner" }
+    private var isEmergency: Bool { compromisedKey != nil }
+    private var currentPerm: Permission? {
+        model.account?.permissions.first { $0.permName == permission }
+    }
+    /// In an emergency, keep the permission's other keys and swap only the bad one.
+    /// Otherwise replace the whole authority with the new key (1-of-1).
+    private var coSigners: [AuthKey] {
+        guard isEmergency, let perm = currentPerm else { return [] }
+        return perm.requiredAuth.keys.filter { $0.key != compromisedKey?.pubKey }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -42,17 +60,28 @@ struct RotateKeySheet: View {
         }
         .padding(24).frame(width: 500, height: 560)
         .background(BrandBackground())
+        .onAppear {
+            // Pre-target the permission the compromised key actually sits on.
+            if let ck = compromisedKey {
+                let perms = model.permissions(forKey: ck.pubKey)
+                permission = perms.first ?? "active"
+                parent = permission == "owner" ? "owner" : "owner"
+            }
+        }
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Rotate Key").font(.title2.weight(.semibold))
+            Text(isEmergency ? "Emergency Key Rotation" : "Rotate Key").font(.title2.weight(.semibold))
             Text(stepHint).font(.caption).foregroundStyle(.secondary)
         }
     }
     private var stepHint: String {
         switch step {
-        case .setup:   return "Replace \(model.accountName)’s permission with a new key — safely."
+        case .setup:
+            return isEmergency
+                ? "Replace a key that may be leaked or compromised. A new key is generated and the account is updated to drop the old one — fast."
+                : "Replace \(model.accountName)’s @\(permission) authority with a freshly generated key. Use this if a key may be exposed, or to refresh keys periodically."
         case .backup:  return "Back up your keys before changing anything on-chain."
         case .confirm: return "Review carefully — this changes who can control the account."
         case .done:    return "Rotation submitted."
@@ -72,14 +101,34 @@ struct RotateKeySheet: View {
 
     private var setupStep: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if let ck = compromisedKey {
+                GlassCard(padding: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label("Replacing “\(ck.label)” on @\(permission)", systemImage: "exclamationmark.shield.fill")
+                            .font(.caption.weight(.semibold)).foregroundStyle(Brand.danger)
+                        Text(ck.pubKey).font(.caption2.monospaced()).foregroundStyle(.secondary)
+                            .lineLimit(1).truncationMode(.middle)
+                        Text(coSigners.isEmpty
+                             ? "This key is the only one on @\(permission). It will be replaced by the new key."
+                             : "The other \(coSigners.count) key(s) on @\(permission) are kept; only this one is removed.")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }
             field("New key type") {
                 Picker("", selection: $method) {
                     ForEach(Method.allCases) { Text($0.rawValue).tag($0) }
                 }.labelsHidden().pickerStyle(.menu)
             }
-            HStack {
-                field("Permission") { TextField("active", text: $permission) }
-                field("Parent") { TextField("owner", text: $parent) }
+            if isEmergency {
+                field("Permission") {
+                    Text("@\(permission)").foregroundStyle(.secondary)
+                }
+            } else {
+                HStack {
+                    field("Permission") { TextField("active", text: $permission) }
+                    field("Parent") { TextField("owner", text: $parent) }
+                }
             }
             GlassCard(padding: 12) {
                 Label(rotatingOwner
@@ -136,10 +185,13 @@ struct RotateKeySheet: View {
             GlassCard {
                 VStack(alignment: .leading, spacing: 8) {
                     row("Account", model.accountName)
-                    Divider(); row("Permission", permission)
-                    Divider(); row("New authority", "1-of-1 · \(newKey.map { String($0.pubKey.prefix(16)) } ?? "")…")
+                    Divider(); row("Permission", "@\(permission)")
                     Divider()
-                    row("Signed by", "\(model.accountName)@owner (current key)")
+                    row("New authority", coSigners.isEmpty
+                        ? "1-of-1 · \(newKey.map { String($0.pubKey.prefix(16)) } ?? "")…"
+                        : "\(currentPerm?.requiredAuth.threshold ?? 1)-of-\(coSigners.count + 1) · keeps \(coSigners.count) co-signer(s) + new key")
+                    Divider()
+                    row("Signed by", "\(model.accountName)@\(model.permissionName) (current key)")
                 }
             }
             if rotatingOwner {
@@ -236,12 +288,24 @@ struct RotateKeySheet: View {
         }
         guard let ctx = model.taposContext(), let nk = newKey else { status = "Not connected."; return }
         working = true
-        let me = model.accountName, perm = permission, par = parent
+        let me = model.accountName, perm = permission
+        let par = currentPerm?.parent ?? parent
+        // Emergency with co-signers: keep them, drop only the bad key, preserve threshold.
+        // Otherwise: fresh 1-of-1 authority.
+        let keyStr: String
+        let threshold: UInt32
+        if !coSigners.isEmpty, let cur = currentPerm {
+            keyStr = (coSigners.map { "\($0.key)@\($0.weight)" } + ["\(nk.pubKey)@1"]).joined(separator: ";")
+            threshold = UInt32(cur.requiredAuth.threshold)
+        } else {
+            keyStr = "\(nk.pubKey)@1"
+            threshold = 1
+        }
         Task {
             do {
                 let tx = try model.core.buildUpdateAuth(
                     systemContract: "pulse", account: me, permission: perm, parent: par,
-                    threshold: 1, keys: "\(nk.pubKey)@1", authActor: me, authPerm: model.permissionName,
+                    threshold: threshold, keys: keyStr, authActor: me, authPerm: model.permissionName,
                     chainId: ctx.chainId, refBlockNum: ctx.refBlockNum,
                     refBlockPrefix: ctx.refBlockPrefix, expiration: ctx.expiration)
                 guard let preImage = Data(hexString: tx.preimage) else { status = "bad preimage"; working = false; return }

@@ -11,6 +11,7 @@ struct KeysView: View {
     @State private var showYubiKey = false
     @State private var showUnlock = false
     @State private var toLink: WalletKey?
+    @State private var toRotate: WalletKey?
     @State private var toDelete: WalletKey?
     @State private var errorMessage: String?
 
@@ -28,6 +29,7 @@ struct KeysView: View {
                                onUse: { store.activeKeyID = key.id },
                                onDelete: { toDelete = key },
                                onLink: { toLink = key },
+                               onRotate: { toRotate = key },
                                onReimport: { store.delete(key); showImport = true })
                     }
                 }
@@ -48,6 +50,7 @@ struct KeysView: View {
         .sheet(isPresented: $showYubiKey) { AddYubiKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showUnlock) { UnlockYubiKeySheet() }
         .sheet(item: $toLink) { key in LinkKeySheet(key: key) }
+        .sheet(item: $toRotate) { key in RotateKeySheet(compromisedKey: key) }
         .sheet(item: $toDelete) { key in DeleteKeySheet(key: key) }
         .onChange(of: model.requestImportKey) { _, want in
             if want { showImport = true; model.requestImportKey = false }
@@ -211,6 +214,7 @@ private struct KeyRow: View {
     var onUse: () -> Void
     var onDelete: () -> Void
     var onLink: () -> Void = {}
+    var onRotate: () -> Void = {}
     var onReimport: () -> Void = {}
     @State private var copied = false
     @State private var accounts: [String] = []
@@ -264,6 +268,10 @@ private struct KeyRow: View {
                     // Only offer linking when the key isn't already on the account's perms.
                     if model.account != nil, model.permissions(forKey: key.pubKey).isEmpty {
                         Button("Link to account…") { onLink() }
+                    }
+                    // Emergency rotation only makes sense for a key that controls the account.
+                    if model.account != nil, !model.permissions(forKey: key.pubKey).isEmpty {
+                        Button("Rotate this key (if compromised)…", systemImage: "exclamationmark.shield") { onRotate() }
                     }
                     if !key.isHardwareBacked {
                         Button("Export private key…") { showExport = true }
