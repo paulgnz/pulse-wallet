@@ -102,38 +102,132 @@ struct OwnerWarningBanner: View {
     }
 }
 
-/// Live network indicator in the toolbar — glass capsule, current macOS styling.
+/// Live network indicator in the toolbar — a custom popover (not a native Menu,
+/// which adds its own chevron) so we control width and show connection status.
 struct NetworkPill: View {
     @Environment(AppModel.self) private var model
+    @State private var open = false
 
     private var paused: Bool { model.networkPaused }
-    private var dot: Color { model.chainInfo == nil ? Brand.warn : (paused ? Brand.warn : Brand.success) }
+    private var connecting: Bool { model.chainInfo == nil }
+    private var dot: Color { connecting ? Brand.warn : (paused ? Brand.warn : Brand.success) }
+    private var statusText: String { connecting ? "Connecting…" : (paused ? "Paused" : "Connected") }
 
     var body: some View {
-        Menu {
-            ForEach(model.networks.networks) { n in
-                Button { model.switchNetwork(n) } label: {
-                    Label(n.label, systemImage: n.id == model.networks.selectedID ? "checkmark" : "globe")
-                }
-            }
-            Divider()
-            Button { model.section = .settings } label: { Label("Manage networks…", systemImage: "gearshape") }
-        } label: {
+        Button { open.toggle() } label: {
             HStack(spacing: 7) {
-                Circle().fill(dot).frame(width: 6, height: 6)
-                    .overlay(Circle().fill(dot).blur(radius: 2.5).opacity(0.7))
+                StatusDot(color: dot)
                 Text(model.chainName).font(.callout.weight(.semibold))
-                if paused, let n = model.chainInfo?.headBlockNum {
-                    Text("paused").font(.caption.weight(.medium)).foregroundStyle(Brand.warn)
-                    Text(n.formatted()).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                }
+                if paused { Text("paused").font(.caption.weight(.medium)).foregroundStyle(Brand.warn) }
                 Image(systemName: "chevron.down").font(.system(size: 9, weight: .semibold)).foregroundStyle(.secondary)
             }
-            .padding(.vertical, 2).padding(.horizontal, 12)
-            .fixedSize()
+            .padding(.vertical, 4).padding(.horizontal, 12)
+            .contentShape(Rectangle())
         }
-        .menuStyle(.borderlessButton)
+        .buttonStyle(.plain)
         .fixedSize()
-        .help(model.chainInfo.map { "Head \($0.headBlockNum) · v\($0.serverVersion) · click to switch network" } ?? "Connecting…")
+        .popover(isPresented: $open, arrowEdge: .bottom) {
+            NetworkPopover(open: $open)
+                .frame(width: 340)
+        }
+    }
+}
+
+/// A glowing connection-status dot.
+private struct StatusDot: View {
+    let color: Color
+    var body: some View {
+        Circle().fill(color).frame(width: 7, height: 7)
+            .overlay(Circle().fill(color).blur(radius: 2.5).opacity(0.7))
+    }
+}
+
+/// Wide network switcher: live status header for the active chain + the full
+/// network list to switch between + manage.
+private struct NetworkPopover: View {
+    @Environment(AppModel.self) private var model
+    @Binding var open: Bool
+
+    private var paused: Bool { model.networkPaused }
+    private var connecting: Bool { model.chainInfo == nil }
+    private var dot: Color { connecting ? Brand.warn : (paused ? Brand.warn : Brand.success) }
+    private var statusText: String { connecting ? "Connecting…" : (paused ? "Paused" : "Connected") }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Active-network status header
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    StatusDot(color: dot)
+                    Text(statusText).font(.callout.weight(.semibold)).foregroundStyle(dot)
+                    Spacer()
+                    if let info = model.chainInfo {
+                        Text("v\(info.serverVersion)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                    }
+                }
+                if let info = model.chainInfo {
+                    HStack(spacing: 14) {
+                        Stat("Head block", "#\(info.headBlockNum.formatted())")
+                        Stat("Account", model.accountName)
+                    }
+                }
+                Text(model.networks.active.rpc)
+                    .font(.caption2.monospaced()).foregroundStyle(.tertiary).lineLimit(1).truncationMode(.middle)
+            }
+            .padding(14)
+            .background(Brand.accent.opacity(0.08))
+
+            Divider()
+
+            // Switchable network list
+            ScrollView {
+                VStack(spacing: 2) {
+                    ForEach(model.networks.networks) { n in
+                        let selected = n.id == model.networks.selectedID
+                        Button {
+                            if !selected { model.switchNetwork(n) }
+                            open = false
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: selected ? "checkmark.circle.fill" : "globe")
+                                    .foregroundStyle(selected ? Brand.success : .secondary)
+                                    .frame(width: 18)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(n.label).font(.callout.weight(selected ? .semibold : .regular))
+                                    Text(URL(string: n.rpc)?.host ?? n.rpc)
+                                        .font(.caption2.monospaced()).foregroundStyle(.tertiary).lineLimit(1)
+                                }
+                                Spacer()
+                            }
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                            .contentShape(Rectangle())
+                            .background(selected ? Brand.accent.opacity(0.10) : .clear)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(6)
+            }
+            .frame(maxHeight: 220)
+
+            Divider()
+
+            Button { open = false; model.section = .settings } label: {
+                Label("Manage networks…", systemImage: "gearshape")
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12).padding(.vertical, 9)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    @ViewBuilder private func Stat(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+            Text(value).font(.caption.weight(.semibold).monospacedDigit())
+        }
     }
 }
