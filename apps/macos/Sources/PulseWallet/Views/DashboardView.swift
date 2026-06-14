@@ -19,7 +19,7 @@ struct DashboardView: View {
         ScrollView {
             VStack(spacing: Metric.gutter) {
                 balanceHero
-                if controllingKey == nil && model.account != nil { watchOnlyBanner }
+                if model.account != nil { SetupHealthBanner() }
                 quickActions
                 if model.account != nil { resources }
                 holdings

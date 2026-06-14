@@ -33,6 +33,7 @@
 		87D9A358DFD66E49795200DD /* ToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4AC6D391E73F3C113B9068 /* ToolsView.swift */; };
 		89E3B60CDE9432BE91A99A8B /* YubiKeyPIV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD55C57997F0C2DBAF1EFF3 /* YubiKeyPIV.swift */; };
 		8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */; };
+		8CC02C699B718F8559E1BC6E /* AccountHealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4032B3283902766E647154A /* AccountHealth.swift */; };
 		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
 		9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988744519E80C7631A1550B1 /* KeysView.swift */; };
 		A19E4E71D3FB42A48CE6CDFD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */; };
@@ -91,9 +92,10 @@
 		EA718630DE93EEEAE5AB4CDC /* DataHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHex.swift; sourceTree = "<group>"; };
 		EAE1D7B9716513661393FD3A /* WelcomeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeSheet.swift; sourceTree = "<group>"; };
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
+		F4032B3283902766E647154A /* AccountHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHealth.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_D2EBBF54-0A95-4CAF-859A-06C8575F24A3" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_7A66B135-CA60-47B8-808D-E2C31F18CCD7" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -140,6 +142,7 @@
 		3C40CA16AB27649DE789ACC1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F4032B3283902766E647154A /* AccountHealth.swift */,
 				B1981660F714156CB20D4B81 /* ActivityView.swift */,
 				CD0E759D6B7D50CB345B1E32 /* ComingSoonView.swift */,
 				F4B1EEFEB2E72680C6C808D3 /* Components.swift */,
@@ -225,10 +228,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_D483E5F4-5428-44F7-AC98-F07354CFD90C" /* macos */ = {
+		"TEMP_64F1FDB6-670B-4461-BA01-9929368A7021" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_D2EBBF54-0A95-4CAF-859A-06C8575F24A3" /* Signing.xcconfig */,
+				"TEMP_7A66B135-CA60-47B8-808D-E2C31F18CCD7" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CC02C699B718F8559E1BC6E /* AccountHealth.swift in Sources */,
 				3CB49A1C6153E9B8B04535B0 /* ActivityView.swift in Sources */,
 				37676C6B52CE31F3877F22FD /* AppModel.swift in Sources */,
 				56F8B096E94C096D1B76B2D6 /* Biometrics.swift in Sources */,
@@ -424,7 +428,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_D2EBBF54-0A95-4CAF-859A-06C8575F24A3" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_7A66B135-CA60-47B8-808D-E2C31F18CCD7" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -522,7 +526,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_D2EBBF54-0A95-4CAF-859A-06C8575F24A3" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_7A66B135-CA60-47B8-808D-E2C31F18CCD7" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
