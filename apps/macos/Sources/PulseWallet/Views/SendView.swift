@@ -168,7 +168,8 @@ struct SignSheet: View {
             HStack {
                 Button("Cancel") { dismiss() }
                     .buttonStyle(.glass).controlSize(.large)
-                PrimaryButton(title: "Sign & Send", systemImage: "touchid") { sign() }
+                PrimaryButton(title: keyStore.activeKey?.kind == .yubiKey ? "Sign with YubiKey" : "Sign & Send",
+                              systemImage: keyStore.activeKey?.kind == .yubiKey ? "key.radiowaves.forward" : "touchid") { sign() }
             }
         case .sent(let txid):
             HStack {

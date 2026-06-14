@@ -9,6 +9,7 @@ struct KeysView: View {
     @State private var showUpdateAuth = false
     @State private var showRotate = false
     @State private var showYubiKey = false
+    @State private var showUnlock = false
     @State private var toLink: WalletKey?
     @State private var toDelete: WalletKey?
     @State private var errorMessage: String?
@@ -44,6 +45,7 @@ struct KeysView: View {
         .sheet(isPresented: $showUpdateAuth) { UpdateAuthSheet() }
         .sheet(isPresented: $showRotate) { RotateKeySheet() }
         .sheet(isPresented: $showYubiKey) { AddYubiKeySheet(error: $errorMessage) }
+        .sheet(isPresented: $showUnlock) { UnlockYubiKeySheet() }
         .sheet(item: $toLink) { key in LinkKeySheet(key: key) }
         .sheet(item: $toDelete) { key in DeleteKeySheet(key: key) }
         .onChange(of: model.requestImportKey) { _, want in
@@ -69,6 +71,10 @@ struct KeysView: View {
             }
             HStack(spacing: 12) {
                 glassBtn("Add YubiKey", "key.radiowaves.forward") { showYubiKey = true }
+                if store.keys.contains(where: { $0.kind == .yubiKey }) {
+                    glassBtn(store.sessionYubiPIN == nil ? "Unlock YubiKey" : "YubiKey unlocked ✓",
+                             store.sessionYubiPIN == nil ? "lock.open" : "checkmark.shield") { showUnlock = true }
+                }
             }
         }
     }
@@ -124,7 +130,14 @@ private struct KeyRow: View {
                         badge(key.isHardwareBacked ? "Secure Enclave" : "Imported",
                               tint: key.isHardwareBacked ? Brand.accent : Brand.glow)
                         badge(key.curve.rawValue.uppercased(), tint: .gray)
-                        if isActive { badge("Active", tint: Brand.success) }
+                        // "Signing key" = the wallet's selected key (not the @active permission).
+                        if isActive { badge("Signing key", tint: Brand.success) }
+                        // Whether this key is on the loaded account's permissions.
+                        if model.account != nil {
+                            let perms = model.permissions(forKey: key.pubKey)
+                            if perms.isEmpty { badge("Not linked", tint: Brand.warn) }
+                            else { badge("Linked · \(perms.joined(separator: "/"))", tint: Brand.accent) }
+                        }
                         if unreadable { badge("⚠ Re-import", tint: Brand.danger) }
                     }
                     if unreadable {
@@ -147,7 +160,7 @@ private struct KeyRow: View {
                 Spacer()
                 Menu {
                     Button("Copy public key") { copyPub() }
-                    if !isActive { Button("Set as active") { onUse() } }
+                    if !isActive { Button("Use for signing") { onUse() } }
                     Button("Link to account…") { onLink() }
                     if !key.isHardwareBacked {
                         Button("Export private key…") { showExport = true }

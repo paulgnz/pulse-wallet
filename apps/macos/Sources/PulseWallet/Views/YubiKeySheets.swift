@@ -74,6 +74,33 @@ struct AddYubiKeySheet: View {
     }
 }
 
+/// Enter the PIV PIN, cached in memory for the session so the YubiKey can sign.
+struct UnlockYubiKeySheet: View {
+    @Environment(KeyStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
+    @State private var pin = ""
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "lock.open").font(.system(size: 34)).foregroundStyle(Brand.brandGradient)
+            Text("Unlock YubiKey").font(.title2.weight(.semibold))
+            Text("Enter your PIV PIN. It's held in memory for this session so the YubiKey can sign — never written to disk.")
+                .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            SecureField("PIV PIN", text: $pin).pulseField(mono: true)
+            Spacer()
+            HStack {
+                Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
+                Spacer()
+                PrimaryButton(title: "Unlock", systemImage: "lock.open") {
+                    store.sessionYubiPIN = pin; dismiss()
+                }.frame(width: 150).disabled(pin.isEmpty)
+            }
+        }
+        .padding(24).frame(width: 420, height: 320)
+        .background(BrandBackground())
+    }
+}
+
 /// Link a key to an account permission: `updateauth` that ADDS this key to the
 /// permission (keeping its existing keys), signed by the current active key.
 struct LinkKeySheet: View {
