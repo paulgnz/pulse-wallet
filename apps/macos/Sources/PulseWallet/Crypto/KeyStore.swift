@@ -5,7 +5,7 @@ import Observation
 /// A managed wallet key. Private material lives in the Keychain / Secure Enclave;
 /// only this metadata is persisted in defaults.
 struct WalletKey: Identifiable, Codable, Hashable, Sendable {
-    enum Kind: String, Codable { case enclave, imported }
+    enum Kind: String, Codable { case enclave, imported, yubiKey }
     enum Curve: String, Codable { case r1, k1 }
     let id: String                 // UUID, also the Keychain account name
     var label: String
@@ -14,8 +14,19 @@ struct WalletKey: Identifiable, Codable, Hashable, Sendable {
     let pubCompressedHex: String   // 33-byte compressed key, hex
     var pubKey: String             // PUB_R1_… or PUB_K1_…
     let createdAt: Date
+    var pivSlot: UInt8? = nil       // PIV slot (0x9a/0x9c/…) for .yubiKey keys
 
-    var isHardwareBacked: Bool { kind == .enclave }
+    // Hardware-custodied (key material never in the app): Secure Enclave or YubiKey.
+    var isHardwareBacked: Bool { kind == .enclave || kind == .yubiKey }
+}
+
+enum KeyStoreError: LocalizedError {
+    case yubiPINRequired
+    var errorDescription: String? {
+        switch self {
+        case .yubiPINRequired: return "Enter your YubiKey PIV PIN (Keys → Unlock YubiKey) before signing."
+        }
+    }
 }
 
 /// Stores, lists, imports, and deletes wallet keys.
@@ -144,13 +155,50 @@ final class KeyStore {
     /// Sign a pre-image with the active key, returning a chain-acceptable
     /// signature (SIG_R1 for R1 keys, SIG_K1 for K1). Touch ID is prompted by the
     /// Enclave (R1 hardware) or the Keychain (imported keys).
+    /// Transient PIV PIN, cached for the session so the user enters it once.
+    /// Cleared on lock. Never persisted.
+    var sessionYubiPIN: String?
+    func clearYubiSession() { sessionYubiPIN = nil }
+
     func sign(preImage: Data, reason: String) async throws -> String {
         guard let key = activeKey else {
             throw PulseCoreError.badInput("No active key. Create or import one in Keys.")
         }
+        // YubiKey: sign on the device (PIV GENERAL AUTHENTICATE) using the cached
+        // session PIN; the (r,s) feeds the same SIG_R1 assembly as the Enclave path.
+        if key.kind == .yubiKey {
+            guard let slot = key.pivSlot else { throw PulseCoreError.badInput("YubiKey slot missing") }
+            guard let pin = sessionYubiPIN, !pin.isEmpty else { throw KeyStoreError.yubiPINRequired }
+            let digest = Data(SHA256.hash(data: preImage))
+            let rs = try await YubiKeyPIV.sign(digest: digest, slot: slot, pin: pin)
+            guard let pub = Data(hexString: key.pubCompressedHex) else {
+                throw PulseCoreError.badInput("bad stored pubkey")
+            }
+            return try core.assembleSigR1(rs: rs, digest: digest, compressedPublicKey: pub)
+        }
         // Touch ID is enforced when the secret is unsealed: Enclave signing keys via
         // their own access control; imported keys via the Secure Enclave wrap-key unwrap.
         return try await KeyStore.performSign(key: key, preImage: preImage, reason: reason)
+    }
+
+    /// Read a YubiKey slot's P-256 public key and add it as a watch/sign key.
+    /// Link it to an account afterwards with `updateauth` (see Keys → Link key).
+    @discardableResult
+    func addYubiKey(slot: UInt8, label: String) async throws -> WalletKey {
+        let pub = try await YubiKeyPIV.publicKey(slot: slot)
+        let hex = pub.hexString
+        if keys.contains(where: { $0.pubCompressedHex == hex }) {
+            throw PulseCoreError.badInput("This key is already in the wallet.")
+        }
+        let key = WalletKey(id: UUID().uuidString,
+                            label: label.isEmpty ? "YubiKey \(String(format: "%02x", slot))" : label,
+                            kind: .yubiKey, curve: .r1, pubCompressedHex: hex,
+                            pubKey: core.encodePubR1(compressedPublicKey: pub),
+                            createdAt: Date(), pivSlot: slot)
+        keys.append(key)
+        persist()
+        if activeKeyID == nil { activeKeyID = key.id }
+        return key
     }
 
     nonisolated static func performSign(key: WalletKey, preImage: Data, reason: String) async throws -> String {
@@ -177,6 +225,9 @@ final class KeyStore {
             case (.imported, .k1):
                 let raw = try SecretVault.loadSecret(key.id, reason: reason)
                 return try core.signK1(privateKey: raw, digest: digest)
+            case (.yubiKey, _):
+                // Handled in `sign(preImage:reason:)` (needs PIN + async CTK).
+                throw PulseCoreError.badInput("YubiKey signing is handled separately")
             }
         }.value
     }

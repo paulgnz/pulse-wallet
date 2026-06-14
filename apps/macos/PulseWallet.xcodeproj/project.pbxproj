@@ -31,6 +31,7 @@
 		794C9830B53D13932ABD05A1 /* PulseWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78440EE6283769BDF3E38093 /* PulseWalletApp.swift */; };
 		7DC8A70C3F20BC28F2AC8D2C /* DappRequestSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */; };
 		87D9A358DFD66E49795200DD /* ToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4AC6D391E73F3C113B9068 /* ToolsView.swift */; };
+		89E3B60CDE9432BE91A99A8B /* YubiKeyPIV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD55C57997F0C2DBAF1EFF3 /* YubiKeyPIV.swift */; };
 		8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */; };
 		9DB85C35FB2ED23C8B7DEF1B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0698D056BD05A32CE1905F8C /* DashboardView.swift */; };
 		9E1B713C38DB60B85F77C02A /* KeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988744519E80C7631A1550B1 /* KeysView.swift */; };
@@ -61,6 +62,7 @@
 		358D798ACC8AEEA39E0D9A99 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		37A106B02E0B4966774E12E5 /* PulseRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseRPC.swift; sourceTree = "<group>"; };
 		3D662578D2653106B2A91782 /* RotateKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotateKeySheet.swift; sourceTree = "<group>"; };
+		3FD55C57997F0C2DBAF1EFF3 /* YubiKeyPIV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKeyPIV.swift; sourceTree = "<group>"; };
 		49214E8F320C187EFF00C1BA /* ExportKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeySheet.swift; sourceTree = "<group>"; };
 		50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseCoreFFI.swift; sourceTree = "<group>"; };
 		5683B2975215EE839C7D7028 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -89,7 +91,7 @@
 		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_56BC9F8E-C9A1-4CC4-90AF-0E515B0E598C" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -179,6 +181,7 @@
 				57F9C43E9860AAD1D468DC9C /* PulseCore.swift */,
 				50F592554AE9898BC76768B5 /* PulseCoreFFI.swift */,
 				9B941C54EA34099878D2A0A3 /* SecretVault.swift */,
+				3FD55C57997F0C2DBAF1EFF3 /* YubiKeyPIV.swift */,
 			);
 			path = Crypto;
 			sourceTree = "<group>";
@@ -219,10 +222,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_B0FB38B8-7086-4FF1-8233-6FEE42A8C501" /* macos */ = {
+		"TEMP_C5429178-C8EE-456F-8FB4-3C485483B0B8" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_56BC9F8E-C9A1-4CC4-90AF-0E515B0E598C" /* Signing.xcconfig */,
+				"TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -336,6 +339,7 @@
 				57E93E5155AC480F95D08259 /* UpdateAuthSheet.swift in Sources */,
 				AB530338B4CD02518EB0DEF8 /* WalletError.swift in Sources */,
 				B02FE8BFF708DAA3B089A101 /* WelcomeSheet.swift in Sources */,
+				89E3B60CDE9432BE91A99A8B /* YubiKeyPIV.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,7 +420,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_56BC9F8E-C9A1-4CC4-90AF-0E515B0E598C" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -514,7 +518,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_56BC9F8E-C9A1-4CC4-90AF-0E515B0E598C" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_A898994C-4CE7-4D7D-B430-59658610E04D" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
