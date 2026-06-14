@@ -206,6 +206,7 @@ struct LinkKeySheet: View {
                 guard let preImage = Data(hexString: tx.preimage) else { status = "bad preimage"; working = false; return }
                 let sig = try await keyStore.sign(preImage: preImage, reason: "Link key to \(me)@\(permission)")
                 _ = try await model.broadcast(signatures: [sig], packedTrx: tx.packed)
+                await model.refresh()   // reload on-chain perms so the linked badge updates
                 status = model.networkPaused
                     ? "Submitted ✓ — queued. The chain is paused, so it applies once validators resume."
                     : "Submitted ✓ — \(key.pubKey.prefix(16))… added to \(me)@\(permission)."
