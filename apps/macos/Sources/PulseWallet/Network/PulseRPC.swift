@@ -15,12 +15,26 @@ struct ChainInfo: Decodable, Sendable {
 
 struct ResLimit: Decodable, Sendable {
     let used: Int64
-    let available: String   // chain returns these as strings
-    let max: String
+    let available: Int64
+    let max: Int64
+
+    // Older PulseVM (A-Chain) returned these as strings; newer (v5.0.3) returns
+    // numbers. Accept either so the wallet decodes both.
+    enum CodingKeys: String, CodingKey { case used, available, max }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        used = ResLimit.flexInt(c, .used)
+        available = ResLimit.flexInt(c, .available)
+        max = ResLimit.flexInt(c, .max)
+    }
+    private static func flexInt(_ c: KeyedDecodingContainer<CodingKeys>, _ k: CodingKeys) -> Int64 {
+        if let i = try? c.decode(Int64.self, forKey: k) { return i }
+        if let s = try? c.decode(String.self, forKey: k), let i = Int64(s) { return i }
+        return 0
+    }
 
     var usedFraction: Double {
-        guard let m = Double(max), m > 0 else { return 0 }
-        return min(1, Double(used) / m)
+        max > 0 ? min(1, Double(used) / Double(max)) : 0
     }
 }
 
