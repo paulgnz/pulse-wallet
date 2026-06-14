@@ -45,9 +45,14 @@ final class NetworkStore {
             loaded = NetworkStore.seed
         }
         var nets = loaded
-        // Migration: ensure the XPR Network Pulse Testnet is always present (so
-        // existing installs get it without re-seeding), keyed by its chain id.
-        if !nets.contains(where: { $0.chainId == NetworkStore.pulseTestnet.chainId }) {
+        // Migration: ensure the XPR Network Pulse Testnet is present AND its
+        // endpoints are refreshed to the latest (existing installs get the new
+        // rpc-testnet.pulsevm.dev / explorer URLs), keyed by its chain id.
+        if let i = nets.firstIndex(where: { $0.chainId == NetworkStore.pulseTestnet.chainId }) {
+            nets[i].rpc = NetworkStore.pulseTestnet.rpc
+            nets[i].explorer = NetworkStore.pulseTestnet.explorer
+            nets[i].hyperion = NetworkStore.pulseTestnet.hyperion
+        } else {
             nets.append(NetworkStore.pulseTestnet)
         }
         self.networks = nets
@@ -64,9 +69,9 @@ final class NetworkStore {
     static let pulseTestnet = PulseNetwork(
         id: UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!,
         label: "XPR Network Pulse Testnet",
-        rpc: "https://5.78.114.28.sslip.io",
+        rpc: "https://rpc-testnet.pulsevm.dev",
         hyperion: "",
-        explorer: "https://pulse-explorer.vercel.app",
+        explorer: "https://testnet.explorer.pulsevm.dev",
         chainId: "47e1b7605ad091d456bc33161ec5e52f11bb9ba9fadc6aec914e70a20c0f2821",
         primarySymbol: "XPR")
 

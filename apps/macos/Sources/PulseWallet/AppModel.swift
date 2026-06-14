@@ -158,7 +158,9 @@ final class AppModel {
     /// The network is paused if the head block hasn't advanced recently.
     var networkPaused: Bool {
         guard let t = chainInfo?.headBlockTime, let d = Self.parseChainTime(t) else { return false }
-        return Date().timeIntervalSince(d) > 120
+        // Single-node testnets only mint blocks on activity (heartbeat ~15s); allow
+        // generous margin so brief idle gaps don't read as "paused".
+        return Date().timeIntervalSince(d) > 300
     }
 
     // MARK: Actions
