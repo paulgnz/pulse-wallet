@@ -119,7 +119,7 @@ struct NetworkPill: View {
                 Text(n.formatted()).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 2).padding(.horizontal, 4)
+        .padding(.vertical, 2).padding(.horizontal, 12)
         .fixedSize()
         // The .principal toolbar item already provides a glass capsule on Tahoe —
         // don't add a second one here, or it renders as a pill-inside-a-pill.
