@@ -45,8 +45,13 @@ secp256k1-only chains can't do this natively.
 | `core/` | **Rust** (`pulse-wallet-core`) | Canonical key/sig encoding (SIG_R1/SIG_K1), tx serialization + signing digest — validated byte-for-byte vs pulsevm-js. Exposed to Swift via a C ABI. |
 | `apps/macos/` | **Swift / SwiftUI** (macOS 26) | UI + Secure Enclave / YubiKey signing. Built with [XcodeGen](https://github.com/yonaskolb/XcodeGen). |
 
-Keys are recoverable-by-design: PulseVM recovers the pubkey from the signature, so the core
-derives the recovery id for Enclave/YubiKey ECDSA.
+**On signatures (not private keys):** PulseVM verifies a transaction by **recovering the
+signer's _public_ key from the _signature_** (ECDSA public-key recovery) and matching it to the
+account's permission. So each signature must carry a recovery id — which the core derives for
+Secure Enclave / YubiKey ECDSA (their hardware doesn't emit one). **Private keys are never
+extractable or recoverable.** If a hardware key is lost, you don't "recover" it — you rotate the
+account to a new key (`updateauth`). That's PulseVM's account model: a lost key is a rotation,
+not a lost account.
 
 ## Build
 
