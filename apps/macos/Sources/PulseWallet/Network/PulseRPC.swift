@@ -25,7 +25,23 @@ struct ResLimit: Decodable, Sendable {
 }
 
 struct AuthKey: Decodable, Sendable { let key: String; let weight: Int }
-struct RequiredAuth: Decodable, Sendable { let threshold: Int; let keys: [AuthKey] }
+struct AuthLevel: Decodable, Sendable { let actor: String; let permission: String }
+struct AuthAccount: Decodable, Sendable { let permission: AuthLevel; let weight: Int }
+struct AuthWait: Decodable, Sendable { let waitSec: Int; let weight: Int }
+struct RequiredAuth: Decodable, Sendable {
+    let threshold: Int
+    let keys: [AuthKey]
+    let accounts: [AuthAccount]
+    let waits: [AuthWait]
+    enum CodingKeys: String, CodingKey { case threshold, keys, accounts, waits }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        threshold = try c.decode(Int.self, forKey: .threshold)
+        keys = try c.decodeIfPresent([AuthKey].self, forKey: .keys) ?? []
+        accounts = try c.decodeIfPresent([AuthAccount].self, forKey: .accounts) ?? []
+        waits = try c.decodeIfPresent([AuthWait].self, forKey: .waits) ?? []
+    }
+}
 struct Permission: Decodable, Sendable {
     let permName: String
     let parent: String

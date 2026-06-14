@@ -329,8 +329,8 @@ struct EditablePermission: Identifiable {
         parent = p.parent
         threshold = String(p.requiredAuth.threshold)
         keys = p.requiredAuth.keys.map { Pair(a: $0.key, b: String($0.weight)) }
-        accounts = []
-        waits = []
+        accounts = p.requiredAuth.accounts.map { Triple(a: $0.permission.actor, b: $0.permission.permission, c: String($0.weight)) }
+        waits = p.requiredAuth.waits.map { Pair(a: String($0.waitSec), b: String($0.weight)) }
         isNew = false
         originalName = p.permName
     }
