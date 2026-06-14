@@ -1,5 +1,7 @@
 import Foundation
 import CryptoTokenKit
+import CommonCrypto
+import Security
 
 /// Talks to a YubiKey's PIV applet over CryptoTokenKit (raw APDUs) to read a
 /// slot's P-256 public key and sign a digest with it. P-256 == secp256r1 == R1,
@@ -92,6 +94,57 @@ enum YubiKeyPIV {
             }
             return try derToRS(der)
         }
+    }
+
+    /// Generate a fresh P-256 (R1) key IN the slot (overwrites it) and return the
+    /// compressed public key. Requires PIV management-key auth (default 3DES key).
+    /// No ykman / Terminal needed.
+    static func generateKey(slot: UInt8) async throws -> Data {
+        try await withCard { card in
+            try await authenticateManagementKey(card)
+            // GENERATE ASYMMETRIC: 00 47 00 <slot>, data = AC 03 80 01 11 (alg 0x11 = ECCP256)
+            let resp = try await transmit(card, apdu: [0x00, 0x47, 0x00, slot, 0x05, 0xAC, 0x03, 0x80, 0x01, 0x11])
+            guard let point = findP256Point(resp) else { throw PIVError.parse("no public key in generate response") }
+            return compress(point)
+        }
+    }
+
+    /// PIV mutual authentication with the default 3DES management key.
+    private static func authenticateManagementKey(_ card: TKSmartCard) async throws {
+        let mgmt = Data([0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
+                         0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
+                         0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08])
+        // 1) Request the card's (encrypted) witness.
+        let r1 = try await transmit(card, apdu: [0x00, 0x87, 0x03, 0x9B, 0x04, 0x7C, 0x02, 0x80, 0x00])
+        guard let t1 = tlvValue(0x7C, in: r1), let witness = tlvValue(0x80, in: t1), witness.count == 8 else {
+            throw PIVError.parse("bad management witness")
+        }
+        // 2) Decrypt the witness; 3) send it back with our own challenge.
+        let decrypted = try tdesECB(mgmt, witness, encrypt: false)
+        var challenge = Data(count: 8)
+        _ = challenge.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 8, $0.baseAddress!) }
+        var data: [UInt8] = [0x7C, 0x14, 0x80, 0x08]
+        data.append(contentsOf: decrypted)
+        data.append(contentsOf: [0x81, 0x08])
+        data.append(contentsOf: challenge)
+        let r2 = try await transmit(card, apdu: [0x00, 0x87, 0x03, 0x9B] + lc(data) + data + [0x00], expectOK: false)
+        guard sw(r2) == 0x9000 else {
+            throw PIVError.parse("Management-key auth failed (SW=\(String(format: "%04X", sw(r2)))). In-app generation needs the default PIV management key; if you changed it, provision via ykman instead.")
+        }
+    }
+
+    /// 3DES (TDES) ECB single-block transform with a 24-byte key.
+    private static func tdesECB(_ key: Data, _ data: Data, encrypt: Bool) throws -> Data {
+        let outLen = data.count + kCCBlockSize3DES
+        var out = Data(count: outLen)
+        var moved = 0
+        let status = out.withUnsafeMutableBytes { o in key.withUnsafeBytes { k in data.withUnsafeBytes { d in
+            CCCrypt(CCOperation(encrypt ? kCCEncrypt : kCCDecrypt), CCAlgorithm(kCCAlgorithm3DES),
+                    CCOptions(kCCOptionECBMode), k.baseAddress, key.count, nil,
+                    d.baseAddress, data.count, o.baseAddress, outLen, &moved)
+        }}}
+        guard status == Int32(kCCSuccess) else { throw PIVError.parse("3DES error") }
+        return out.prefix(moved)
     }
 
     // MARK: APDU plumbing

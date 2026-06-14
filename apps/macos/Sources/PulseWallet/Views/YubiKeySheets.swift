@@ -10,6 +10,7 @@ struct AddYubiKeySheet: View {
     @State private var slot: UInt8 = 0x9a
     @State private var label = ""
     @State private var pin = ""
+    @State private var generate = false
     @State private var working = false
     @State private var localError: String?
 
@@ -34,6 +35,14 @@ struct AddYubiKeySheet: View {
                     ForEach(YubiKeyPIV.slots, id: \.0) { Text($0.1).tag($0.0) }
                 }.labelsHidden().pickerStyle(.menu)
             }
+            Toggle(isOn: $generate) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Generate a new key in this slot").font(.callout)
+                    Text(generate ? "⚠︎ Overwrites any existing key in the slot. Uses the default PIV management key."
+                                  : "Off = read the key already in the slot.")
+                        .font(.caption2).foregroundStyle(generate ? Brand.warn : .secondary)
+                }
+            }
             labeled("Label") { TextField("YubiKey", text: $label).pulseField() }
             labeled("PIV PIN (optional — caches it for signing this session)") {
                 SecureField("PIN", text: $pin).pulseField(mono: true)
@@ -43,8 +52,9 @@ struct AddYubiKeySheet: View {
             HStack {
                 Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
                 Spacer()
-                PrimaryButton(title: working ? "Reading…" : "Add", systemImage: "plus") { add() }
-                    .frame(width: 150).disabled(working || !present)
+                PrimaryButton(title: working ? (generate ? "Generating…" : "Reading…") : (generate ? "Generate & Add" : "Add"),
+                              systemImage: generate ? "sparkles" : "plus") { add() }
+                    .frame(width: 180).disabled(working || !present)
             }
         }
         .padding(24).frame(width: 460, height: 470)
@@ -62,7 +72,7 @@ struct AddYubiKeySheet: View {
         working = true; localError = nil; error = nil
         Task {
             do {
-                try await store.addYubiKey(slot: slot, label: label)
+                try await store.addYubiKey(slot: slot, label: label, generate: generate)
                 if !pin.isEmpty { store.sessionYubiPIN = pin }
                 working = false
                 dismiss()

@@ -184,8 +184,10 @@ final class KeyStore {
     /// Read a YubiKey slot's P-256 public key and add it as a watch/sign key.
     /// Link it to an account afterwards with `updateauth` (see Keys → Link key).
     @discardableResult
-    func addYubiKey(slot: UInt8, label: String) async throws -> WalletKey {
-        let pub = try await YubiKeyPIV.publicKey(slot: slot)
+    func addYubiKey(slot: UInt8, label: String, generate: Bool = false) async throws -> WalletKey {
+        // generate = create a fresh key in the slot (no ykman); else read the existing one.
+        let pub = generate ? try await YubiKeyPIV.generateKey(slot: slot)
+                           : try await YubiKeyPIV.publicKey(slot: slot)
         let hex = pub.hexString
         if keys.contains(where: { $0.pubCompressedHex == hex }) {
             throw PulseCoreError.badInput("This key is already in the wallet.")
