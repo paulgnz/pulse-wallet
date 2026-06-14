@@ -193,6 +193,47 @@ struct PulseCoreFFI: PulseCore {
         return try parse(out, n, "buildUpdateAuth")
     }
 
+    func buildUpdateAuthFull(systemContract: String, account: String, permission: String,
+                             parent: String, threshold: UInt32, keys: String, accounts: String, waits: String,
+                             authActor: String, authPerm: String, chainId: String,
+                             refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 16384)
+        let n = pwc_build_updateauth_full(systemContract, account, permission, parent, threshold,
+                                          keys, accounts, waits, authActor, authPerm, chainId,
+                                          refBlockNum, refBlockPrefix, expiration, &out, out.count)
+        return try parse(out, n, "buildUpdateAuthFull")
+    }
+
+    func buildLinkAuth(systemContract: String, account: String, code: String, type: String,
+                       requirement: String, authActor: String, authPerm: String, chainId: String,
+                       refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 8192)
+        let n = pwc_build_linkauth(systemContract, account, code, type, requirement,
+                                   authActor, authPerm, chainId, refBlockNum, refBlockPrefix,
+                                   expiration, &out, out.count)
+        return try parse(out, n, "buildLinkAuth")
+    }
+
+    func buildUnlinkAuth(systemContract: String, account: String, code: String, type: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 8192)
+        let n = pwc_build_unlinkauth(systemContract, account, code, type,
+                                     authActor, authPerm, chainId, refBlockNum, refBlockPrefix,
+                                     expiration, &out, out.count)
+        return try parse(out, n, "buildUnlinkAuth")
+    }
+
+    func buildDeleteAuth(systemContract: String, account: String, permission: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        var out = [CChar](repeating: 0, count: 8192)
+        let n = pwc_build_deleteauth(systemContract, account, permission,
+                                     authActor, authPerm, chainId, refBlockNum, refBlockPrefix,
+                                     expiration, &out, out.count)
+        return try parse(out, n, "buildDeleteAuth")
+    }
+
     func decodeTransaction(packedTrx: String) -> DecodedTx? {
         var out = [CChar](repeating: 0, count: 16384)
         let n = pwc_decode_transaction(packedTrx, &out, out.count)

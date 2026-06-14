@@ -8,8 +8,9 @@
 use crate::tx::{
     build_action_signing, build_msig_propose_transfer_signing, build_msig_signing,
     build_transfer_signing, build_updateauth_signing, decode_transaction, delegatebw_data,
-    msig_approve_data, msig_exec_data, parse_key_weights, parse_perm_levels, refund_data,
-    signing_material_hex, undelegatebw_data, PermLevel, TransferParams,
+    deleteauth_data, linkauth_data, msig_approve_data, msig_exec_data, parse_account_weights,
+    parse_key_weights, parse_perm_levels, parse_wait_weights, refund_data, signing_material_hex,
+    undelegatebw_data, unlinkauth_data, updateauth_full_data, PermLevel, TransferParams,
 };
 use crate::{
     assemble_sig_r1, decode_pvt_k1, decode_pvt_r1, encode_pub_k1, encode_pub_r1, encode_pvt_k1,
@@ -359,6 +360,102 @@ pub unsafe extern "C" fn pwc_build_updateauth(
     let kws = parse_key_weights(keys);
     emit_tx(build_updateauth_signing(
         sys, account, permission, parent, threshold, &kws,
+        PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// updateauth with a FULL authority: keys "PUB@w;…", accounts "actor@perm@w;…",
+/// waits "sec@w;…". Any of the three may be empty. Signed by `auth_actor`@`auth_perm`.
+/// # Safety: string pointers NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_updateauth_full(
+    system_contract: *const c_char, account: *const c_char, permission: *const c_char,
+    parent: *const c_char, threshold: u32,
+    keys: *const c_char, accounts: *const c_char, waits: *const c_char,
+    auth_actor: *const c_char, auth_perm: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(system_contract), cstr(account), cstr(permission), cstr(parent),
+             cstr(auth_actor), cstr(auth_perm), cstr(chain_id_hex));
+    let (sys, account, permission, parent, aa, ap, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(g), Some(h), Some(i)) => (a, b, c, d, g, h, i),
+        _ => return -1,
+    };
+    let kws = parse_key_weights(cstr(keys).unwrap_or(""));
+    let accs = parse_account_weights(cstr(accounts).unwrap_or(""));
+    let wts = parse_wait_weights(cstr(waits).unwrap_or(""));
+    let data = match updateauth_full_data(account, permission, parent, threshold, &kws, &accs, &wts) {
+        Ok(d) => d, Err(_) => return -1,
+    };
+    emit_tx(build_action_signing(sys, "updateauth", data,
+        PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// linkauth: bind `account`'s `requirement` permission to `code`::`type` (action).
+/// Empty `type` links all actions of `code`. Signed by `auth_actor`@`auth_perm`.
+/// # Safety: string pointers NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_linkauth(
+    system_contract: *const c_char, account: *const c_char, code: *const c_char,
+    type_: *const c_char, requirement: *const c_char,
+    auth_actor: *const c_char, auth_perm: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(system_contract), cstr(account), cstr(code), cstr(type_), cstr(requirement),
+             cstr(auth_actor), cstr(auth_perm), cstr(chain_id_hex));
+    let (sys, account, code, ty, req, aa, ap, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(e), Some(g), Some(h), Some(i)) =>
+            (a, b, c, d, e, g, h, i),
+        _ => return -1,
+    };
+    let data = linkauth_data(account, code, ty, req);
+    emit_tx(build_action_signing(sys, "linkauth", data,
+        PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// unlinkauth: remove the link binding `code`::`type` for `account`.
+/// # Safety: string pointers NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_unlinkauth(
+    system_contract: *const c_char, account: *const c_char, code: *const c_char,
+    type_: *const c_char,
+    auth_actor: *const c_char, auth_perm: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(system_contract), cstr(account), cstr(code), cstr(type_),
+             cstr(auth_actor), cstr(auth_perm), cstr(chain_id_hex));
+    let (sys, account, code, ty, aa, ap, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(d), Some(g), Some(h), Some(i)) => (a, b, c, d, g, h, i),
+        _ => return -1,
+    };
+    let data = unlinkauth_data(account, code, ty);
+    emit_tx(build_action_signing(sys, "unlinkauth", data,
+        PermLevel { actor: aa.to_string(), permission: ap.to_string() },
+        cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
+}
+
+/// deleteauth: remove `permission` from `account`. Signed by `auth_actor`@`auth_perm`.
+/// # Safety: string pointers NUL-terminated; `out` has `out_len` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn pwc_build_deleteauth(
+    system_contract: *const c_char, account: *const c_char, permission: *const c_char,
+    auth_actor: *const c_char, auth_perm: *const c_char, chain_id_hex: *const c_char,
+    ref_block_num: u16, ref_block_prefix: u32, expiration: u32,
+    out: *mut c_char, out_len: usize,
+) -> c_int {
+    let f = (cstr(system_contract), cstr(account), cstr(permission),
+             cstr(auth_actor), cstr(auth_perm), cstr(chain_id_hex));
+    let (sys, account, permission, aa, ap, cid) = match f {
+        (Some(a), Some(b), Some(c), Some(g), Some(h), Some(i)) => (a, b, c, g, h, i),
+        _ => return -1,
+    };
+    let data = deleteauth_data(account, permission);
+    emit_tx(build_action_signing(sys, "deleteauth", data,
         PermLevel { actor: aa.to_string(), permission: ap.to_string() },
         cid, ref_block_num, ref_block_prefix, expiration), out, out_len)
 }

@@ -74,6 +74,28 @@ protocol PulseCore {
                          parent: String, threshold: UInt32, keys: String,
                          authActor: String, authPerm: String, chainId: String,
                          refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
+
+    /// updateauth with a full authority: keys "PUB@w;…", accounts "actor@perm@w;…", waits "sec@w;…".
+    func buildUpdateAuthFull(systemContract: String, account: String, permission: String,
+                             parent: String, threshold: UInt32,
+                             keys: String, accounts: String, waits: String,
+                             authActor: String, authPerm: String, chainId: String,
+                             refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
+
+    /// linkauth: bind `account`'s `requirement` permission to `code`::`type` (empty type = all actions).
+    func buildLinkAuth(systemContract: String, account: String, code: String, type: String,
+                       requirement: String, authActor: String, authPerm: String, chainId: String,
+                       refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
+
+    /// unlinkauth: remove the link binding `code`::`type` for `account`.
+    func buildUnlinkAuth(systemContract: String, account: String, code: String, type: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
+
+    /// deleteauth: remove `permission` from `account`.
+    func buildDeleteAuth(systemContract: String, account: String, permission: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx
 }
 
 /// Serialized transaction + its signing material (all hex).
@@ -178,5 +200,26 @@ struct PulseCoreStub: PulseCore {
                          authActor: String, authPerm: String, chainId: String,
                          refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
         throw PulseCoreError.notImplemented("buildUpdateAuth")
+    }
+    func buildUpdateAuthFull(systemContract: String, account: String, permission: String,
+                             parent: String, threshold: UInt32, keys: String, accounts: String, waits: String,
+                             authActor: String, authPerm: String, chainId: String,
+                             refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("buildUpdateAuthFull")
+    }
+    func buildLinkAuth(systemContract: String, account: String, code: String, type: String,
+                       requirement: String, authActor: String, authPerm: String, chainId: String,
+                       refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("buildLinkAuth")
+    }
+    func buildUnlinkAuth(systemContract: String, account: String, code: String, type: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("buildUnlinkAuth")
+    }
+    func buildDeleteAuth(systemContract: String, account: String, permission: String,
+                         authActor: String, authPerm: String, chainId: String,
+                         refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32) throws -> BuiltTx {
+        throw PulseCoreError.notImplemented("buildDeleteAuth")
     }
 }

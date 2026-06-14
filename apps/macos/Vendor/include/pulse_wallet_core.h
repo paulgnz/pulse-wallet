@@ -53,6 +53,34 @@ int pwc_build_updateauth(const char *system_contract, const char *account, const
                          uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
                          char *out, size_t out_len);
 
+// updateauth with a FULL authority: keys "PUB@w;…", accounts "actor@perm@w;…", waits "sec@w;…".
+int pwc_build_updateauth_full(const char *system_contract, const char *account, const char *permission,
+                              const char *parent, uint32_t threshold,
+                              const char *keys, const char *accounts, const char *waits,
+                              const char *auth_actor, const char *auth_perm, const char *chain_id_hex,
+                              uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                              char *out, size_t out_len);
+
+// linkauth: bind `account`'s `requirement` permission to `code`::`type`. Empty type = all actions.
+int pwc_build_linkauth(const char *system_contract, const char *account, const char *code,
+                       const char *type, const char *requirement,
+                       const char *auth_actor, const char *auth_perm, const char *chain_id_hex,
+                       uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                       char *out, size_t out_len);
+
+// unlinkauth: remove the link binding `code`::`type` for `account`.
+int pwc_build_unlinkauth(const char *system_contract, const char *account, const char *code,
+                         const char *type,
+                         const char *auth_actor, const char *auth_perm, const char *chain_id_hex,
+                         uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                         char *out, size_t out_len);
+
+// deleteauth: remove `permission` from `account`.
+int pwc_build_deleteauth(const char *system_contract, const char *account, const char *permission,
+                         const char *auth_actor, const char *auth_perm, const char *chain_id_hex,
+                         uint16_t ref_block_num, uint32_t ref_block_prefix, uint32_t expiration,
+                         char *out, size_t out_len);
+
 // Resources (pulse system contract). Each writes "<packed>\n<preimage>\n<digest>".
 int pwc_build_stake(const char *contract, const char *from, const char *receiver,
                     const char *net_qty, const char *cpu_qty, uint8_t transfer,

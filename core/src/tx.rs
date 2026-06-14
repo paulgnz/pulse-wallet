@@ -523,6 +523,135 @@ pub fn build_updateauth_signing(
     Ok((packed, preimage, digest))
 }
 
+// === Full authority (keys + accounts + waits) + link/unlink/delete auth =====
+
+pub struct AccountWeight {
+    pub actor: String,
+    pub permission: String,
+    pub weight: u16,
+}
+
+pub struct WaitWeight {
+    pub wait_sec: u32,
+    pub weight: u16,
+}
+
+/// Parse "actor@perm@weight;actor2@perm2" — permission defaults to "active", weight to 1.
+pub fn parse_account_weights(s: &str) -> Vec<AccountWeight> {
+    s.split(';')
+        .map(|p| p.trim())
+        .filter(|p| !p.is_empty())
+        .map(|p| {
+            let mut it = p.split('@');
+            let actor = it.next().unwrap_or("").trim().to_string();
+            let permission = it.next().map(|x| x.trim()).filter(|x| !x.is_empty())
+                .unwrap_or("active").to_string();
+            let weight = it.next().and_then(|w| w.trim().parse().ok()).unwrap_or(1);
+            AccountWeight { actor, permission, weight }
+        })
+        .collect()
+}
+
+/// Parse "seconds@weight;seconds2@weight2" — weight defaults to 1.
+pub fn parse_wait_weights(s: &str) -> Vec<WaitWeight> {
+    s.split(';')
+        .map(|p| p.trim())
+        .filter(|p| !p.is_empty())
+        .map(|p| {
+            let mut it = p.splitn(2, '@');
+            let wait_sec = it.next().and_then(|w| w.trim().parse().ok()).unwrap_or(0);
+            let weight = it.next().and_then(|w| w.trim().parse().ok()).unwrap_or(1);
+            WaitWeight { wait_sec, weight }
+        })
+        .collect()
+}
+
+/// Full authority { threshold, keys[], accounts[], waits[] } with canonical ordering
+/// (keys by binary form, accounts by (actor, permission), waits by wait_sec) — Antelope
+/// requires sorted, unique entries or the authority is rejected.
+fn serialize_authority_full(
+    threshold: u32,
+    keys: &[KeyWeight],
+    accounts: &[AccountWeight],
+    waits: &[WaitWeight],
+    out: &mut Vec<u8>,
+) -> Result<(), String> {
+    out.extend_from_slice(&threshold.to_le_bytes());
+
+    let mut ekeys: Vec<(Vec<u8>, u16)> = Vec::with_capacity(keys.len());
+    for kw in keys {
+        ekeys.push((pub_to_binary(&kw.key)?, kw.weight));
+    }
+    ekeys.sort_by(|a, b| a.0.cmp(&b.0));
+    write_varuint32(ekeys.len() as u32, out);
+    for (bin, weight) in &ekeys {
+        out.extend_from_slice(bin);
+        out.extend_from_slice(&weight.to_le_bytes());
+    }
+
+    let mut eacc: Vec<(u64, u64, u16)> = accounts
+        .iter()
+        .map(|a| (name_to_u64(&a.actor), name_to_u64(&a.permission), a.weight))
+        .collect();
+    eacc.sort_by(|a, b| (a.0, a.1).cmp(&(b.0, b.1)));
+    write_varuint32(eacc.len() as u32, out);
+    for (actor, perm, weight) in &eacc {
+        out.extend_from_slice(&actor.to_le_bytes());
+        out.extend_from_slice(&perm.to_le_bytes());
+        out.extend_from_slice(&weight.to_le_bytes());
+    }
+
+    let mut ewaits: Vec<(u32, u16)> = waits.iter().map(|w| (w.wait_sec, w.weight)).collect();
+    ewaits.sort_by(|a, b| a.0.cmp(&b.0));
+    write_varuint32(ewaits.len() as u32, out);
+    for (sec, weight) in &ewaits {
+        out.extend_from_slice(&sec.to_le_bytes());
+        out.extend_from_slice(&weight.to_le_bytes());
+    }
+    Ok(())
+}
+
+/// updateauth action data with a full authority (keys + accounts + waits).
+#[allow(clippy::too_many_arguments)]
+pub fn updateauth_full_data(
+    account: &str, permission: &str, parent: &str, threshold: u32,
+    keys: &[KeyWeight], accounts: &[AccountWeight], waits: &[WaitWeight],
+) -> Result<Vec<u8>, String> {
+    let mut d = Vec::new();
+    write_name(account, &mut d);
+    write_name(permission, &mut d);
+    write_name(parent, &mut d);
+    serialize_authority_full(threshold, keys, accounts, waits, &mut d)?;
+    Ok(d)
+}
+
+/// linkauth { account, code, type, requirement } — bind a permission to contract::action.
+pub fn linkauth_data(account: &str, code: &str, type_: &str, requirement: &str) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(account, &mut d);
+    write_name(code, &mut d);
+    write_name(type_, &mut d);
+    write_name(requirement, &mut d);
+    d
+}
+
+/// unlinkauth { account, code, type }.
+pub fn unlinkauth_data(account: &str, code: &str, type_: &str) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(account, &mut d);
+    write_name(code, &mut d);
+    write_name(type_, &mut d);
+    d
+}
+
+/// deleteauth { account, permission }.
+pub fn deleteauth_data(account: &str, permission: &str) -> Vec<u8> {
+    let mut d = Vec::new();
+    write_name(account, &mut d);
+    write_name(permission, &mut d);
+    d
+}
+
 /// Build + sign-material to propose a single transfer via pulse.msig.
 #[allow(clippy::too_many_arguments)]
 pub fn build_msig_propose_transfer_signing(
