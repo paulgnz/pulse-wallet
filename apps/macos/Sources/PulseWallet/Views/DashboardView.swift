@@ -118,10 +118,12 @@ struct DashboardView: View {
                 }
                 GlassCard(padding: 16) {
                     VStack(spacing: 14) {
-                        ResourceBar(label: "CPU", fraction: a.cpuLimit.usedFraction, tint: Brand.accent)
-                        ResourceBar(label: "NET", fraction: a.netLimit.usedFraction, tint: Brand.glow)
+                        ResourceBar(label: "CPU", fraction: a.cpuLimit.usedFraction, tint: Brand.accent,
+                                    detail: a.cpuLimit.max < 0 ? "Unlimited" : nil)
+                        ResourceBar(label: "NET", fraction: a.netLimit.usedFraction, tint: Brand.glow,
+                                    detail: a.netLimit.max < 0 ? "Unlimited" : nil)
                         ResourceBar(label: "RAM", fraction: a.ramFraction, tint: Brand.success,
-                                    detail: "\(a.ramUsage) / \(a.ramQuota) B")
+                                    detail: a.ramQuota < 0 ? "Unlimited" : "\(a.ramUsage) / \(a.ramQuota) B")
                     }
                 }
             }
