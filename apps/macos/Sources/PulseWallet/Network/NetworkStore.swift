@@ -74,7 +74,7 @@ final class NetworkStore {
         rpc: "https://rpc-testnet.pulsevm.dev",
         hyperion: "https://hyperion-testnet.pulsevm.dev",
         explorer: "https://testnet.explorer.pulsevm.dev",
-        chainId: "35376baa374c0fa5d710eb56b3bd9952c610df6c6f86fd95d9f2f3f6b86926db",
+        chainId: "d0b700440cf54372a022d065421ab48f2555bc7c496f6fe8131af42775e722e8",
         primarySymbol: "XPR")
 
     static var seed: [PulseNetwork] {
