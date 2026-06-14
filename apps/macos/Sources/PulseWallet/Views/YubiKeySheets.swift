@@ -121,6 +121,7 @@ struct LinkKeySheet: View {
 
     @State private var permission = "active"
     @State private var working = false
+    @State private var done = false
     @State private var status: String?
 
     private var currentPerm: Permission? {
@@ -153,11 +154,15 @@ struct LinkKeySheet: View {
                     .textSelection(.enabled)
             }
             Spacer()
-            HStack {
-                Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
-                Spacer()
-                PrimaryButton(title: working ? "Linking…" : "Link (updateauth)", systemImage: "link") { submit() }
-                    .frame(width: 220).disabled(working || currentPerm == nil)
+            if done {
+                PrimaryButton(title: "Done", systemImage: "checkmark") { dismiss() }
+            } else {
+                HStack {
+                    Button("Cancel") { dismiss() }.buttonStyle(.glass).controlSize(.large)
+                    Spacer()
+                    PrimaryButton(title: working ? "Linking…" : "Link (updateauth)", systemImage: "link") { submit() }
+                        .frame(width: 220).disabled(working || currentPerm == nil)
+                }
             }
         }
         .padding(24).frame(width: 480, height: 430)
@@ -197,8 +202,11 @@ struct LinkKeySheet: View {
                     refBlockPrefix: ctx.refBlockPrefix, expiration: ctx.expiration)
                 guard let preImage = Data(hexString: tx.preimage) else { status = "bad preimage"; working = false; return }
                 let sig = try await keyStore.sign(preImage: preImage, reason: "Link key to \(me)@\(permission)")
-                let txid = try await model.broadcast(signatures: [sig], packedTrx: tx.packed)
-                status = "Submitted: \(txid)"
+                _ = try await model.broadcast(signatures: [sig], packedTrx: tx.packed)
+                status = model.networkPaused
+                    ? "Submitted ✓ — queued. The chain is paused, so it applies once validators resume."
+                    : "Submitted ✓ — \(key.pubKey.prefix(16))… added to \(me)@\(permission)."
+                done = true
                 working = false
             } catch {
                 status = error.localizedDescription

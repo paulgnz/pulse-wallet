@@ -18,6 +18,13 @@ struct WalletKey: Identifiable, Codable, Hashable, Sendable {
 
     // Hardware-custodied (key material never in the app): Secure Enclave or YubiKey.
     var isHardwareBacked: Bool { kind == .enclave || kind == .yubiKey }
+
+    var kindLabel: String {
+        switch kind { case .enclave: "Secure Enclave"; case .yubiKey: "YubiKey"; case .imported: "Imported" }
+    }
+    var kindIcon: String {
+        switch kind { case .enclave: "touchid"; case .yubiKey: "key.radiowaves.forward"; case .imported: "key.fill" }
+    }
 }
 
 enum KeyStoreError: LocalizedError {
@@ -54,7 +61,9 @@ final class KeyStore {
 
     /// Flag any keys whose Keychain material can't be found (no Touch ID prompt).
     func runHealthCheck() {
-        unreadableKeyIDs = Set(keys.filter { !SecretVault.exists($0.id) }.map(\.id))
+        // YubiKey keys have no local material (the key lives on the device), so
+        // don't flag them as "missing / re-import".
+        unreadableKeyIDs = Set(keys.filter { $0.kind != .yubiKey && !SecretVault.exists($0.id) }.map(\.id))
     }
 
     var activeKey: WalletKey? { keys.first { $0.id == activeKeyID } }

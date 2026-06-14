@@ -121,14 +121,13 @@ private struct KeyRow: View {
                 ZStack {
                     Circle().fill((key.isHardwareBacked ? Brand.accent : Brand.glow).opacity(0.18))
                         .frame(width: 40, height: 40)
-                    Image(systemName: key.isHardwareBacked ? "touchid" : "key.fill")
+                    Image(systemName: key.kindIcon)
                         .foregroundStyle(key.isHardwareBacked ? Brand.accent : Brand.glow)
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Text(key.label).font(.body.weight(.semibold))
-                        badge(key.isHardwareBacked ? "Secure Enclave" : "Imported",
-                              tint: key.isHardwareBacked ? Brand.accent : Brand.glow)
+                        badge(key.kindLabel, tint: key.isHardwareBacked ? Brand.accent : Brand.glow)
                         badge(key.curve.rawValue.uppercased(), tint: .gray)
                         // "Signing key" = the wallet's selected key (not the @active permission).
                         if isActive { badge("Signing key", tint: Brand.success) }
