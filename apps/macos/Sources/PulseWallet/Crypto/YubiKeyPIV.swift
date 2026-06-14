@@ -40,13 +40,34 @@ enum YubiKeyPIV {
     }
 
     /// Read the compressed (33-byte) P-256 public key from a PIV slot.
+    /// Tries GET METADATA (firmware 5.3+); falls back to the slot certificate
+    /// (YubiKey 4 / NEO and any pre-5.3 device).
     static func publicKey(slot: UInt8) async throws -> Data {
         try await withCard { card in
-            let meta = try await transmit(card, apdu: [0x00, 0xF7, 0x00, slot])
-            guard let point = extractECPoint(fromMetadata: meta) else {
-                throw PIVError.metadataUnsupported
+            // 1) Metadata (fast path, fw 5.3+).
+            if let meta = try? await transmit(card, apdu: [0x00, 0xF7, 0x00, slot]),
+               let value = tlvValue(0x04, in: meta), let point = findP256Point(value) {
+                return compress(point)
+            }
+            // 2) Slot certificate (GET DATA) → extract the EC point from the X.509.
+            guard let obj = certObjectID(slot) else { throw PIVError.parse("unknown slot") }
+            let req = [0x5C, 0x03] + obj
+            let resp = try await transmit(card, apdu: [0x00, 0xCB, 0x3F, 0xFF] + lc(req) + req + [0x00])
+            let cert = tlvValue(0x70, in: tlvValue(0x53, in: resp) ?? resp) ?? resp
+            guard let point = findP256Point(cert) else {
+                throw PIVError.parse("No P-256 key/cert in slot — provision it (ykman piv keys generate -a ECCP256 \(String(format: "%02x", slot)) … and a certificate).")
             }
             return compress(point)
+        }
+    }
+
+    private static func certObjectID(_ slot: UInt8) -> [UInt8]? {
+        switch slot {
+        case 0x9a: return [0x5F, 0xC1, 0x05]
+        case 0x9c: return [0x5F, 0xC1, 0x0A]
+        case 0x9d: return [0x5F, 0xC1, 0x0B]
+        case 0x9e: return [0x5F, 0xC1, 0x01]
+        default:   return nil
         }
     }
 
@@ -147,21 +168,19 @@ enum YubiKeyPIV {
         return nil
     }
 
-    /// Pull the 65-byte uncompressed EC point (04‖X‖Y) out of a PIV metadata response.
-    private static func extractECPoint(fromMetadata meta: Data) -> Data? {
-        // metadata tag 0x04 = public; its value holds 86 41 04 X Y (point template).
-        let pub = tlvValue(0x04, in: meta) ?? meta
-        let bytes = [UInt8](pub)
-        // Find an uncompressed point: 0x04 followed by 64 bytes.
+    /// Find a 65-byte uncompressed P-256 point (04‖X‖Y) inside a value or cert DER.
+    /// The point is preceded by 0x41 in a metadata point template (86 41 04…) or
+    /// by 0x00 in a certificate BIT STRING (03 42 00 04…).
+    private static func findP256Point(_ data: Data) -> Data? {
+        let b = [UInt8](data)
+        if b.count == 65 && b[0] == 0x04 { return Data(b) }
         var i = 0
-        while i + 65 <= bytes.count {
-            if bytes[i] == 0x04 && (i == 0 || bytes[i - 1] == 0x41) {
-                return Data(bytes[i..<i + 65])
+        while i + 65 <= b.count {
+            if b[i] == 0x04, i > 0, b[i - 1] == 0x41 || b[i - 1] == 0x00 {
+                return Data(b[i..<i + 65])
             }
             i += 1
         }
-        // Fallback: value is exactly the 65-byte point.
-        if bytes.count == 65 && bytes[0] == 0x04 { return Data(bytes) }
         return nil
     }
 

@@ -2,8 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Access smart-card readers (YubiKey PIV) via CryptoTokenKit. -->
+    <key>com.apple.security.smartcard</key>
+    <true/>
     <!--
-      Intentionally empty. Keys live in the standard (file) login keychain, bound
+      Keys live in the standard (file) login keychain, bound
       to the app's code signature — so no keychain-access-groups / provisioning
       profile is needed (Mac apps signed "None Required" don't have one). Touch ID
       is enforced in-app via LAContext; Secure Enclave keys are hardware-protected.
