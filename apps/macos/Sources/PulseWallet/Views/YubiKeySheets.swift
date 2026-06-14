@@ -35,6 +35,8 @@ struct AddYubiKeySheet: View {
                     ForEach(YubiKeyPIV.slots, id: \.0) { Text($0.1).tag($0.0) }
                 }.labelsHidden().pickerStyle(.menu)
             }
+            Text("A “slot” is a key storage location on the YubiKey. Any works — **Authentication (9a)** is the standard choice. Each slot holds one key.")
+                .font(.caption2).foregroundStyle(.secondary)
             Toggle(isOn: $generate) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Generate a new key in this slot").font(.callout)

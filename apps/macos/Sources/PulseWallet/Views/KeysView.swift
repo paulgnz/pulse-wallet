@@ -31,6 +31,7 @@ struct KeysView: View {
                                onReimport: { store.delete(key); showImport = true })
                     }
                 }
+                accountKeysCard
                 if let err = errorMessage {
                     Label(err, systemImage: "exclamationmark.triangle")
                         .font(.callout).foregroundStyle(Brand.danger)
@@ -54,6 +55,106 @@ struct KeysView: View {
         .onAppear {
             if model.requestImportKey { showImport = true; model.requestImportKey = false }
         }
+    }
+
+    /// The loaded account's on-chain permission structure, with a marker showing
+    /// which keys this wallet actually holds. This is the "guide me based on my
+    /// account" view — it answers "what keys control my account, and do I have them?"
+    @ViewBuilder private var accountKeysCard: some View {
+        if let account = model.account {
+            GlassCard(padding: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.text.rectangle").foregroundStyle(Brand.accent)
+                        Text("\(model.accountName)’s account keys").font(.headline)
+                        Spacer()
+                        Text("on-chain").font(.caption2.weight(.semibold))
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(.gray.opacity(0.18), in: .capsule).foregroundStyle(.secondary)
+                    }
+                    Text("These are the keys that actually control your account. A ✓ means the key lives in this wallet and can sign; otherwise it's held elsewhere (paper backup, another device, or a co-signer).")
+                        .font(.caption).foregroundStyle(.secondary)
+
+                    ForEach(account.permissions.sorted { permRank($0.permName) < permRank($1.permName) }, id: \.permName) { perm in
+                        permissionBlock(perm)
+                    }
+
+                    if let tip = guidanceTip(account) {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: tip.icon).foregroundStyle(tip.tint)
+                            Text(tip.text).font(.caption).foregroundStyle(tip.tint)
+                        }
+                        .padding(10)
+                        .background(tip.tint.opacity(0.12), in: .rect(cornerRadius: 10))
+                    }
+                }
+            }
+        } else if !model.accountName.isEmpty {
+            GlassCard(padding: 16) {
+                Label("Load \(model.accountName) to see its on-chain keys and which ones you hold.",
+                      systemImage: "arrow.down.circle")
+                    .font(.callout).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder private func permissionBlock(_ perm: Permission) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: perm.permName == "owner" ? "crown.fill" : "key.fill")
+                    .font(.caption).foregroundStyle(perm.permName == "owner" ? Brand.warn : Brand.accent)
+                Text("@\(perm.permName)").font(.subheadline.weight(.semibold))
+                Text("threshold \(perm.requiredAuth.threshold)").font(.caption2).foregroundStyle(.secondary)
+                if perm.permName != "owner" {
+                    Text("· parent @\(perm.parent)").font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+            ForEach(perm.requiredAuth.keys, id: \.key) { entry in
+                let held = store.keys.first { $0.pubKey == entry.key }
+                HStack(spacing: 8) {
+                    Image(systemName: held != nil ? "checkmark.circle.fill" : "circle.dashed")
+                        .font(.caption).foregroundStyle(held != nil ? Brand.success : .secondary)
+                    Text(entry.key).font(.caption.monospaced()).foregroundStyle(.secondary)
+                        .lineLimit(1).truncationMode(.middle).textSelection(.enabled)
+                    if perm.requiredAuth.threshold > 1 || entry.weight > 1 {
+                        Text("w\(entry.weight)").font(.caption2).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if let held {
+                        Text(held.label).font(.caption2.weight(.medium)).foregroundStyle(Brand.success)
+                            .lineLimit(1)
+                    } else {
+                        Text("not in this wallet").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(.leading, 2)
+    }
+
+    private func permRank(_ name: String) -> Int { name == "owner" ? 0 : (name == "active" ? 1 : 2) }
+
+    /// One contextual nudge based on how the account is actually set up.
+    private func guidanceTip(_ account: AccountInfo) -> (text: String, icon: String, tint: Color)? {
+        let held = Set(store.keys.map(\.pubKey))
+        let ownerKeys = account.permissions.first { $0.permName == "owner" }?.requiredAuth.keys.map(\.key) ?? []
+        let activeKeys = account.permissions.first { $0.permName == "active" }?.requiredAuth.keys.map(\.key) ?? []
+        // No controlling key at all → can't sign anything.
+        if !ownerKeys.contains(where: held.contains) && !activeKeys.contains(where: held.contains) {
+            return ("This wallet doesn't hold any key that controls \(model.accountName). Import or link one of the keys above to sign transactions.",
+                    "exclamationmark.triangle.fill", Brand.danger)
+        }
+        // Holds owner in a hot wallet → recommend moving owner to cold storage.
+        if ownerKeys.contains(where: held.contains) {
+            return ("Your owner key is in this wallet. The owner key is your master recovery key — for larger balances, keep it on a YubiKey or paper backup and sign day-to-day with @active.",
+                    "lightbulb.fill", Brand.warn)
+        }
+        // Healthy: active held, owner cold.
+        if activeKeys.contains(where: held.contains) {
+            return ("Good setup: you sign with @active and your owner key is held elsewhere as a recovery path.",
+                    "checkmark.seal.fill", Brand.success)
+        }
+        return nil
     }
 
     private var header: some View {
