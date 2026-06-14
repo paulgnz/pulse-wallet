@@ -10,8 +10,18 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/paulgnz/pulse-wallet/releases/latest">
+    <img src="https://img.shields.io/badge/⬇%20Download%20for%20macOS-.dmg-4F7CFF?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" height="44" />
+  </a>
+  <br/>
+  <sub>macOS 26+ · signed &amp; notarized · free &amp; open source · beta (A-Chain testnet)</sub>
+</p>
+
+<p align="center">
   <img src="docs/screenshot-wallet.png" width="760" alt="PulseVM Wallet — dashboard" />
 </p>
+
+> **Just want the app?** → **[Download the latest release](https://github.com/paulgnz/pulse-wallet/releases/latest)**, open the `.dmg`, drag **PulseVM** into Applications. (Signed + notarized — no security warnings.)
 
 ---
 
