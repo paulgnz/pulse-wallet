@@ -70,7 +70,7 @@ final class NetworkStore {
         id: UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!,
         label: "XPR Network Pulse Testnet",
         rpc: "https://rpc-testnet.pulsevm.dev",
-        hyperion: "",
+        hyperion: "https://hyperion-testnet.pulsevm.dev",
         explorer: "https://testnet.explorer.pulsevm.dev",
         chainId: "47e1b7605ad091d456bc33161ec5e52f11bb9ba9fadc6aec914e70a20c0f2821",
         primarySymbol: "XPR")
