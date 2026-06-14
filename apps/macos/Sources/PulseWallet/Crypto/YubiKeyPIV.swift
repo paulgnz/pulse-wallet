@@ -28,10 +28,12 @@ enum YubiKeyPIV {
     }
 
     // Common PIV slots for digital signature / authentication.
-    static let slots: [(UInt8, String)] = [(0x9a, "Authentication (9a)"),
-                                           (0x9c, "Digital Signature (9c)"),
-                                           (0x9d, "Key Management (9d)"),
-                                           (0x9e, "Card Authentication (9e)")]
+    /// (slot byte, menu label, role description shown as a hint). 9a is the default.
+    static let slots: [(UInt8, String, String)] = [
+        (0x9a, "9a — Authentication · recommended", "Standard slot for a day-to-day @active key. PIN required, caching allowed."),
+        (0x9c, "9c — Digital Signature", "PIN required on every signature (no caching) — best for a high-assurance @owner key."),
+        (0x9d, "9d — Key Management", "Originally for encryption keys. Works for signing too."),
+        (0x9e, "9e — Card Authentication", "No PIN required (touch-only) — weaker; avoid for keys controlling value.")]
 
     private static let aid: [UInt8] = [0xA0, 0x00, 0x00, 0x03, 0x08, 0x00, 0x00, 0x10, 0x00, 0x01, 0x00]
 

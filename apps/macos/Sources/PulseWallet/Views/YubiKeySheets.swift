@@ -15,6 +15,7 @@ struct AddYubiKeySheet: View {
     @State private var localError: String?
 
     private var present: Bool { YubiKeyPIV.isPresent() }
+    private var slotRole: String { YubiKeyPIV.slots.first { $0.0 == slot }?.2 ?? "" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -35,7 +36,7 @@ struct AddYubiKeySheet: View {
                     ForEach(YubiKeyPIV.slots, id: \.0) { Text($0.1).tag($0.0) }
                 }.labelsHidden().pickerStyle(.menu)
             }
-            Text("A “slot” is a key storage location on the YubiKey. Any works — **Authentication (9a)** is the standard choice. Each slot holds one key.")
+            Text("A “slot” is a key storage location on the YubiKey (each holds one key). \(slotRole)")
                 .font(.caption2).foregroundStyle(.secondary)
             Toggle(isOn: $generate) {
                 VStack(alignment: .leading, spacing: 1) {
