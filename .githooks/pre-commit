@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Block commits containing private keys (Antelope WIF / PVT_K1_ / PVT_R1_).
+# The public EOS dev key is an allowed known-answer test vector.
+ALLOW='5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'
+added=$(git diff --cached -U0 | grep -E '^\+' | grep -vE '^\+\+\+')
+hits=$(printf '%s\n' "$added" | grep -nE '5[HJK][1-9A-HJ-NP-Za-km-z]{48,51}|PVT_K1_[1-9A-HJ-NP-Za-km-z]{40,}|PVT_R1_[1-9A-HJ-NP-Za-km-z]{40,}' | grep -v "$ALLOW" || true)
+if [ -n "$hits" ]; then
+  echo "🚫 pre-commit: possible PRIVATE KEY in staged changes — blocked:"
+  echo "$hits"
+  echo "If it's a known public test vector, add it to ALLOW in .githooks/pre-commit."
+  exit 1
+fi
+command -v gitleaks >/dev/null 2>&1 && { gitleaks protect --staged --no-banner -c .gitleaks.toml || { echo "🚫 gitleaks blocked the commit."; exit 1; }; }
+exit 0

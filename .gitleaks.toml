@@ -1,0 +1,6 @@
+title = "pulse-wallet"
+[extend]
+useDefault = true
+[[allowlists]]
+description = "Public EOS development key — a documented known-answer test vector, not a secret."
+regexes = ['''5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3''']

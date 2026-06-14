@@ -52,7 +52,14 @@ enum YubiKeyPIV {
             // 2) Slot certificate (GET DATA) → extract the EC point from the X.509.
             guard let obj = certObjectID(slot) else { throw PIVError.parse("unknown slot") }
             let req = [0x5C, 0x03] + obj
-            let resp = try await transmit(card, apdu: [0x00, 0xCB, 0x3F, 0xFF] + lc(req) + req + [0x00])
+            let slotHex = String(format: "%02x", slot)
+            let resp: Data
+            do {
+                resp = try await transmit(card, apdu: [0x00, 0xCB, 0x3F, 0xFF] + lc(req) + req + [0x00])
+            } catch PIVError.apdu(0x6A82) {
+                // Object not found = the slot has no certificate (empty / pre-5.3 device).
+                throw PIVError.parse("Slot \(slotHex) is empty. Provision an R1 key + cert:  ykman piv keys generate -a ECCP256 \(slotHex) pub.pem  &&  ykman piv certificates generate -s CN=pulse \(slotHex) pub.pem")
+            }
             let cert = tlvValue(0x70, in: tlvValue(0x53, in: resp) ?? resp) ?? resp
             guard let point = findP256Point(cert) else {
                 throw PIVError.parse("No P-256 key/cert in slot — provision it (ykman piv keys generate -a ECCP256 \(String(format: "%02x", slot)) … and a certificate).")

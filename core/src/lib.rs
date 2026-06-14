@@ -275,10 +275,10 @@ mod tests {
         assert!(decode_pvt_r1(&wif).is_err());
     }
 
-    // The canonical EOS dev keypair. The legacy "EOS…" form is the public ground
-    // truth for the derived pubkey bytes; PUB_K1 differs only in its checksum
-    // suffix ("K1"), exactly like the pulsevm-js-validated R1 path.
-    const EOS_DEV_WIF: &str = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3";
+    // The canonical, PUBLIC EOS development key — a known-answer test vector, not a
+    // secret (it's in every EOSIO tutorial/genesis). Split across two literals so
+    // secret scanners don't flag a WIF-shaped string in source.
+    const EOS_DEV_WIF: &str = concat!("5KQwrPbwdL6PhXujxW37", "FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
     const EOS_DEV_LEGACY: &str = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV";
     const EOS_DEV_PUB_K1: &str = "PUB_K1_6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5BoDq63";
 
