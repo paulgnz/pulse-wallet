@@ -45,13 +45,15 @@ final class NetworkStore {
             loaded = NetworkStore.seed
         }
         var nets = loaded
-        // Migration: ensure the XPR Network Pulse Testnet is present AND its
-        // endpoints are refreshed to the latest (existing installs get the new
-        // rpc-testnet.pulsevm.dev / explorer URLs), keyed by its chain id.
-        if let i = nets.firstIndex(where: { $0.chainId == NetworkStore.pulseTestnet.chainId }) {
+        // Migration: ensure the XPR Network Pulse Testnet is present AND refreshed,
+        // keyed by its STABLE id (its chain_id changes on every chain relaunch — PulseVM
+        // derives it from the Avalanche blockchainID — so we refresh chainId in place
+        // rather than appending a dead duplicate each rebuild).
+        if let i = nets.firstIndex(where: { $0.id == NetworkStore.pulseTestnet.id }) {
             nets[i].rpc = NetworkStore.pulseTestnet.rpc
             nets[i].explorer = NetworkStore.pulseTestnet.explorer
             nets[i].hyperion = NetworkStore.pulseTestnet.hyperion
+            nets[i].chainId = NetworkStore.pulseTestnet.chainId
         } else {
             nets.append(NetworkStore.pulseTestnet)
         }
@@ -72,7 +74,7 @@ final class NetworkStore {
         rpc: "https://rpc-testnet.pulsevm.dev",
         hyperion: "https://hyperion-testnet.pulsevm.dev",
         explorer: "https://testnet.explorer.pulsevm.dev",
-        chainId: "201d08f73e5a72be8a1b5bc8f33f371219d89e21094b03530e29fec6d726e0ef",
+        chainId: "25ca8f0ab74b88b13d861021989dc10193e3270a66bd70a15bca0615f9dc6bb2",
         primarySymbol: "XPR")
 
     static var seed: [PulseNetwork] {
