@@ -315,7 +315,14 @@ final class AppModel {
             if let tokens = try? await hyperion?.getTokens(accountName), !tokens.isEmpty {
                 assets = sorted(tokens.map(Asset.init(token:)))
             } else {
-                assets = sorted(Self.coreAssets(from: a))
+                // No indexer → core_liquid_balance is often null on PulseVM, so query
+                // the token contract directly for the primary symbol.
+                var core = Self.coreAssets(from: a)
+                if core.isEmpty, let bals = try? await rpc.getCurrencyBalance(
+                        code: "pulse.token", account: accountName, symbol: primarySymbol) {
+                    core = bals.compactMap { Asset(balanceString: $0, contract: "pulse.token", role: .value) }
+                }
+                assets = sorted(core)
             }
 
             // Recent history (best-effort; empty if indexer unavailable).
