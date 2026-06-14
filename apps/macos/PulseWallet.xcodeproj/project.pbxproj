@@ -10,6 +10,7 @@
 		0093BAD19BA60039704185CE /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0E759D6B7D50CB345B1E32 /* ComingSoonView.swift */; };
 		08D1FE78B555E850F01AE797 /* Hyperion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE7891077FC4FDC8B7002AE /* Hyperion.swift */; };
 		09BB9D6FA9BC1954BBCD16B1 /* KeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320D8A92D151F0FF17E2DC83 /* KeyStore.swift */; };
+		0ED4ED63D6F5188A07C0221F /* PermissionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3F08748343E77110F0083C /* PermissionsSheet.swift */; };
 		136D57B564649E7D600689EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3415124985CAAF63350F0BB7 /* Assets.xcassets */; };
 		18720D060BD811A105F0C63F /* StakeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826C3A0682E237C794F27DED /* StakeSheet.swift */; };
 		227763B316A637302CE0C75F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13029EAE706A34911065861E /* Models.swift */; };
@@ -24,7 +25,6 @@
 		40684E27788DB0AA0ED2FF65 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED00983BCEA7586B91D3F8A /* Sidebar.swift */; };
 		493A5DADE001156F6B99DDB4 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FC2C0D8FA258ACAC588FE /* SendView.swift */; };
 		56F8B096E94C096D1B76B2D6 /* Biometrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE2872F95290C0C2024BCB1 /* Biometrics.swift */; };
-		57E93E5155AC480F95D08259 /* UpdateAuthSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */; };
 		59747BF54046AFE46FF1C001 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5683B2975215EE839C7D7028 /* RootView.swift */; };
 		5B0916AFF4A3527BCD0B85F8 /* DataHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA718630DE93EEEAE5AB4CDC /* DataHex.swift */; };
 		7309BED486CDDE68317678BF /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BD05E9A1D174E2DD0E55D4 /* QRCode.swift */; };
@@ -76,6 +76,7 @@
 		5951D210555DC50EA36E1A5B /* DappRequestSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappRequestSheet.swift; sourceTree = "<group>"; };
 		7565A5201A525117526CF9E4 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		78440EE6283769BDF3E38093 /* PulseWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWalletApp.swift; sourceTree = "<group>"; };
+		7A3F08748343E77110F0083C /* PermissionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsSheet.swift; sourceTree = "<group>"; };
 		7ED00983BCEA7586B91D3F8A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		7F4AC6D391E73F3C113B9068 /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
 		826C3A0682E237C794F27DED /* StakeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSheet.swift; sourceTree = "<group>"; };
@@ -93,11 +94,10 @@
 		D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreen.swift; sourceTree = "<group>"; };
 		EA718630DE93EEEAE5AB4CDC /* DataHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHex.swift; sourceTree = "<group>"; };
 		EAE1D7B9716513661393FD3A /* WelcomeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeSheet.swift; sourceTree = "<group>"; };
-		F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAuthSheet.swift; sourceTree = "<group>"; };
 		F4032B3283902766E647154A /* AccountHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHealth.swift; sourceTree = "<group>"; };
 		F4B1EEFEB2E72680C6C808D3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F55D58BFECA263D8B812953C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		"TEMP_65341C43-8EBB-4DF8-9567-4F852E4F14C1" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		"TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -155,6 +155,7 @@
 				988744519E80C7631A1550B1 /* KeysView.swift */,
 				D68ABF30F197DCCB9C3E2D6B /* LockScreen.swift */,
 				0963F1C4442FCBABC7261C01 /* MultisigView.swift */,
+				7A3F08748343E77110F0083C /* PermissionsSheet.swift */,
 				58CCCAE0F795AF0A764816B3 /* ReceiveView.swift */,
 				5683B2975215EE839C7D7028 /* RootView.swift */,
 				3D662578D2653106B2A91782 /* RotateKeySheet.swift */,
@@ -163,7 +164,6 @@
 				7ED00983BCEA7586B91D3F8A /* Sidebar.swift */,
 				826C3A0682E237C794F27DED /* StakeSheet.swift */,
 				7F4AC6D391E73F3C113B9068 /* ToolsView.swift */,
-				F0F1025006EADA44B3A7CD16 /* UpdateAuthSheet.swift */,
 				EAE1D7B9716513661393FD3A /* WelcomeSheet.swift */,
 				39AB1E94A8D538B465083D8A /* YubiKeySheets.swift */,
 			);
@@ -231,10 +231,10 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		"TEMP_A5E25BC5-E9F4-4BA6-91EE-85CFE09B0EB0" /* macos */ = {
+		"TEMP_D47CAE16-75C1-4F76-B575-E5F338E0BB98" /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_65341C43-8EBB-4DF8-9567-4F852E4F14C1" /* Signing.xcconfig */,
+				"TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -331,6 +331,7 @@
 				227763B316A637302CE0C75F /* Models.swift in Sources */,
 				BEC49AA9E87AF795843DA76A /* MultisigView.swift in Sources */,
 				36598184A7A34289D9A76A03 /* NetworkStore.swift in Sources */,
+				0ED4ED63D6F5188A07C0221F /* PermissionsSheet.swift in Sources */,
 				AD7DC9ED9FA2972EA70A9CA5 /* PulseCore.swift in Sources */,
 				8A5CFEADD088763B63634E50 /* PulseCoreFFI.swift in Sources */,
 				2D80351ED5E347B638B5DEB7 /* PulseRPC.swift in Sources */,
@@ -347,7 +348,6 @@
 				2FFFD4045968AEFF34F33511 /* Theme.swift in Sources */,
 				EE3BA5A63E951B6D3A251EBC /* ThemeStore.swift in Sources */,
 				87D9A358DFD66E49795200DD /* ToolsView.swift in Sources */,
-				57E93E5155AC480F95D08259 /* UpdateAuthSheet.swift in Sources */,
 				AB530338B4CD02518EB0DEF8 /* WalletError.swift in Sources */,
 				B02FE8BFF708DAA3B089A101 /* WelcomeSheet.swift in Sources */,
 				89E3B60CDE9432BE91A99A8B /* YubiKeyPIV.swift in Sources */,
@@ -432,7 +432,7 @@
 		};
 		5F6DBD0E0632EFEC875ADF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_65341C43-8EBB-4DF8-9567-4F852E4F14C1" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -530,7 +530,7 @@
 		};
 		D1BEC9BEA8C2B7BEE726581D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_65341C43-8EBB-4DF8-9567-4F852E4F14C1" /* Signing.xcconfig */;
+			baseConfigurationReference = "TEMP_D8D88D23-656E-41FC-BC85-B6C08C3EB001" /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

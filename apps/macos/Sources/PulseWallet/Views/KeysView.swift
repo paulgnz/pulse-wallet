@@ -45,7 +45,7 @@ struct KeysView: View {
         .task { store.runHealthCheck() }
         .sheet(isPresented: $showNew) { NewEnclaveKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showImport) { ImportKeySheet(error: $errorMessage) }
-        .sheet(isPresented: $showUpdateAuth) { UpdateAuthSheet() }
+        .sheet(isPresented: $showUpdateAuth) { PermissionsSheet() }
         .sheet(isPresented: $showRotate) { RotateKeySheet() }
         .sheet(isPresented: $showYubiKey) { AddYubiKeySheet(error: $errorMessage) }
         .sheet(isPresented: $showUnlock) { UnlockYubiKeySheet() }
@@ -174,7 +174,7 @@ struct KeysView: View {
                 glassBtn("Import Key", "square.and.arrow.down") { showImport = true }
             }
             HStack(spacing: 12) {
-                glassBtn("Set Account Keys", "person.badge.key") { showUpdateAuth = true }
+                glassBtn("Permissions", "person.badge.key") { showUpdateAuth = true }
                 glassBtn("Rotate Key", "arrow.triangle.2.circlepath") { showRotate = true }
             }
             HStack(spacing: 12) {
