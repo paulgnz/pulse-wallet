@@ -118,8 +118,8 @@ struct NetworkPill: View {
                 Text("· paused @ \(n)").font(.caption).foregroundStyle(.secondary)
             }
         }
-        .padding(.horizontal, 12).padding(.vertical, 6)
-        .glassEffect(.regular, in: .capsule)
+        // The .principal toolbar item already provides a glass capsule on Tahoe —
+        // don't add a second one here, or it renders as a pill-inside-a-pill.
         .help(model.chainInfo.map { "Head \($0.headBlockNum) · v\($0.serverVersion)" } ?? "Connecting…")
     }
 }
