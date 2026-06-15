@@ -48,6 +48,10 @@ final class AppModel {
     var chainName: String { networks.active.label }
     /// The token shown as the headline balance (value token; SYS is resource).
     var primarySymbol: String { networks.active.primarySymbol }
+    /// Core token contract detected on connect by probing the chain (eosio.token on
+    /// XPR / the 1:1 migrated chain, pulse.token on pre-1:1 PulseVM). Used for the
+    /// headline balance and as the default contract for sends of the primary symbol.
+    var coreTokenContract: String = "eosio.token"
 
     /// Chain logic backed by the Rust core (validated vs pulsevm-js).
     let core: PulseCore = PulseCoreFFI()
@@ -155,13 +159,12 @@ final class AppModel {
             ?? assets.first
     }
 
-    /// The network is paused if the head block hasn't advanced recently.
-    var networkPaused: Bool {
-        guard let t = chainInfo?.headBlockTime, let d = Self.parseChainTime(t) else { return false }
-        // Single-node testnets only mint blocks on activity (heartbeat ~15s); allow
-        // generous margin so brief idle gaps don't read as "paused".
-        return Date().timeIntervalSince(d) > 300
-    }
+    /// PulseVM (Avalanche subnet) mints blocks ON DEMAND — between transactions the
+    /// head block time is naturally stale, which is normal, NOT paused. So we never
+    /// infer "paused" from head-time staleness (that was a false alarm). Liveness is
+    /// reflected by whether getInfo requests succeed (connection errors surface
+    /// separately). Reserved for a real halt signal if one becomes available.
+    var networkPaused: Bool { false }
 
     // MARK: Actions
 
@@ -327,12 +330,21 @@ final class AppModel {
             if let tokens = try? await hyperion?.getTokens(accountName), !tokens.isEmpty {
                 assets = sorted(tokens.map(Asset.init(token:)))
             } else {
-                // No indexer → core_liquid_balance is often null on PulseVM, so query
-                // the token contract directly for the primary symbol.
+                // No indexer → core_liquid_balance is null on PulseVM. Detect the core
+                // token contract by probing the standard namespaces for the primary symbol:
+                // `eosio.token` (XPR / the 1:1 migrated chain) or `pulse.token` (pre-1:1
+                // PulseVM). First contract that returns the symbol wins — so the wallet
+                // adapts to whichever system contracts the chain actually runs.
                 var core = Self.coreAssets(from: a)
-                if core.isEmpty, let bals = try? await rpc.getCurrencyBalance(
-                        code: "pulse.token", account: accountName, symbol: primarySymbol) {
-                    core = bals.compactMap { Asset(balanceString: $0, contract: "pulse.token", role: .value) }
+                if core.isEmpty {
+                    for c in ["eosio.token", "pulse.token", "token"] {
+                        if let bals = try? await rpc.getCurrencyBalance(
+                                code: c, account: accountName, symbol: primarySymbol), !bals.isEmpty {
+                            core = bals.compactMap { Asset(balanceString: $0, contract: c, role: .value) }
+                            coreTokenContract = c
+                            break
+                        }
+                    }
                 }
                 assets = sorted(core)
             }
