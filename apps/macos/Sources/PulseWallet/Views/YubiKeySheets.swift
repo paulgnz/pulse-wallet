@@ -199,7 +199,7 @@ struct LinkKeySheet: View {
         Task {
             do {
                 let tx = try model.core.buildUpdateAuth(
-                    systemContract: "pulse", account: me, permission: permission, parent: parent,
+                    systemContract: model.systemContract, account: me, permission: permission, parent: parent,
                     threshold: threshold, keys: keyStr, authActor: me, authPerm: model.permissionName,
                     chainId: ctx.chainId, refBlockNum: ctx.refBlockNum,
                     refBlockPrefix: ctx.refBlockPrefix, expiration: ctx.expiration)

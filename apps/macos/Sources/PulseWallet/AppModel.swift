@@ -52,6 +52,10 @@ final class AppModel {
     /// XPR / the 1:1 migrated chain, pulse.token on pre-1:1 PulseVM). Used for the
     /// headline balance and as the default contract for sends of the primary symbol.
     var coreTokenContract: String = "eosio.token"
+    /// System contract account, inferred from the detected token namespace
+    /// (eosio.token → "eosio", pulse.token → "pulse"). Used for the native system
+    /// actions updateauth/deleteauth/linkauth/unlinkauth.
+    var systemContract: String { coreTokenContract.hasPrefix("pulse") ? "pulse" : "eosio" }
 
     /// Chain logic backed by the Rust core (validated vs pulsevm-js).
     let core: PulseCore = PulseCoreFFI()

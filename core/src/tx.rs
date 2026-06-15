@@ -426,24 +426,36 @@ pub fn refund_data(owner: &str) -> Vec<u8> {
 
 use crate::ripemd_checksum;
 
-/// Antelope binary public key: type byte (0=K1, 1=R1) ‖ 33-byte compressed key.
+/// Antelope binary public key (variant): type byte (0=K1, 1=R1, 2=WA) ‖ key body.
+/// K1/R1 bodies are a 33-byte compressed point. WA (WebAuthn) bodies are variable —
+/// 33-byte point ‖ user_presence(1) ‖ rpid(string) — already serialized inside the
+/// PUB_WA_ payload, so we copy it through verbatim. Required because migrated XPR
+/// accounts carry WebAuthn keys in their authorities, and updateauth re-serializes
+/// the whole authority (existing keys kept).
 pub fn pub_to_binary(s: &str) -> Result<Vec<u8>, String> {
-    let (ty, body, suffix): (u8, &str, &[u8]) = if let Some(b) = s.strip_prefix("PUB_K1_") {
-        (0, b, b"K1")
-    } else if let Some(b) = s.strip_prefix("PUB_R1_") {
-        (1, b, b"R1")
-    } else {
-        return Err("expected PUB_K1_/PUB_R1_".into());
-    };
+    let (ty, body, suffix, fixed33): (u8, &str, &[u8], bool) =
+        if let Some(b) = s.strip_prefix("PUB_K1_") {
+            (0, b, b"K1", true)
+        } else if let Some(b) = s.strip_prefix("PUB_R1_") {
+            (1, b, b"R1", true)
+        } else if let Some(b) = s.strip_prefix("PUB_WA_") {
+            (2, b, b"WA", false)
+        } else {
+            return Err("expected PUB_K1_/PUB_R1_/PUB_WA_".into());
+        };
     let data = bs58::decode(body).into_vec().map_err(|e| e.to_string())?;
-    if data.len() != 37 {
+    if data.len() < 5 {
         return Err("bad public key length".into());
     }
-    let (key, cs) = data.split_at(33);
+    // Last 4 bytes are the ripemd160(key‖suffix) checksum; the rest is the key body.
+    let (key, cs) = data.split_at(data.len() - 4);
+    if fixed33 && key.len() != 33 {
+        return Err("bad public key length".into());
+    }
     if &ripemd_checksum(key, suffix)[..] != cs {
         return Err("public key checksum mismatch".into());
     }
-    let mut out = Vec::with_capacity(34);
+    let mut out = Vec::with_capacity(1 + key.len());
     out.push(ty);
     out.extend_from_slice(key);
     Ok(out)
@@ -696,6 +708,16 @@ pub fn parse_perm_levels(s: &str) -> Vec<PermLevel> {
 #[cfg(test)]
 mod tx_tests {
     use super::*;
+
+    #[test]
+    fn pub_to_binary_handles_webauthn_key() {
+        // A real WebAuthn key migrated into protonnz's authority — updateauth must be
+        // able to re-serialize it (variant type 2, variable-length body).
+        let wa = "PUB_WA_27389444ccZ7nRD4LSZHYzmay1ZtNkT9JfxEnxwUaHGjAhSsNtgZxNqMYBTgKBqQKTyzfEBcv5UVD3n";
+        let bin = pub_to_binary(wa).expect("WA key must serialize");
+        assert_eq!(bin[0], 2, "WebAuthn variant type byte");
+        assert!(bin.len() > 34, "WA body = 33B point + presence + rpid (variable)");
+    }
 
     #[test]
     fn name_encoding_matches_known_values() {

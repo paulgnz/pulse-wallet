@@ -30,7 +30,7 @@ struct PermissionsSheet: View {
     @State private var lContract = ""
     @State private var lAction = ""
 
-    private let systemContract = "pulse"
+    private var systemContract: String { model.systemContract }
     private typealias Tapos = (chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32)
 
     var body: some View {
