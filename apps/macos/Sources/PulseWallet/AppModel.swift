@@ -209,7 +209,9 @@ final class AppModel {
             pendingRequest = PendingRequest(request: .login(callback: callback), relay: relay)
         case "sign":
             guard let packed = q("packed_trx") else { return }
-            let cid = q("chain_id") ?? networks.active.chainId ?? chainInfo?.chainId ?? ""
+            // Prefer the request's explicit chain_id, then the LIVE node chain_id; the stored
+            // network value is the last resort (it can be stale across chain relaunches).
+            let cid = q("chain_id") ?? chainInfo?.chainId ?? networks.active.chainId ?? ""
             // Query values use form-encoding where '+' means space.
             let summary = (q("summary") ?? "External transaction").replacingOccurrences(of: "+", with: " ")
             pendingRequest = PendingRequest(request: .sign(chainId: cid, packedTrx: packed, summary: summary, callback: callback), relay: relay)
@@ -279,7 +281,7 @@ final class AppModel {
     func taposContext() -> (chainId: String, refBlockNum: UInt16, refBlockPrefix: UInt32, expiration: UInt32)? {
         guard let info = chainInfo, let prefix = Self.refBlockPrefix(blockIdHex: info.headBlockId)
         else { return nil }
-        let chainId = networks.active.chainId ?? info.chainId
+        let chainId = info.chainId   // live chain_id from getInfo (never the stale stored one)
         return (chainId, UInt16(truncatingIfNeeded: info.headBlockNum), prefix,
                 UInt32(Date().timeIntervalSince1970) + 3600)  // proposals: longer expiry
     }
@@ -309,6 +311,16 @@ final class AppModel {
             let (i, a) = try await (info, acct)
             chainInfo = i
             account = a
+
+            // Keep the stored network's chain_id in sync with what the endpoint actually
+            // reports — PulseVM rotates it on every relaunch. This makes Settings show the
+            // live chain_id and keeps any fallback paths correct, so the wallet never gets
+            // "stuck" on a stale id after a chain rebuild.
+            var act = networks.active
+            if act.chainId != i.chainId {
+                act.chainId = i.chainId
+                networks.update(act)
+            }
 
             // Prefer Hyperion for full multi-token discovery; fall back to the
             // system core balance if the indexer is unavailable.
@@ -397,7 +409,10 @@ final class AppModel {
               let qty = Self.formatQuantity(amount, precision: asset.precision, symbol: symbol),
               let prefix = Self.refBlockPrefix(blockIdHex: info.headBlockId)
         else { return nil }
-        let chainId = networks.active.chainId ?? info.chainId
+        // Always sign with the LIVE chain_id from the connected node — PulseVM derives
+        // it from the Avalanche blockchainID, so it changes on every chain relaunch and a
+        // stored value goes stale (the #1 cause of "stuck"/invalid-signature). Live wins.
+        let chainId = info.chainId
         return TransferDraft(
             from: accountName, to: to.trimmingCharacters(in: .whitespaces),
             quantity: qty, memo: memo, contract: asset.contract,
