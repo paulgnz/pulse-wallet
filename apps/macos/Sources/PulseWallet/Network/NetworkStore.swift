@@ -68,22 +68,27 @@ final class NetworkStore {
     }
 
     /// Our self-hosted XPR Network Pulse Testnet (stable id → idempotent migration).
+    /// OFFLINE: the 1:1 chain is decommissioned pending its v0.6.x-era rebuild —
+    /// entry retained so saved accounts survive; endpoints will be repointed at relaunch.
     static let pulseTestnet = PulseNetwork(
         id: UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!,
-        label: "XPR Network Pulse Testnet",
+        label: "XPR 1:1 Testnet (offline — rebuild pending)",
         rpc: "https://rpc-testnet.pulsevm.dev",
         hyperion: "https://hyperion-testnet.pulsevm.dev",
         explorer: "https://testnet.explorer.pulsevm.dev",
         chainId: "b0f66414aa5b498bcaf099366d92dde9c79b8a40065b43056fb75741e88374bb",
         primarySymbol: "XPR")
 
+    /// A-Chain Alpine (reset 2026-08-05). NOTE: Alpine resets frequently during
+    /// consensus hardening — current endpoints/chain id live at
+    /// https://pulsevm.dev/network/endpoints
     static var seed: [PulseNetwork] {
         [PulseNetwork(
-            label: "A-Chain Testnet",
-            rpc: "https://rpc.a-chain-testnet.protonnz.com",
-            hyperion: "https://hyperion.a-chain-testnet.protonnz.com",
+            label: "A-Chain Alpine Testnet",
+            rpc: "https://a-chain-alpine.metalblockchain.org/ext/bc/C6tuBzT2M3TZHyWc5Ro6L3cJyoxRAPy9avJeNh3FPzkBswXgX/rpc",
+            hyperion: "https://a-chain-alpine-hyperion.metalblockchain.org",
             explorer: "https://a-chain-testnet.metalblockchain.org",
-            chainId: "0d6f033e887fae475d641104b6e87762b6c869e87a101afeeb64d608ab376618",
+            chainId: "193526980f523c07a567dda80f5f543e2356518ce1475cf3e03d98ca740b3f67",
             primarySymbol: "XPR"),
          pulseTestnet]
     }
