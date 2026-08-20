@@ -50,10 +50,12 @@ final class NetworkStore {
         // derives it from the Avalanche blockchainID — so we refresh chainId in place
         // rather than appending a dead duplicate each rebuild).
         if let i = nets.firstIndex(where: { $0.id == NetworkStore.pulseTestnet.id }) {
+            nets[i].label = NetworkStore.pulseTestnet.label
             nets[i].rpc = NetworkStore.pulseTestnet.rpc
             nets[i].explorer = NetworkStore.pulseTestnet.explorer
             nets[i].hyperion = NetworkStore.pulseTestnet.hyperion
             nets[i].chainId = NetworkStore.pulseTestnet.chainId
+            nets[i].primarySymbol = NetworkStore.pulseTestnet.primarySymbol
         } else {
             nets.append(NetworkStore.pulseTestnet)
         }
@@ -68,29 +70,29 @@ final class NetworkStore {
     }
 
     /// Our self-hosted XPR Network Pulse Testnet (stable id → idempotent migration).
-    /// OFFLINE: the 1:1 chain is decommissioned pending its v0.6.x-era rebuild —
-    /// entry retained so saved accounts survive; endpoints will be repointed at relaunch.
+    /// LIVE: fresh Aug-15-snapshot import chain on Tahoe (base block 400588707) with a
+    /// hyperion-rs history stack — the flagship 1:1 demo network.
     static let pulseTestnet = PulseNetwork(
         id: UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!,
-        label: "XPR 1:1 Testnet (offline — rebuild pending)",
-        rpc: "https://rpc-testnet.pulsevm.dev",
-        hyperion: "https://hyperion-testnet.pulsevm.dev",
+        label: "XPR 1:1 Testnet (Tahoe)",
+        rpc: "https://xpr-rpc-testnet.pulsevm.dev",
+        hyperion: "https://xpr-hyperion-testnet.pulsevm.dev",
         explorer: "https://testnet.explorer.pulsevm.dev",
-        chainId: "b0f66414aa5b498bcaf099366d92dde9c79b8a40065b43056fb75741e88374bb",
+        chainId: "71ee83bcf52142d61019d95f9cc5427ba6a0d7ff8accd9e2088ae2abeaf3d3dd",
         primarySymbol: "XPR")
 
     /// A-Chain Alpine (reset 2026-08-05). NOTE: Alpine resets frequently during
     /// consensus hardening — current endpoints/chain id live at
     /// https://pulsevm.dev/network/endpoints
     static var seed: [PulseNetwork] {
-        [PulseNetwork(
+        [pulseTestnet,
+         PulseNetwork(
             label: "A-Chain Alpine Testnet",
             rpc: "https://a-chain-alpine.metalblockchain.org/ext/bc/C6tuBzT2M3TZHyWc5Ro6L3cJyoxRAPy9avJeNh3FPzkBswXgX/rpc",
             hyperion: "https://a-chain-alpine-hyperion.metalblockchain.org",
             explorer: "https://a-chain-testnet.metalblockchain.org",
             chainId: "193526980f523c07a567dda80f5f543e2356518ce1475cf3e03d98ca740b3f67",
-            primarySymbol: "XPR"),
-         pulseTestnet]
+            primarySymbol: "XPR")]
     }
 
     var active: PulseNetwork { networks.first { $0.id == selectedID } ?? networks[0] }
