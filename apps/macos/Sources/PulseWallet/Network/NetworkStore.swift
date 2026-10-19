@@ -45,20 +45,11 @@ final class NetworkStore {
             loaded = NetworkStore.seed
         }
         var nets = loaded
-        // Migration: ensure the XPR Network Pulse Testnet is present AND refreshed,
-        // keyed by its STABLE id (its chain_id changes on every chain relaunch — PulseVM
-        // derives it from the Avalanche blockchainID — so we refresh chainId in place
-        // rather than appending a dead duplicate each rebuild).
-        if let i = nets.firstIndex(where: { $0.id == NetworkStore.pulseTestnet.id }) {
-            nets[i].label = NetworkStore.pulseTestnet.label
-            nets[i].rpc = NetworkStore.pulseTestnet.rpc
-            nets[i].explorer = NetworkStore.pulseTestnet.explorer
-            nets[i].hyperion = NetworkStore.pulseTestnet.hyperion
-            nets[i].chainId = NetworkStore.pulseTestnet.chainId
-            nets[i].primarySymbol = NetworkStore.pulseTestnet.primarySymbol
-        } else {
-            nets.append(NetworkStore.pulseTestnet)
-        }
+        // Migration: drop the retired XPR 1:1 demo network preset (its endpoints
+        // went offline 2026-10-19), keyed by its stable id. If it was the only
+        // saved network, fall back to the seed list.
+        nets.removeAll { $0.id == NetworkStore.retiredDemoNetworkID }
+        if nets.isEmpty { nets = NetworkStore.seed }
         self.networks = nets
         if let s = UserDefaults.standard.string(forKey: selKey), let uid = UUID(uuidString: s),
            nets.contains(where: { $0.id == uid }) {
@@ -69,24 +60,16 @@ final class NetworkStore {
         persist()
     }
 
-    /// Our self-hosted XPR Network Pulse Testnet (stable id → idempotent migration).
-    /// LIVE: fresh Aug-15-snapshot import chain on Tahoe (base block 400588707) with a
-    /// hyperion-rs history stack — the flagship 1:1 demo network.
-    static let pulseTestnet = PulseNetwork(
-        id: UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!,
-        label: "XPR 1:1 Testnet (Tahoe)",
-        rpc: "https://xpr-rpc-testnet.pulsevm.dev",
-        hyperion: "https://xpr-hyperion-testnet.pulsevm.dev",
-        explorer: "https://testnet.explorer.pulsevm.dev",
-        chainId: "71ee83bcf52142d61019d95f9cc5427ba6a0d7ff8accd9e2088ae2abeaf3d3dd",
-        primarySymbol: "XPR")
+    /// Stable id of the former "XPR 1:1 Testnet (Tahoe)" preset. That demo network
+    /// was retired on 2026-10-19; XPR→PulseVM cutover testing is in progress and
+    /// public test endpoints will be listed at https://pulsevm.dev/network/endpoints.
+    static let retiredDemoNetworkID = UUID(uuidString: "2E5C9A10-0001-4000-8000-000000000001")!
 
     /// A-Chain Alpine (reset 2026-08-05). NOTE: Alpine resets frequently during
     /// consensus hardening — current endpoints/chain id live at
     /// https://pulsevm.dev/network/endpoints
     static var seed: [PulseNetwork] {
-        [pulseTestnet,
-         PulseNetwork(
+        [PulseNetwork(
             label: "A-Chain Alpine Testnet",
             rpc: "https://a-chain-alpine.metalblockchain.org/ext/bc/C6tuBzT2M3TZHyWc5Ro6L3cJyoxRAPy9avJeNh3FPzkBswXgX/rpc",
             hyperion: "https://a-chain-alpine-hyperion.metalblockchain.org",
